@@ -11,6 +11,9 @@ import com.manojbuilds.nagly.db.NaglyDatabase
 import com.manojbuilds.nagly.notifications.IgnoredNudgeStore
 import com.manojbuilds.nagly.notifications.NotificationCoordinator
 import com.manojbuilds.nagly.notifications.NudgeScheduler
+import com.manojbuilds.nagly.push.FakePushClient
+import com.manojbuilds.nagly.push.PushClient
+import com.manojbuilds.nagly.push.PushTagSync
 import com.manojbuilds.nagly.ui.history.HistoryStateHolder
 import com.manojbuilds.nagly.ui.onboarding.OnboardingStateHolder
 import com.manojbuilds.nagly.ui.today.TodayStateHolder
@@ -33,6 +36,7 @@ fun commonModule(): Module = module {
     }
     single { OnboardingStateHolder(get(), get(), get(), get()) }
     single { HistoryStateHolder(get(), get()) }
+    single { PushTagSync(get(), get(), get(), get()) }
 
     // Sandbox ↔ production swap lives here only.
     single<BillingRepository> {
@@ -41,6 +45,14 @@ fun commonModule(): Module = module {
         } else {
             // TODO: bind RevenueCatBillingRepository when keys exist
             FakeBillingRepository(get())
+        }
+    }
+    single<PushClient> {
+        if (Integrations.SANDBOX_MODE) {
+            FakePushClient()
+        } else {
+            // TODO: bind OneSignalPushClient when ONESIGNAL_APP_ID exists
+            FakePushClient()
         }
     }
 }
