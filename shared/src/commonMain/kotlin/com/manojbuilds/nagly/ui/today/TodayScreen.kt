@@ -52,6 +52,7 @@ import com.manojbuilds.nagly.ui.designsystem.NaglySpacing
 import com.manojbuilds.nagly.ui.designsystem.components.MoodRing
 import com.manojbuilds.nagly.ui.designsystem.components.PillButton
 import com.manojbuilds.nagly.ui.designsystem.components.PillButtonVariant
+import com.manojbuilds.nagly.ui.designsystem.components.RelationshipMeterChip
 import com.manojbuilds.nagly.ui.designsystem.components.SpeechBubble
 import com.manojbuilds.nagly.ui.designsystem.components.WaveBottle
 import com.manojbuilds.nagly.ui.designsystem.moodColor
@@ -125,6 +126,14 @@ fun TodayScreen(
                 )
             }
         }
+
+        RelationshipMeterChip(
+            level = state.relationshipLevel,
+            progressToNext = state.relationshipProgress,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = NaglySpacing.xs),
+        )
 
         // Character zone ~35%
         Box(

@@ -109,6 +109,8 @@ fun App() {
                             selectedId = goal.personaId,
                             unlockExpiries = unlockExpiries,
                             isPro = onboardingState.isPro,
+                            relationshipLevel = todayState.relationshipLevel,
+                            relationshipProgress = todayState.relationshipProgress,
                             onSelect = { id ->
                                 onboardingHolder.savePersonaOnly(id) {}
                             },

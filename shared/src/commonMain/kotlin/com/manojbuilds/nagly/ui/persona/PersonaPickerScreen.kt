@@ -2,6 +2,7 @@ package com.manojbuilds.nagly.ui.persona
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -12,7 +13,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.manojbuilds.nagly.domain.RelationshipLevel
 import com.manojbuilds.nagly.ui.designsystem.NaglySpacing
+import com.manojbuilds.nagly.ui.designsystem.components.RelationshipMeterChip
 import com.manojbuilds.nagly.domain.PersonaCatalog
 import com.manojbuilds.nagly.domain.model.Persona
 import com.manojbuilds.nagly.domain.model.Relationship
@@ -29,6 +32,8 @@ fun PersonaPickerScreen(
     onLockedRelationship: (Relationship) -> Unit = { relationship ->
         onLockedClick(previewPersonaForRelationship(relationship.id))
     },
+    relationshipLevel: RelationshipLevel = RelationshipLevel.STRANGER,
+    relationshipProgress: Float = 0f,
     nowMs: Long = Clock.System.now().toEpochMilliseconds(),
 ) {
     var relationshipId by rememberSaveable {
@@ -45,6 +50,14 @@ fun PersonaPickerScreen(
             if (showVariants) "Pick their vibe" else "Pick your nagger",
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(bottom = NaglySpacing.sm),
+        )
+
+        RelationshipMeterChip(
+            level = relationshipLevel,
+            progressToNext = relationshipProgress,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = NaglySpacing.sm),
         )
 
         if (showVariants) {

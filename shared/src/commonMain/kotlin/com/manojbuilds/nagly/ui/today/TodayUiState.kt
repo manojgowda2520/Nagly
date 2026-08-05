@@ -2,6 +2,7 @@ package com.manojbuilds.nagly.ui.today
 
 import com.manojbuilds.nagly.domain.model.DrinkLog
 import com.manojbuilds.nagly.domain.model.Mood
+import com.manojbuilds.nagly.domain.RelationshipLevel
 
 data class TodayUiState(
     val personaName: String = "",
@@ -21,4 +22,6 @@ data class TodayUiState(
     val drinks: List<DrinkLog> = emptyList(),
     val recentCustomMl: Int? = null,
     val nextNudgeLabel: String = "",
+    val relationshipLevel: RelationshipLevel = RelationshipLevel.STRANGER,
+    val relationshipProgress: Float = 0f,
 )

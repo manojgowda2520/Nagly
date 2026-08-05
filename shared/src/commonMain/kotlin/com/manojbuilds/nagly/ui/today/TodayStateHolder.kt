@@ -8,7 +8,10 @@ import com.manojbuilds.nagly.domain.computeMood
 import com.manojbuilds.nagly.domain.currentStreak
 import com.manojbuilds.nagly.domain.dayPartFor
 import com.manojbuilds.nagly.domain.expectedRatio
+import com.manojbuilds.nagly.domain.computeRelationshipLevel
+import com.manojbuilds.nagly.domain.countDaysMetGoalInWindow
 import com.manojbuilds.nagly.domain.pickLine
+import com.manojbuilds.nagly.domain.relationshipProgressToNext
 import com.manojbuilds.nagly.domain.model.DrinkLog
 import com.manojbuilds.nagly.domain.model.Mood
 import com.manojbuilds.nagly.domain.model.UserGoal
@@ -113,6 +116,17 @@ class TodayStateHolder(
             formatCountdown(nextAt - nowMs)
         }
 
+        val daysMet = countDaysMetGoalInWindow(logsByDay, goal.dailyMl, today = today)
+        val bondLevel = computeRelationshipLevel(
+            currentStreak(logsByDay, goal.dailyMl, today),
+            daysMet,
+        )
+        val bondProgress = relationshipProgressToNext(
+            bondLevel,
+            currentStreak(logsByDay, goal.dailyMl, today),
+            daysMet,
+        )
+
         return TodayUiState(
             personaName = persona.displayName,
             personaEmoji = persona.emoji,
@@ -131,6 +145,8 @@ class TodayStateHolder(
             drinks = todayLogs.sortedByDescending { it.timestampMs },
             recentCustomMl = recentCustom,
             nextNudgeLabel = nextLabel,
+            relationshipLevel = bondLevel,
+            relationshipProgress = bondProgress,
         )
     }
 
