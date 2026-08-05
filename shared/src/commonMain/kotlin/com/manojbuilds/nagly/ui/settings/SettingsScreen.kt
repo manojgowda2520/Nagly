@@ -27,6 +27,7 @@ import com.manojbuilds.nagly.domain.volumeUnitLabel
 import com.manojbuilds.nagly.platform.PlatformActions
 import com.manojbuilds.nagly.ui.designsystem.NaglySpacing
 import com.manojbuilds.nagly.ui.designsystem.components.NaglyCard
+import com.manojbuilds.nagly.ui.designsystem.components.PersonaEmptyState
 import com.manojbuilds.nagly.ui.designsystem.components.PillButton
 import com.manojbuilds.nagly.ui.designsystem.components.PillButtonVariant
 import kotlin.math.roundToInt
@@ -45,13 +46,12 @@ fun SettingsScreen(
     onDismissMessage: () -> Unit,
 ) {
     if (state.isLoading) {
-        Column(
+        PersonaEmptyState(
+            personaEmoji = state.personaEmoji,
+            personaName = state.personaLabel.substringAfter(" ").ifBlank { "Your nagger" },
+            line = state.loadingLine,
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            CircularProgressIndicator()
-        }
+        )
         return
     }
 

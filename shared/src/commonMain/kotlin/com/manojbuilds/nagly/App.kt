@@ -9,6 +9,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,6 +41,9 @@ import com.manojbuilds.nagly.ui.persona.UnlockSheet
 import com.manojbuilds.nagly.ui.persona.previewPersonaForRelationship
 import com.manojbuilds.nagly.ui.settings.SettingsScreen
 import com.manojbuilds.nagly.ui.settings.SettingsStateHolder
+import com.manojbuilds.nagly.ui.splash.SplashScreen
+import com.manojbuilds.nagly.platform.LocalHaptics
+import com.manojbuilds.nagly.platform.rememberPlatformHaptics
 import com.manojbuilds.nagly.ui.theme.NaglyTheme
 import com.manojbuilds.nagly.ui.today.TodayScreen
 import com.manojbuilds.nagly.ui.today.TodayStateHolder
@@ -49,11 +53,24 @@ import org.koin.compose.koinInject
 @Composable
 fun App() {
     NaglyTheme {
-        Surface(
-            modifier = Modifier
-                .fillMaxSize()
-                .safeContentPadding(),
-        ) {
+        val haptics = rememberPlatformHaptics()
+        var showSplash by remember { mutableStateOf(true) }
+        CompositionLocalProvider(LocalHaptics provides haptics) {
+            if (showSplash) {
+                SplashScreen(onFinished = { showSplash = false })
+            } else {
+                AppContent(                )
+            }
+        }
+    }
+}
+@Composable
+private fun AppContent() {
+    Surface(
+        modifier = Modifier
+            .fillMaxSize()
+            .safeContentPadding(),
+    ) {
             val goalRepository = koinInject<GoalRepository>()
             val unlockRepository = koinInject<UnlockRepository>()
             val goal by goalRepository.observeGoal().collectAsState(
@@ -250,4 +267,3 @@ fun App() {
             }
         }
     }
-}

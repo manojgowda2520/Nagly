@@ -1,5 +1,13 @@
 package com.manojbuilds.nagly.ui.designsystem.components
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -17,6 +25,7 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.manojbuilds.nagly.ui.designsystem.NaglyShapes
+import com.manojbuilds.nagly.ui.designsystem.NaglyMotion
 import com.manojbuilds.nagly.ui.designsystem.NaglySpacing
 import com.manojbuilds.nagly.ui.designsystem.LocalNaglyColors
 import androidx.compose.foundation.Canvas
@@ -58,6 +67,38 @@ fun SpeechBubble(
                     top = NaglySpacing.sm,
                     bottom = NaglySpacing.sm + NaglySpacing.xxs,
                 ),
+        )
+    }
+}
+
+@Composable
+fun SpeechBubbleAnimated(
+    text: String,
+    modifier: Modifier = Modifier,
+    backgroundColor: Color? = null,
+    textColor: Color? = null,
+    textStyle: TextStyle = MaterialTheme.typography.bodyLarge,
+    tailAtStart: Boolean = true,
+) {
+    AnimatedContent(
+        targetState = text,
+        modifier = modifier,
+        transitionSpec = {
+            (scaleIn(initialScale = 0.92f, animationSpec = tween(NaglyMotion.DurationNormal)) +
+                fadeIn(animationSpec = tween(NaglyMotion.DurationNormal)))
+                .togetherWith(
+                    scaleOut(targetScale = 0.92f, animationSpec = tween(NaglyMotion.DurationFast)) +
+                        fadeOut(animationSpec = tween(NaglyMotion.DurationFast)),
+                )
+        },
+        label = "speechExpand",
+    ) { line ->
+        SpeechBubble(
+            text = line,
+            backgroundColor = backgroundColor,
+            textColor = textColor,
+            textStyle = textStyle,
+            tailAtStart = tailAtStart,
         )
     }
 }

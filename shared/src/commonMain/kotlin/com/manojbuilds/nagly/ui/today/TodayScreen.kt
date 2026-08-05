@@ -37,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
@@ -45,6 +46,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.manojbuilds.nagly.domain.model.Mood
+import com.manojbuilds.nagly.platform.LocalHaptics
 import com.manojbuilds.nagly.ui.designsystem.LocalNaglyColors
 import com.manojbuilds.nagly.ui.designsystem.NaglyMotion
 import com.manojbuilds.nagly.ui.designsystem.NaglyShapes
@@ -53,7 +55,7 @@ import com.manojbuilds.nagly.ui.designsystem.components.MoodRing
 import com.manojbuilds.nagly.ui.designsystem.components.PillButton
 import com.manojbuilds.nagly.ui.designsystem.components.PillButtonVariant
 import com.manojbuilds.nagly.ui.designsystem.components.RelationshipMeterChip
-import com.manojbuilds.nagly.ui.designsystem.components.SpeechBubble
+import com.manojbuilds.nagly.ui.designsystem.components.SpeechBubbleAnimated
 import com.manojbuilds.nagly.ui.designsystem.components.WaveBottle
 import com.manojbuilds.nagly.ui.designsystem.moodColor
 import kotlin.time.Instant
@@ -71,14 +73,28 @@ fun TodayScreen(
     onOpenPersonas: () -> Unit = {},
 ) {
     val colors = LocalNaglyColors.current
+    val haptics = LocalHaptics.current
     var showCustomDialog by remember { mutableStateOf(false) }
     var logPulse by remember { mutableStateOf(false) }
+    var showDroplet by remember { mutableStateOf(false) }
     var prevConsumed by remember { mutableStateOf(state.consumedMl) }
+    fun logWithFeedback(amount: Int) {
+        haptics.lightTap()
+        logPulse = !logPulse
+        showDroplet = true
+        onLog(amount)
+    }
     LaunchedEffect(state.consumedMl) {
         if (state.consumedMl > prevConsumed) {
-            logPulse = !logPulse
+            if (state.progress >= 1f) haptics.success()
         }
         prevConsumed = state.consumedMl
+    }
+    LaunchedEffect(showDroplet) {
+        if (showDroplet) {
+            kotlinx.coroutines.delay(800)
+            showDroplet = false
+        }
     }
     val animatedProgress by animateFloatAsState(
         targetValue = state.progress,
@@ -107,6 +123,9 @@ fun TodayScreen(
             .padding(horizontal = NaglySpacing.sm, vertical = NaglySpacing.xs),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        if (showDroplet) {
+            FloatingDroplet(modifier = Modifier.padding(bottom = NaglySpacing.xxs))
+        }
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -162,7 +181,7 @@ fun TodayScreen(
             }
         }
 
-        SpeechBubble(
+        SpeechBubbleAnimated(
             text = state.personaLine.ifBlank { "Loading your nag..." },
             modifier = Modifier
                 .fillMaxWidth()
@@ -225,19 +244,19 @@ fun TodayScreen(
             horizontalArrangement = Arrangement.spacedBy(NaglySpacing.xs),
         ) {
             PillButton(
-                onClick = { onLog(250) },
+                onClick = { logWithFeedback(250) },
                 modifier = Modifier.weight(1f),
                 variant = PillButtonVariant.Primary,
             ) { Text("+250") }
             PillButton(
-                onClick = { onLog(500) },
+                onClick = { logWithFeedback(500) },
                 modifier = Modifier.weight(1f),
                 variant = PillButtonVariant.Accent,
             ) { Text("+500") }
             val custom = state.recentCustomMl
             if (custom != null) {
                 PillButton(
-                    onClick = { onLog(custom) },
+                    onClick = { logWithFeedback(custom) },
                     modifier = Modifier.weight(1f),
                     variant = PillButtonVariant.Outlined,
                 ) { Text("+$custom") }
@@ -310,7 +329,7 @@ fun TodayScreen(
                         val amount = text.toIntOrNull()
                         if (amount != null && amount > 0) {
                             showCustomDialog = false
-                            onLog(amount)
+                            logWithFeedback(amount)
                         }
                     },
                 ) { Text("Log it") }
@@ -380,4 +399,21 @@ private fun formatTime(timestampMs: Long): String {
     val local = Instant.fromEpochMilliseconds(timestampMs)
         .toLocalDateTime(TimeZone.currentSystemDefault())
     return local.hour.toString().padStart(2, '0') + ":" + local.minute.toString().padStart(2, '0')
+}
+
+@Composable
+private fun FloatingDroplet(modifier: Modifier = Modifier) {
+    val offsetY = remember { androidx.compose.animation.core.Animatable(0f) }
+    val alpha = remember { androidx.compose.animation.core.Animatable(1f) }
+    LaunchedEffect(Unit) {
+        offsetY.animateTo(-48f, tween(700, easing = FastOutSlowInEasing))
+        alpha.animateTo(0f, tween(300))
+    }
+    Text(
+        text = "💧",
+        fontSize = 28.sp,
+        modifier = modifier
+            .offset(y = offsetY.value.dp)
+            .alpha(alpha.value),
+    )
 }
