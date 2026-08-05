@@ -37,7 +37,9 @@ import com.manojbuilds.nagly.ui.paywall.PaywallScreen
 import com.manojbuilds.nagly.ui.persona.FakeAdOverlay
 import com.manojbuilds.nagly.ui.persona.PersonaPickerScreen
 import com.manojbuilds.nagly.ui.persona.UnlockSheet
+import com.manojbuilds.nagly.ui.persona.previewPersonaForRelationship
 import com.manojbuilds.nagly.ui.settings.SettingsScreen
+import com.manojbuilds.nagly.ui.settings.SettingsStateHolder
 import com.manojbuilds.nagly.ui.theme.NaglyTheme
 import com.manojbuilds.nagly.ui.today.TodayScreen
 import com.manojbuilds.nagly.ui.today.TodayStateHolder
@@ -75,6 +77,8 @@ fun App() {
             val onboardingState by onboardingHolder.uiState.collectAsState()
             val historyHolder = koinInject<HistoryStateHolder>()
             val historyState by historyHolder.uiState.collectAsState()
+            val settingsHolder = koinInject<SettingsStateHolder>()
+            val settingsState by settingsHolder.uiState.collectAsState()
             val billing = koinInject<BillingRepository>()
             val adClient = koinInject<AdClient>()
             val expiryWatcher = koinInject<UnlockExpiryWatcher>()
@@ -99,17 +103,13 @@ fun App() {
                             onOpenHistory = { screen = Screen.History },
                             onOpenPersonas = { screen = Screen.Personas },
                         )
-                        Screen.History -> HistoryScreen(
-                            state = historyState,
-                            onBack = { screen = Screen.Today },
-                        )
+                        Screen.History -> HistoryScreen(state = historyState)
                         Screen.Personas -> PersonaPickerScreen(
                             selectedId = goal.personaId,
                             unlockExpiries = unlockExpiries,
+                            isPro = onboardingState.isPro,
                             onSelect = { id ->
-                                onboardingHolder.savePersonaOnly(id) {
-                                    screen = Screen.Today
-                                }
+                                onboardingHolder.savePersonaOnly(id) {}
                             },
                             canSelect = { persona ->
                                 onboardingHolder.canSelect(
@@ -119,9 +119,22 @@ fun App() {
                                 )
                             },
                             onLockedClick = { persona -> lockedPersona = persona },
-                            onBack = { screen = Screen.Today },
+                            onLockedRelationship = { relationship ->
+                                lockedPersona = previewPersonaForRelationship(relationship.id)
+                            },
                         )
-                        Screen.Settings -> SettingsScreen()
+                        Screen.Settings -> SettingsScreen(
+                            state = settingsState,
+                            onDailyGoalChange = settingsHolder::setDailyDisplay,
+                            onVolumeUnitChange = settingsHolder::setVolumeUnit,
+                            onWakeChange = settingsHolder::setWakeHour,
+                            onSleepChange = settingsHolder::setSleepHour,
+                            onNotificationsChange = settingsHolder::setNotificationsEnabled,
+                            onOpenPersonas = { screen = Screen.Personas },
+                            onRestorePurchases = settingsHolder::restorePurchases,
+                            onRequestPermission = settingsHolder::requestNotificationPermission,
+                            onDismissMessage = settingsHolder::clearMessages,
+                        )
                         else -> Unit
                     }
                 }
@@ -130,22 +143,20 @@ fun App() {
                     Screen.Onboarding -> OnboardingScreen(
                         state = onboardingState,
                         onWeightChange = onboardingHolder::setWeight,
-                        onManualMlChange = onboardingHolder::setManualMl,
-                        onSelectPersona = { id ->
-                            val persona = PersonaCatalog.get(id)
-                            if (onboardingHolder.canSelect(
-                                    persona,
-                                    onboardingState.unlockedIds,
-                                    onboardingState.isPro,
-                                )
-                            ) {
-                                onboardingHolder.selectPersona(id)
-                            } else if (PersonaCatalog.isPro(persona)) {
+                        onActivityChange = onboardingHolder::setActivity,
+                        onSelectRelationship = onboardingHolder::selectRelationship,
+                        onSelectPersona = onboardingHolder::selectPersona,
+                        onLockedRelationship = { relationship ->
+                            lockedPersona = previewPersonaForRelationship(relationship.id)
+                        },
+                        onLockedPersona = { persona ->
+                            if (PersonaCatalog.isPro(persona)) {
                                 lockedPersona = persona
                             }
                         },
                         onWakeChange = onboardingHolder::setWakeHour,
                         onSleepChange = onboardingHolder::setSleepHour,
+                        onLogFirstGlass = onboardingHolder::logFirstGlass,
                         onNext = onboardingHolder::next,
                         onBack = onboardingHolder::back,
                         onFinish = {
@@ -159,6 +170,7 @@ fun App() {
                             )
                         },
                         permissionLine = onboardingHolder.permissionLine(),
+                        unlockExpiries = unlockExpiries,
                     )
                     Screen.Paywall -> PaywallScreen(
                         purchasing = purchasing,
@@ -200,7 +212,6 @@ fun App() {
                                 onboardingHolder.selectPersona(persona.id)
                                 onboardingHolder.savePersonaOnly(persona.id) {}
                                 lockedPersona = null
-                                screen = Screen.Today
                             }
                         }
                     },

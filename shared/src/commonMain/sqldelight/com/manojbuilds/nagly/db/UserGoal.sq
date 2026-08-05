@@ -4,7 +4,8 @@ CREATE TABLE user_goal (
   wakeHour INTEGER NOT NULL,
   sleepHour INTEGER NOT NULL,
   personaId TEXT NOT NULL,
-  onboarded INTEGER NOT NULL DEFAULT 0
+  onboarded INTEGER NOT NULL DEFAULT 0,
+  volumeUnit INTEGER NOT NULL DEFAULT 0
 );
 
 select:
@@ -13,5 +14,5 @@ FROM user_goal
 WHERE id = 1;
 
 upsert:
-INSERT OR REPLACE INTO user_goal(id, dailyMl, wakeHour, sleepHour, personaId, onboarded)
-VALUES (1, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO user_goal(id, dailyMl, wakeHour, sleepHour, personaId, onboarded, volumeUnit)
+VALUES (1, ?, ?, ?, ?, ?, ?);

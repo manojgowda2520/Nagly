@@ -4,6 +4,7 @@ import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToOneOrNull
 import com.manojbuilds.nagly.db.NaglyDatabase
 import com.manojbuilds.nagly.domain.model.UserGoal
+import com.manojbuilds.nagly.domain.model.VolumeUnit
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.Flow
@@ -29,6 +30,7 @@ class GoalRepository(
             sleepHour = goal.sleepHour.toLong(),
             personaId = goal.personaId,
             onboarded = if (goal.onboarded) 1L else 0L,
+            volumeUnit = goal.volumeUnit.ordinal.toLong(),
         )
     }
 
@@ -38,6 +40,7 @@ class GoalRepository(
         sleepHour = sleepHour.toInt(),
         personaId = personaId,
         onboarded = onboarded != 0L,
+        volumeUnit = VolumeUnit.entries.getOrElse(volumeUnit.toInt()) { VolumeUnit.ML },
     )
 
     companion object {
@@ -47,6 +50,7 @@ class GoalRepository(
             sleepHour = 22,
             personaId = "indian_mom",
             onboarded = false,
+            volumeUnit = VolumeUnit.ML,
         )
     }
 }

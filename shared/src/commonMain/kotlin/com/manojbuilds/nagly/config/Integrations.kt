@@ -21,4 +21,10 @@ object Integrations {
 
     // TODO: AdMob rewarded unit id
     const val ADMOB_REWARDED_UNIT_ID: String = ""
+
+    const val PRIVACY_URL: String = "https://example.com/nagly/privacy"
+    const val TERMS_URL: String = "https://example.com/nagly/terms"
+    const val MANAGE_SUBSCRIPTION_URL: String = "https://example.com/nagly/subscription"
+    const val SUPPORT_EMAIL: String = "support@example.com"
+    const val SHARE_MESSAGE: String = "Stay hydrated with Nagly — your family nags you to drink water. https://example.com/nagly"
 }

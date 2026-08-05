@@ -7,6 +7,8 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.mp.KoinPlatform
 
 fun initKoinAndroid(context: Context) {
+    com.manojbuilds.nagly.platform.PlatformActions.init { context }
+    com.manojbuilds.nagly.platform.AppInfo.init { context }
     initKoin(platformModules = listOf(androidPlatformModule())) {
         androidContext(context)
     }
