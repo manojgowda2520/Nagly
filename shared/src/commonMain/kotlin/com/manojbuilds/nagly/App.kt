@@ -2,7 +2,10 @@ package com.manojbuilds.nagly
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -12,16 +15,24 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.manojbuilds.nagly.ads.AdClient
+import com.manojbuilds.nagly.ads.FakeAdClient
 import com.manojbuilds.nagly.billing.BillingRepository
 import com.manojbuilds.nagly.data.GoalRepository
+import com.manojbuilds.nagly.data.UnlockRepository
 import com.manojbuilds.nagly.domain.PersonaCatalog
+import com.manojbuilds.nagly.domain.TEMP_UNLOCK_MS
+import com.manojbuilds.nagly.domain.UnlockExpiryWatcher
+import com.manojbuilds.nagly.domain.model.Persona
 import com.manojbuilds.nagly.ui.history.HistoryScreen
 import com.manojbuilds.nagly.ui.history.HistoryStateHolder
 import com.manojbuilds.nagly.ui.navigation.Screen
 import com.manojbuilds.nagly.ui.onboarding.OnboardingScreen
 import com.manojbuilds.nagly.ui.onboarding.OnboardingStateHolder
 import com.manojbuilds.nagly.ui.paywall.PaywallScreen
+import com.manojbuilds.nagly.ui.persona.FakeAdOverlay
 import com.manojbuilds.nagly.ui.persona.PersonaPickerScreen
+import com.manojbuilds.nagly.ui.persona.UnlockSheet
 import com.manojbuilds.nagly.ui.theme.NaglyTheme
 import com.manojbuilds.nagly.ui.today.TodayScreen
 import com.manojbuilds.nagly.ui.today.TodayStateHolder
@@ -37,9 +48,12 @@ fun App() {
                 .safeContentPadding(),
         ) {
             val goalRepository = koinInject<GoalRepository>()
+            val unlockRepository = koinInject<UnlockRepository>()
             val goal by goalRepository.observeGoal().collectAsState(
                 initial = GoalRepository.DEFAULT_GOAL,
             )
+            val unlockExpiries by unlockRepository.observeUnlockExpiries()
+                .collectAsState(initial = emptyMap())
             var screen by remember { mutableStateOf<Screen?>(null) }
             LaunchedEffect(goal.onboarded) {
                 if (screen == null) {
@@ -57,8 +71,13 @@ fun App() {
             val historyHolder = koinInject<HistoryStateHolder>()
             val historyState by historyHolder.uiState.collectAsState()
             val billing = koinInject<BillingRepository>()
+            val adClient = koinInject<AdClient>()
+            val expiryWatcher = koinInject<UnlockExpiryWatcher>()
+            val expiryMessage by expiryWatcher.expiryMessage.collectAsState()
             val scope = rememberCoroutineScope()
             var purchasing by remember { mutableStateOf(false) }
+            var lockedPersona by remember { mutableStateOf<Persona?>(null) }
+            var watchingAd by remember { mutableStateOf(false) }
 
             when (currentScreen) {
                 Screen.Today -> TodayScreen(
@@ -74,6 +93,7 @@ fun App() {
                 )
                 Screen.PersonaPicker -> PersonaPickerScreen(
                     selectedId = goal.personaId,
+                    unlockExpiries = unlockExpiries,
                     onSelect = { id ->
                         onboardingHolder.savePersonaOnly(id) {
                             screen = Screen.Today
@@ -86,7 +106,7 @@ fun App() {
                             onboardingState.isPro,
                         )
                     },
-                    onLockedClick = { screen = Screen.Paywall },
+                    onLockedClick = { persona -> lockedPersona = persona },
                     onBack = { screen = Screen.Today },
                 )
                 Screen.Onboarding -> OnboardingScreen(
@@ -103,7 +123,7 @@ fun App() {
                         ) {
                             onboardingHolder.selectPersona(id)
                         } else if (persona.isPro) {
-                            screen = Screen.Paywall
+                            lockedPersona = persona
                         }
                     },
                     onWakeChange = onboardingHolder::setWakeHour,
@@ -141,6 +161,57 @@ fun App() {
                         }
                     },
                     onClose = { screen = Screen.PersonaPicker },
+                )
+            }
+
+            lockedPersona?.let { persona ->
+                UnlockSheet(
+                    persona = persona,
+                    isPro = onboardingState.isPro,
+                    watchingAd = watchingAd,
+                    onWatchAd = {
+                        scope.launch {
+                            watchingAd = true
+                            adClient.loadRewarded()
+                            val result = adClient.showRewarded()
+                            watchingAd = false
+                            if (result.isSuccess) {
+                                unlockRepository.grant(persona.id, TEMP_UNLOCK_MS)
+                                onboardingHolder.selectPersona(persona.id)
+                                onboardingHolder.savePersonaOnly(persona.id) {}
+                                lockedPersona = null
+                                screen = Screen.Today
+                            }
+                        }
+                    },
+                    onGoPro = {
+                        lockedPersona = null
+                        screen = Screen.Paywall
+                    },
+                    onDismiss = { lockedPersona = null },
+                )
+            }
+
+            if (watchingAd) {
+                FakeAdOverlay(
+                    personaName = lockedPersona?.displayName ?: "her",
+                    onCancel = {
+                        (adClient as? FakeAdClient)?.cancel()
+                        watchingAd = false
+                    },
+                )
+            }
+
+            expiryMessage?.let { message ->
+                AlertDialog(
+                    onDismissRequest = expiryWatcher::clearExpiryMessage,
+                    title = { Text("She's gone for now") },
+                    text = { Text(message) },
+                    confirmButton = {
+                        TextButton(onClick = expiryWatcher::clearExpiryMessage) {
+                            Text("Okay")
+                        }
+                    },
                 )
             }
         }

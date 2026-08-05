@@ -17,13 +17,18 @@ class UnlockRepository(
     private val queries get() = database.personaUnlockQueries
 
     fun observeUnlocked(): Flow<Set<String>> {
+        return observeUnlockExpiries().map { it.keys }
+    }
+
+    fun observeUnlockExpiries(): Flow<Map<String, Long>> {
         val nowMs = clock.now().toEpochMilliseconds()
         return queries.selectActive(nowMs)
             .asFlow()
             .mapToList(Dispatchers.IO)
             .map { rows ->
                 val current = clock.now().toEpochMilliseconds()
-                rows.filter { it.expiresAtMs > current }.map { it.personaId }.toSet()
+                rows.filter { it.expiresAtMs > current }
+                    .associate { it.personaId to it.expiresAtMs }
             }
     }
 

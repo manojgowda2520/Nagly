@@ -1,5 +1,7 @@
 package com.manojbuilds.nagly.di
 
+import com.manojbuilds.nagly.ads.AdClient
+import com.manojbuilds.nagly.ads.FakeAdClient
 import com.manojbuilds.nagly.billing.BillingRepository
 import com.manojbuilds.nagly.billing.FakeBillingRepository
 import com.manojbuilds.nagly.config.Integrations
@@ -8,6 +10,7 @@ import com.manojbuilds.nagly.data.DrinkLogRepository
 import com.manojbuilds.nagly.data.GoalRepository
 import com.manojbuilds.nagly.data.UnlockRepository
 import com.manojbuilds.nagly.db.NaglyDatabase
+import com.manojbuilds.nagly.domain.UnlockExpiryWatcher
 import com.manojbuilds.nagly.notifications.IgnoredNudgeStore
 import com.manojbuilds.nagly.notifications.NotificationCoordinator
 import com.manojbuilds.nagly.notifications.NudgeScheduler
@@ -37,6 +40,7 @@ fun commonModule(): Module = module {
     single { OnboardingStateHolder(get(), get(), get(), get()) }
     single { HistoryStateHolder(get(), get()) }
     single { PushTagSync(get(), get(), get(), get()) }
+    single { UnlockExpiryWatcher(get(), get(), get()) }
 
     // Sandbox ↔ production swap lives here only.
     single<BillingRepository> {
@@ -53,6 +57,14 @@ fun commonModule(): Module = module {
         } else {
             // TODO: bind OneSignalPushClient when ONESIGNAL_APP_ID exists
             FakePushClient()
+        }
+    }
+    single<AdClient> {
+        if (Integrations.SANDBOX_MODE) {
+            FakeAdClient()
+        } else {
+            // TODO: bind AdMobAdClient when ADMOB_* ids exist
+            FakeAdClient()
         }
     }
 }
