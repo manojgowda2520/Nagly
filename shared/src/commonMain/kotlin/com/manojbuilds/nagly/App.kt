@@ -9,20 +9,23 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.manojbuilds.nagly.billing.BillingRepository
 import com.manojbuilds.nagly.data.GoalRepository
 import com.manojbuilds.nagly.domain.PersonaCatalog
-import com.manojbuilds.nagly.ui.common.PlaceholderScreen
 import com.manojbuilds.nagly.ui.history.HistoryScreen
 import com.manojbuilds.nagly.ui.history.HistoryStateHolder
 import com.manojbuilds.nagly.ui.navigation.Screen
 import com.manojbuilds.nagly.ui.onboarding.OnboardingScreen
 import com.manojbuilds.nagly.ui.onboarding.OnboardingStateHolder
+import com.manojbuilds.nagly.ui.paywall.PaywallScreen
 import com.manojbuilds.nagly.ui.persona.PersonaPickerScreen
 import com.manojbuilds.nagly.ui.theme.NaglyTheme
 import com.manojbuilds.nagly.ui.today.TodayScreen
 import com.manojbuilds.nagly.ui.today.TodayStateHolder
+import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
 @Composable
@@ -53,6 +56,9 @@ fun App() {
             val onboardingState by onboardingHolder.uiState.collectAsState()
             val historyHolder = koinInject<HistoryStateHolder>()
             val historyState by historyHolder.uiState.collectAsState()
+            val billing = koinInject<BillingRepository>()
+            val scope = rememberCoroutineScope()
+            var purchasing by remember { mutableStateOf(false) }
 
             when (currentScreen) {
                 Screen.Today -> TodayScreen(
@@ -96,6 +102,8 @@ fun App() {
                             )
                         ) {
                             onboardingHolder.selectPersona(id)
+                        } else if (persona.isPro) {
+                            screen = Screen.Paywall
                         }
                     },
                     onWakeChange = onboardingHolder::setWakeHour,
@@ -114,9 +122,25 @@ fun App() {
                     },
                     permissionLine = onboardingHolder.permissionLine(),
                 )
-                Screen.Paywall -> PlaceholderScreen(
-                    title = "Paywall",
-                    onBack = { screen = Screen.PersonaPicker },
+                Screen.Paywall -> PaywallScreen(
+                    purchasing = purchasing,
+                    onPurchase = { packageId ->
+                        scope.launch {
+                            purchasing = true
+                            billing.purchase(packageId)
+                            purchasing = false
+                            screen = Screen.PersonaPicker
+                        }
+                    },
+                    onRestore = {
+                        scope.launch {
+                            purchasing = true
+                            billing.restore()
+                            purchasing = false
+                            if (billing.isPro.value) screen = Screen.PersonaPicker
+                        }
+                    },
+                    onClose = { screen = Screen.PersonaPicker },
                 )
             }
         }

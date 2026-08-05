@@ -1,5 +1,8 @@
 package com.manojbuilds.nagly.di
 
+import com.manojbuilds.nagly.billing.BillingRepository
+import com.manojbuilds.nagly.billing.FakeBillingRepository
+import com.manojbuilds.nagly.config.Integrations
 import com.manojbuilds.nagly.data.DatabaseDriverFactory
 import com.manojbuilds.nagly.data.DrinkLogRepository
 import com.manojbuilds.nagly.data.GoalRepository
@@ -28,8 +31,18 @@ fun commonModule(): Module = module {
         val ignored = get<IgnoredNudgeStore>()
         TodayStateHolder(get(), get(), ignoredNudgeCountProvider = { ignored.count })
     }
-    single { OnboardingStateHolder(get(), get(), get()) }
+    single { OnboardingStateHolder(get(), get(), get(), get()) }
     single { HistoryStateHolder(get(), get()) }
+
+    // Sandbox ↔ production swap lives here only.
+    single<BillingRepository> {
+        if (Integrations.SANDBOX_MODE) {
+            FakeBillingRepository(get())
+        } else {
+            // TODO: bind RevenueCatBillingRepository when keys exist
+            FakeBillingRepository(get())
+        }
+    }
 }
 
 fun initKoin(

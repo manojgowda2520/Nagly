@@ -1,5 +1,6 @@
 package com.manojbuilds.nagly.ui.onboarding
 
+import com.manojbuilds.nagly.billing.BillingRepository
 import com.manojbuilds.nagly.data.GoalRepository
 import com.manojbuilds.nagly.data.UnlockRepository
 import com.manojbuilds.nagly.domain.PersonaCatalog
@@ -44,6 +45,7 @@ class OnboardingStateHolder(
     private val goalRepository: GoalRepository,
     unlockRepository: UnlockRepository,
     private val notifier: Notifier,
+    billingRepository: BillingRepository,
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private val draft = MutableStateFlow(OnboardingUiState())
@@ -51,8 +53,9 @@ class OnboardingStateHolder(
     val uiState: StateFlow<OnboardingUiState> = combine(
         draft,
         unlockRepository.observeUnlocked(),
-    ) { current, unlocked ->
-        current.copy(unlockedIds = unlocked)
+        billingRepository.isPro,
+    ) { current, unlocked, isPro ->
+        current.copy(unlockedIds = unlocked, isPro = isPro)
     }.stateIn(scope, SharingStarted.Eagerly, OnboardingUiState())
 
     fun setWeight(value: String) {

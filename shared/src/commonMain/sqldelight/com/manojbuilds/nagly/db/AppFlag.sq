@@ -1,0 +1,13 @@
+CREATE TABLE app_flag (
+  key TEXT NOT NULL PRIMARY KEY,
+  value INTEGER NOT NULL
+);
+
+select:
+SELECT value
+FROM app_flag
+WHERE key = ?;
+
+upsert:
+INSERT OR REPLACE INTO app_flag(key, value)
+VALUES (?, ?);
