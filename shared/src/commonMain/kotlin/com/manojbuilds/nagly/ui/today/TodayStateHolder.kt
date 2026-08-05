@@ -3,6 +3,7 @@ package com.manojbuilds.nagly.ui.today
 import com.manojbuilds.nagly.data.DrinkLogRepository
 import com.manojbuilds.nagly.data.GoalRepository
 import com.manojbuilds.nagly.domain.PersonaCatalog
+import com.manojbuilds.nagly.domain.behindSeverity
 import com.manojbuilds.nagly.domain.computeMood
 import com.manojbuilds.nagly.domain.currentStreak
 import com.manojbuilds.nagly.domain.dayPartFor
@@ -17,6 +18,7 @@ import kotlin.time.Instant
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -35,6 +37,8 @@ class TodayStateHolder(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private var cachedMood: Mood? = null
     private var cachedLine: String? = null
+    private var lastGoal: UserGoal? = null
+    private val lineTick = MutableStateFlow(0)
 
     val uiState: StateFlow<TodayUiState> = combine(
         goalRepository.observeGoal(),
@@ -43,7 +47,8 @@ class TodayStateHolder(
             fromMs = clock.now().toEpochMilliseconds() - 14L * 24L * 60L * 60L * 1000L,
             toMs = clock.now().toEpochMilliseconds() + 1L,
         ),
-    ) { goal, todayLogs, recentLogs ->
+        lineTick,
+    ) { goal, todayLogs, recentLogs, _ ->
         buildState(goal, todayLogs, recentLogs)
     }.stateIn(
         scope = scope,
@@ -56,6 +61,7 @@ class TodayStateHolder(
         todayLogs: List<DrinkLog>,
         recentLogs: List<DrinkLog>,
     ): TodayUiState {
+        lastGoal = goal
         val persona = PersonaCatalog.get(goal.personaId)
         val consumed = todayLogs.sumOf { it.amountMl }
         val progressRatio = if (goal.dailyMl <= 0) {
@@ -76,6 +82,16 @@ class TodayStateHolder(
             val dayPart = dayPartFor(nowHour, goal.wakeHour, goal.sleepHour)
             cachedLine = pickLine(persona, mood, dayPart = dayPart, previousLine = cachedLine)
             cachedMood = mood
+        }
+
+        val expectedMl = (expected * goal.dailyMl).toInt()
+        val behind = (expectedMl - consumed).coerceAtLeast(0)
+        val severity = behindSeverity(progressRatio, expected)
+        val guilt = when (mood) {
+            Mood.PROUD -> 0.12f
+            Mood.NEUTRAL -> (0.25f + severity * 0.25f).coerceIn(0.2f, 0.5f)
+            Mood.WORRIED -> (0.55f + severity * 0.3f).coerceIn(0.55f, 0.85f)
+            Mood.DISAPPOINTED -> 1f
         }
 
         val today = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
@@ -104,14 +120,27 @@ class TodayStateHolder(
             mood = mood,
             consumedMl = consumed,
             dailyMl = goal.dailyMl,
+            behindMl = behind,
             streak = currentStreak(logsByDay, goal.dailyMl, today),
             progress = progressRatio.coerceIn(0f, 1.2f).coerceAtMost(1f),
+            guiltProgress = guilt,
+            hourOfDay = nowHour,
             canUndo = todayLogs.isNotEmpty(),
             isLoading = false,
             drinks = todayLogs.sortedByDescending { it.timestampMs },
             recentCustomMl = recentCustom,
             nextNudgeLabel = nextLabel,
         )
+    }
+
+    fun cycleLine() {
+        val goal = lastGoal ?: return
+        val persona = PersonaCatalog.get(goal.personaId)
+        val mood = cachedMood ?: return
+        val nowHour = clock.now().toLocalDateTime(TimeZone.currentSystemDefault()).hour
+        val dayPart = dayPartFor(nowHour, goal.wakeHour, goal.sleepHour)
+        cachedLine = pickLine(persona, mood, dayPart = dayPart, previousLine = cachedLine)
+        lineTick.value = lineTick.value + 1
     }
 
     fun log(amountMl: Int) {

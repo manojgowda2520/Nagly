@@ -100,6 +100,7 @@ fun App() {
                             onLog = todayStateHolder::log,
                             onUndo = todayStateHolder::undo,
                             onUndoEntry = todayStateHolder::undoEntry,
+                            onCycleLine = todayStateHolder::cycleLine,
                             onOpenHistory = { screen = Screen.History },
                             onOpenPersonas = { screen = Screen.Personas },
                         )
