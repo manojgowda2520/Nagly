@@ -1,0 +1,17 @@
+CREATE TABLE persona_unlock (
+  personaId TEXT NOT NULL PRIMARY KEY,
+  expiresAtMs INTEGER NOT NULL
+);
+
+selectActive:
+SELECT *
+FROM persona_unlock
+WHERE expiresAtMs > :nowMs;
+
+upsert:
+INSERT OR REPLACE INTO persona_unlock(personaId, expiresAtMs)
+VALUES (?, ?);
+
+deleteExpired:
+DELETE FROM persona_unlock
+WHERE expiresAtMs <= :nowMs;

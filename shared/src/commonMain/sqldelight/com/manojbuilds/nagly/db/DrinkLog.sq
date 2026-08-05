@@ -1,0 +1,31 @@
+CREATE TABLE drink_log (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  timestampMs INTEGER NOT NULL,
+  amountMl INTEGER NOT NULL
+);
+
+selectToday:
+SELECT *
+FROM drink_log
+WHERE timestampMs >= :fromMs AND timestampMs < :toMs
+ORDER BY timestampMs ASC;
+
+selectRange:
+SELECT *
+FROM drink_log
+WHERE timestampMs >= :fromMs AND timestampMs < :toMs
+ORDER BY timestampMs ASC;
+
+insert:
+INSERT INTO drink_log(timestampMs, amountMl)
+VALUES (?, ?);
+
+selectLast:
+SELECT *
+FROM drink_log
+ORDER BY timestampMs DESC, id DESC
+LIMIT 1;
+
+deleteById:
+DELETE FROM drink_log
+WHERE id = ?;

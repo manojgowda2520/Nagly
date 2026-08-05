@@ -1,0 +1,17 @@
+CREATE TABLE user_goal (
+  id INTEGER NOT NULL PRIMARY KEY,
+  dailyMl INTEGER NOT NULL,
+  wakeHour INTEGER NOT NULL,
+  sleepHour INTEGER NOT NULL,
+  personaId TEXT NOT NULL,
+  onboarded INTEGER NOT NULL DEFAULT 0
+);
+
+select:
+SELECT *
+FROM user_goal
+WHERE id = 1;
+
+upsert:
+INSERT OR REPLACE INTO user_goal(id, dailyMl, wakeHour, sleepHour, personaId, onboarded)
+VALUES (1, ?, ?, ?, ?, ?);
