@@ -44,6 +44,10 @@ class DrinkLogRepository(
         queries.deleteById(last.id)
     }
 
+    suspend fun delete(id: Long) = withContext(Dispatchers.IO) {
+        queries.deleteById(id)
+    }
+
     private fun com.manojbuilds.nagly.db.Drink_log.toDomain() = DrinkLog(
         id = id,
         timestampMs = timestampMs,

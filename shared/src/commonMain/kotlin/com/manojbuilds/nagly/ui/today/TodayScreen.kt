@@ -8,11 +8,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -32,8 +34,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.input.KeyboardType
@@ -41,30 +47,40 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.manojbuilds.nagly.domain.model.Mood
+import kotlin.time.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 
 @Composable
 fun TodayScreen(
     state: TodayUiState,
     onLog: (Int) -> Unit,
     onUndo: () -> Unit,
-    onOpenHistory: () -> Unit,
-    onOpenPersonas: () -> Unit,
+    onUndoEntry: (Long) -> Unit = {},
+    onOpenHistory: () -> Unit = {},
+    onOpenPersonas: () -> Unit = {},
 ) {
     var showCustomDialog by remember { mutableStateOf(false) }
     val animatedProgress by animateFloatAsState(
         targetValue = state.progress,
-        animationSpec = tween(durationMillis = 700),
-        label = "progress",
+        animationSpec = tween(durationMillis = 800),
+        label = "fill",
     )
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(
+                Brush.verticalGradient(
+                    listOf(
+                        MaterialTheme.colorScheme.background,
+                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f),
+                    ),
+                ),
+            )
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 24.dp, vertical = 20.dp),
+            .padding(horizontal = 24.dp, vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -74,86 +90,149 @@ fun TodayScreen(
             TextButton(onClick = onOpenPersonas) {
                 Text("${state.personaEmoji} ${state.personaName}")
             }
-            TextButton(onClick = onOpenHistory) {
-                Text("History")
+            if (state.streak > 0) {
+                Text(
+                    text = "🔥 ${state.streak}-day",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.tertiary,
+                    modifier = Modifier
+                        .background(
+                            MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f),
+                            RoundedCornerShape(999.dp),
+                        )
+                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                )
             }
         }
 
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.size(220.dp),
+        ) {
+            FillBottle(
+                progress = animatedProgress,
+                modifier = Modifier.size(140.dp, 200.dp),
+            )
+            Text(
+                text = state.personaEmoji,
+                fontSize = 42.sp,
+                modifier = Modifier.align(Alignment.TopCenter).padding(top = 28.dp),
+            )
+        }
+
         Text(
-            text = state.personaLine.ifBlank { "Loading your nag..." },
-            style = MaterialTheme.typography.displayLarge.copy(fontSize = 34.sp, lineHeight = 40.sp),
-            color = MaterialTheme.colorScheme.onBackground,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 8.dp, vertical = 8.dp),
+            text = "${state.consumedMl} / ${state.dailyMl} ml",
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(top = 4.dp),
         )
 
         Text(
             text = moodLabel(state.mood),
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier.padding(top = 12.dp),
+        )
+        Text(
+            text = state.personaLine.ifBlank { "Loading your nag..." },
+            style = MaterialTheme.typography.headlineMedium,
+            color = MaterialTheme.colorScheme.onBackground,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 4.dp, bottom = 8.dp),
+        )
+
+        Text(
+            text = state.nextNudgeLabel,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
-        Box(
-            modifier = Modifier.padding(vertical = 12.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            ProgressRing(
-                progress = animatedProgress,
-                modifier = Modifier.size(210.dp),
-            )
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = "${state.consumedMl}",
-                    style = MaterialTheme.typography.headlineLarge,
-                )
-                Text(
-                    text = "of ${state.dailyMl} ml",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        }
-
-        Text(
-            text = if (state.streak > 0) "${state.streak}-day streak" else "Start a streak today",
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.secondary,
-        )
+        Spacer(modifier = Modifier.height(16.dp))
 
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            LogChip(
-                label = "+250 ml",
+            QuickAdd(
+                label = "+250",
                 onClick = { onLog(250) },
                 modifier = Modifier.weight(1f),
                 emphasized = true,
             )
-            LogChip(
-                label = "+500 ml",
+            QuickAdd(
+                label = "+500",
                 onClick = { onLog(500) },
                 modifier = Modifier.weight(1f),
             )
+            val custom = state.recentCustomMl
+            if (custom != null) {
+                QuickAdd(
+                    label = "+$custom",
+                    onClick = { onLog(custom) },
+                    modifier = Modifier.weight(1f),
+                )
+            } else {
+                OutlinedButton(
+                    onClick = { showCustomDialog = true },
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(52.dp),
+                    shape = RoundedCornerShape(16.dp),
+                ) {
+                    Text("Custom")
+                }
+            }
         }
 
-        OutlinedButton(
-            onClick = { showCustomDialog = true },
+        if (state.recentCustomMl != null) {
+            TextButton(onClick = { showCustomDialog = true }) {
+                Text("Other amount")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Text(
+            "Today's sips",
+            style = MaterialTheme.typography.titleLarge,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(54.dp),
-            shape = RoundedCornerShape(18.dp),
-        ) {
-            Text("Custom amount")
-        }
-
-        if (state.canUndo) {
-            TextButton(onClick = onUndo) {
-                Text("Undo last sip")
+                .padding(bottom = 8.dp),
+        )
+        if (state.drinks.isEmpty()) {
+            Text(
+                "No drinks yet — tap a quick-add.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.fillMaxWidth(),
+            )
+        } else {
+            state.drinks.forEach { drink ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = formatTime(drink.timestampMs),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.width(64.dp),
+                    )
+                    Text(
+                        text = "${drink.amountMl} ml",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.weight(1f),
+                    )
+                    TextButton(onClick = { onUndoEntry(drink.id) }) {
+                        Text("Undo")
+                    }
+                }
             }
         }
     }
@@ -170,7 +249,7 @@ fun TodayScreen(
 }
 
 @Composable
-private fun LogChip(
+private fun QuickAdd(
     label: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -178,8 +257,8 @@ private fun LogChip(
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier.height(54.dp),
-        shape = RoundedCornerShape(18.dp),
+        modifier = modifier.height(52.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = if (emphasized) {
             ButtonDefaults.buttonColors()
         } else {
@@ -194,34 +273,52 @@ private fun LogChip(
 }
 
 @Composable
-private fun ProgressRing(
+private fun FillBottle(
     progress: Float,
     modifier: Modifier = Modifier,
 ) {
-    val track = MaterialTheme.colorScheme.surfaceVariant
-    val fill = MaterialTheme.colorScheme.primary
+    val water = MaterialTheme.colorScheme.primary
+    val glass = MaterialTheme.colorScheme.outline
+    val foam = MaterialTheme.colorScheme.surface
     Canvas(modifier = modifier) {
-        val stroke = 18.dp.toPx()
-        val arcSize = Size(size.width - stroke, size.height - stroke)
-        val topLeft = Offset(stroke / 2f, stroke / 2f)
-        drawArc(
-            color = track,
-            startAngle = -90f,
-            sweepAngle = 360f,
-            useCenter = false,
-            topLeft = topLeft,
-            size = arcSize,
-            style = Stroke(width = stroke, cap = StrokeCap.Round),
-        )
-        drawArc(
-            color = fill,
-            startAngle = -90f,
-            sweepAngle = 360f * progress.coerceIn(0f, 1f),
-            useCenter = false,
-            topLeft = topLeft,
-            size = arcSize,
-            style = Stroke(width = stroke, cap = StrokeCap.Round),
-        )
+        val w = size.width
+        val h = size.height
+        val neckW = w * 0.28f
+        val bodyTop = h * 0.18f
+        val bodyLeft = w * 0.18f
+        val bodyWidth = w * 0.64f
+        val bodyHeight = h * 0.72f
+
+        // Bottle outline
+        val path = Path().apply {
+            moveTo(w / 2f - neckW / 2f, 0f)
+            lineTo(w / 2f + neckW / 2f, 0f)
+            lineTo(w / 2f + neckW / 2f, bodyTop)
+            lineTo(bodyLeft + bodyWidth, bodyTop)
+            lineTo(bodyLeft + bodyWidth, bodyTop + bodyHeight)
+            quadraticTo(
+                bodyLeft + bodyWidth / 2f,
+                h,
+                bodyLeft,
+                bodyTop + bodyHeight,
+            )
+            lineTo(bodyLeft, bodyTop)
+            lineTo(w / 2f - neckW / 2f, bodyTop)
+            close()
+        }
+        drawPath(path, color = foam.copy(alpha = 0.35f))
+        drawPath(path, color = glass, style = Stroke(width = 4.dp.toPx(), cap = StrokeCap.Round))
+
+        val fillH = bodyHeight * progress.coerceIn(0f, 1f)
+        if (fillH > 0f) {
+            val fillTop = bodyTop + bodyHeight - fillH
+            drawRoundRect(
+                color = water.copy(alpha = 0.75f),
+                topLeft = Offset(bodyLeft + 3.dp.toPx(), fillTop),
+                size = Size(bodyWidth - 6.dp.toPx(), fillH),
+                cornerRadius = CornerRadius(12.dp.toPx(), 12.dp.toPx()),
+            )
+        }
     }
 }
 
@@ -259,8 +356,16 @@ private fun CustomAmountDialog(
 }
 
 private fun moodLabel(mood: Mood): String = when (mood) {
-    Mood.NEUTRAL -> "She's keeping an eye on you"
-    Mood.WORRIED -> "She's getting worried"
-    Mood.DISAPPOINTED -> "She's disappointed"
-    Mood.PROUD -> "She's proud of you"
+    Mood.NEUTRAL -> "Keeping an eye on you"
+    Mood.WORRIED -> "Getting worried"
+    Mood.DISAPPOINTED -> "Disappointed"
+    Mood.PROUD -> "Proud of you"
+}
+
+private fun formatTime(timestampMs: Long): String {
+    val local = Instant.fromEpochMilliseconds(timestampMs)
+        .toLocalDateTime(TimeZone.currentSystemDefault())
+    val h = local.hour.toString().padStart(2, '0')
+    val m = local.minute.toString().padStart(2, '0')
+    return "$h:$m"
 }

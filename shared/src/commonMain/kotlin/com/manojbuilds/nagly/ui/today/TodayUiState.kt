@@ -1,5 +1,6 @@
 package com.manojbuilds.nagly.ui.today
 
+import com.manojbuilds.nagly.domain.model.DrinkLog
 import com.manojbuilds.nagly.domain.model.Mood
 
 data class TodayUiState(
@@ -13,4 +14,7 @@ data class TodayUiState(
     val progress: Float = 0f,
     val canUndo: Boolean = false,
     val isLoading: Boolean = true,
+    val drinks: List<DrinkLog> = emptyList(),
+    val recentCustomMl: Int? = null,
+    val nextNudgeLabel: String = "",
 )

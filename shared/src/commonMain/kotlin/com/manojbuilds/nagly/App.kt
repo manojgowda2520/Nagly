@@ -95,6 +95,7 @@ fun App() {
                             state = todayState,
                             onLog = todayStateHolder::log,
                             onUndo = todayStateHolder::undo,
+                            onUndoEntry = todayStateHolder::undoEntry,
                             onOpenHistory = { screen = Screen.History },
                             onOpenPersonas = { screen = Screen.Personas },
                         )

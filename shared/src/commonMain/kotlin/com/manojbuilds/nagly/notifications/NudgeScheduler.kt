@@ -17,6 +17,12 @@ private const val MIN_INTERVAL_MS = 45L * 60L * 1000L
 private const val MAX_NUDGES = 8
 private const val MS_PER_HOUR = 60L * 60L * 1000L
 
+fun nextNudgeAtMs(
+    nowMs: Long,
+    goal: UserGoal,
+    consumedMl: Int,
+): Long? = nextNudgeTimes(nowMs, goal, consumedMl).firstOrNull()
+
 fun nextNudgeTimes(
     nowMs: Long,
     goal: UserGoal,
