@@ -49,7 +49,7 @@ fun PersonaPickerScreen(
             items(PersonaCatalog.all, key = { it.id }) { persona ->
                 val unlocked = canSelect(persona)
                 val selected = persona.id == selectedId
-                val expires = unlockExpiries[persona.id]
+                val expires = unlockExpiries[persona.relationshipId]
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()

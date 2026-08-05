@@ -20,6 +20,7 @@ class UnlockRepository(
         return observeUnlockExpiries().map { it.keys }
     }
 
+    /** Active unlocks keyed by relationshipId. */
     fun observeUnlockExpiries(): Flow<Map<String, Long>> {
         val nowMs = clock.now().toEpochMilliseconds()
         return queries.selectActive(nowMs)
@@ -28,24 +29,24 @@ class UnlockRepository(
             .map { rows ->
                 val current = clock.now().toEpochMilliseconds()
                 rows.filter { it.expiresAtMs > current }
-                    .associate { it.personaId to it.expiresAtMs }
+                    .associate { it.relationshipId to it.expiresAtMs }
             }
     }
 
-    suspend fun grant(personaId: String, durationMs: Long) = withContext(Dispatchers.IO) {
+    suspend fun grant(relationshipId: String, durationMs: Long) = withContext(Dispatchers.IO) {
         val nowMs = clock.now().toEpochMilliseconds()
         queries.deleteExpired(nowMs)
         queries.upsert(
-            personaId = personaId,
+            relationshipId = relationshipId,
             expiresAtMs = nowMs + durationMs,
         )
     }
 
-    suspend fun expiresAtMs(personaId: String): Long? = withContext(Dispatchers.IO) {
+    suspend fun expiresAtMs(relationshipId: String): Long? = withContext(Dispatchers.IO) {
         val nowMs = clock.now().toEpochMilliseconds()
         queries.selectActive(nowMs)
             .executeAsList()
-            .firstOrNull { it.personaId == personaId }
+            .firstOrNull { it.relationshipId == relationshipId }
             ?.expiresAtMs
     }
 }

@@ -1,5 +1,5 @@
 CREATE TABLE persona_unlock (
-  personaId TEXT NOT NULL PRIMARY KEY,
+  relationshipId TEXT NOT NULL PRIMARY KEY,
   expiresAtMs INTEGER NOT NULL
 );
 
@@ -9,7 +9,7 @@ FROM persona_unlock
 WHERE expiresAtMs > :nowMs;
 
 upsert:
-INSERT OR REPLACE INTO persona_unlock(personaId, expiresAtMs)
+INSERT OR REPLACE INTO persona_unlock(relationshipId, expiresAtMs)
 VALUES (?, ?);
 
 deleteExpired:

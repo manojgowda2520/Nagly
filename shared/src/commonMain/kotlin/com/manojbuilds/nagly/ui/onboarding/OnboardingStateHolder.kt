@@ -109,7 +109,7 @@ class OnboardingStateHolder(
     }
 
     fun canSelect(persona: Persona, unlocked: Set<String>, isPro: Boolean): Boolean {
-        return !PersonaCatalog.isPro(persona) || isPro || persona.id in unlocked
+        return !PersonaCatalog.isPro(persona) || isPro || persona.relationshipId in unlocked
     }
 
     fun permissionLine(): String {

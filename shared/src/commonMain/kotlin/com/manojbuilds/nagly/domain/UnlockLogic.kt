@@ -1,12 +1,13 @@
 package com.manojbuilds.nagly.domain
 
+import com.manojbuilds.nagly.domain.model.Mood
 import com.manojbuilds.nagly.domain.model.Persona
 import com.manojbuilds.nagly.domain.model.UserGoal
 
 const val TEMP_UNLOCK_MS: Long = 24L * 60L * 60L * 1000L
 
 data class UnlockStatus(
-    val personaId: String,
+    val relationshipId: String,
     val expiresAtMs: Long,
 )
 
@@ -18,7 +19,20 @@ fun isPersonaAccessible(
 ): Boolean {
     if (!PersonaCatalog.isPro(persona)) return true
     if (isPro) return true
-    val expires = activeUnlocks[persona.id] ?: return false
+    val expires = activeUnlocks[persona.relationshipId] ?: return false
+    return expires > nowMs
+}
+
+fun isRelationshipAccessible(
+    relationshipId: String,
+    isPro: Boolean,
+    activeUnlocks: Map<String, Long>,
+    nowMs: Long,
+): Boolean {
+    val relationship = PersonaCatalog.relationship(relationshipId)
+    if (relationship.tier == com.manojbuilds.nagly.domain.model.Tier.FREE) return true
+    if (isPro) return true
+    val expires = activeUnlocks[relationshipId] ?: return false
     return expires > nowMs
 }
 
@@ -34,10 +48,8 @@ fun resolveExpiredSelection(
     val persona = PersonaCatalog.get(goal.personaId)
     val stillOk = isPersonaAccessible(persona, isPro, activeUnlocks, nowMs)
     if (stillOk) return goal to null
-    val message = pickLine(
-        PersonaCatalog.get(freeFallbackId),
-        com.manojbuilds.nagly.domain.model.Mood.DISAPPOINTED,
-    )
+    val fallback = PersonaCatalog.get(freeFallbackId)
+    val message = pickLine(fallback, Mood.DISAPPOINTED)
     return goal.copy(personaId = freeFallbackId) to message
 }
 

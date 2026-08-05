@@ -176,7 +176,7 @@ fun App() {
                             val result = adClient.showRewarded()
                             watchingAd = false
                             if (result.isSuccess) {
-                                unlockRepository.grant(persona.id, TEMP_UNLOCK_MS)
+                                unlockRepository.grant(persona.relationshipId, TEMP_UNLOCK_MS)
                                 onboardingHolder.selectPersona(persona.id)
                                 onboardingHolder.savePersonaOnly(persona.id) {}
                                 lockedPersona = null

@@ -58,11 +58,11 @@ class RepositoryTest {
 
         assertTrue(repo.observeUnlocked().first().isEmpty())
 
-        repo.grant("italian_nonna", durationMs = 60_000L)
+        repo.grant("grandparent", durationMs = 60_000L)
         val unlocked = repo.observeUnlocked().first()
-        assertEquals(setOf("italian_nonna"), unlocked)
+        assertEquals(setOf("grandparent"), unlocked)
 
-        val expires = repo.expiresAtMs("italian_nonna")
+        val expires = repo.expiresAtMs("grandparent")
         assertTrue(expires != null && expires > 0L)
     }
 }
