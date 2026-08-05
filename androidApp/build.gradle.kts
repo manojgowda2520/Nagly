@@ -13,11 +13,11 @@ dependencies {
 }
 
 android {
-    namespace = "com.nagly.app"
+    namespace = "com.manojbuilds.nagly"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.nagly.app"
+        applicationId = "com.manojbuilds.nagly"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1

@@ -1,4 +1,4 @@
-package com.nagly.app
+package com.manojbuilds.nagly
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

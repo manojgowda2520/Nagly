@@ -19,7 +19,7 @@ kotlin {
     }
 
     androidLibrary {
-        namespace = "com.nagly.app.shared"
+        namespace = "com.manojbuilds.nagly.shared"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
 
