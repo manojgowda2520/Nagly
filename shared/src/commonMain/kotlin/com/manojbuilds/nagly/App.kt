@@ -27,6 +27,8 @@ import com.manojbuilds.nagly.domain.UnlockExpiryWatcher
 import com.manojbuilds.nagly.domain.model.Persona
 import com.manojbuilds.nagly.ui.history.HistoryScreen
 import com.manojbuilds.nagly.ui.history.HistoryStateHolder
+import com.manojbuilds.nagly.ui.insights.InsightsScreen
+import com.manojbuilds.nagly.ui.insights.InsightsStateHolder
 import com.manojbuilds.nagly.ui.navigation.MainShell
 import com.manojbuilds.nagly.ui.navigation.MainTab
 import com.manojbuilds.nagly.ui.navigation.Screen
@@ -94,6 +96,8 @@ private fun AppContent() {
             val onboardingState by onboardingHolder.uiState.collectAsState()
             val historyHolder = koinInject<HistoryStateHolder>()
             val historyState by historyHolder.uiState.collectAsState()
+            val insightsHolder = koinInject<InsightsStateHolder>()
+            val insightsState by insightsHolder.uiState.collectAsState()
             val settingsHolder = koinInject<SettingsStateHolder>()
             val settingsState by settingsHolder.uiState.collectAsState()
             val billing = koinInject<BillingRepository>()
@@ -110,6 +114,7 @@ private fun AppContent() {
                 MainShell(
                     selectedTab = mainTab,
                     onTabSelected = { tab -> screen = tab.toScreen() },
+                    onQuickAddWater = { todayStateHolder.log(250) },
                 ) {
                     when (currentScreen) {
                         Screen.Today -> TodayScreen(
@@ -143,6 +148,7 @@ private fun AppContent() {
                                 lockedPersona = previewPersonaForRelationship(relationship.id)
                             },
                         )
+                        Screen.Insights -> InsightsScreen(state = insightsState)
                         Screen.Settings -> SettingsScreen(
                             state = settingsState,
                             onDailyGoalChange = settingsHolder::setDailyDisplay,

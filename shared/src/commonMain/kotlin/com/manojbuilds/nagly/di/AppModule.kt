@@ -19,6 +19,7 @@ import com.manojbuilds.nagly.push.FakePushClient
 import com.manojbuilds.nagly.push.PushClient
 import com.manojbuilds.nagly.push.PushTagSync
 import com.manojbuilds.nagly.ui.history.HistoryStateHolder
+import com.manojbuilds.nagly.ui.insights.InsightsStateHolder
 import com.manojbuilds.nagly.ui.onboarding.OnboardingStateHolder
 import com.manojbuilds.nagly.ui.settings.SettingsStateHolder
 import com.manojbuilds.nagly.ui.today.TodayStateHolder
@@ -42,6 +43,7 @@ fun commonModule(): Module = module {
     }
     single { OnboardingStateHolder(get(), get(), get(), get(), get()) }
     single { HistoryStateHolder(get(), get()) }
+    single { InsightsStateHolder(get(), get(), get()) }
     single { SettingsStateHolder(get(), get(), get(), get()) }
     single { PushTagSync(get(), get(), get(), get()) }
     single { UnlockExpiryWatcher(get(), get(), get()) }

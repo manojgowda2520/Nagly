@@ -63,7 +63,7 @@ fun SettingsScreen(
             .padding(NaglySpacing.md),
         verticalArrangement = Arrangement.spacedBy(NaglySpacing.xs),
     ) {
-        Text("Settings", style = MaterialTheme.typography.headlineMedium)
+        Text("Profile", style = MaterialTheme.typography.headlineMedium)
 
         state.restoreMessage?.let { msg ->
             MessageBanner(msg, onDismissMessage)

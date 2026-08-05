@@ -4,29 +4,33 @@ sealed interface Screen {
     data object Today : Screen
     data object History : Screen
     data object Personas : Screen
+    data object Insights : Screen
     data object Settings : Screen
     data object Onboarding : Screen
     data object Paywall : Screen
 }
 
 enum class MainTab(val label: String, val emoji: String) {
-    Today("Today", "💧"),
+    Home("Home", "🏠"),
     History("History", "📅"),
-    Personas("Personas", "💬"),
-    Settings("Settings", "⚙️"),
+    Characters("Characters", "💬"),
+    Insights("Insights", "📊"),
+    Profile("Profile", "👤"),
 }
 
 fun MainTab.toScreen(): Screen = when (this) {
-    MainTab.Today -> Screen.Today
+    MainTab.Home -> Screen.Today
     MainTab.History -> Screen.History
-    MainTab.Personas -> Screen.Personas
-    MainTab.Settings -> Screen.Settings
+    MainTab.Characters -> Screen.Personas
+    MainTab.Insights -> Screen.Insights
+    MainTab.Profile -> Screen.Settings
 }
 
 fun Screen.toMainTabOrNull(): MainTab? = when (this) {
-    Screen.Today -> MainTab.Today
+    Screen.Today -> MainTab.Home
     Screen.History -> MainTab.History
-    Screen.Personas -> MainTab.Personas
-    Screen.Settings -> MainTab.Settings
+    Screen.Personas -> MainTab.Characters
+    Screen.Insights -> MainTab.Insights
+    Screen.Settings -> MainTab.Profile
     Screen.Onboarding, Screen.Paywall -> null
 }
