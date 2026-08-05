@@ -51,6 +51,25 @@ class MoodEngineTest {
     }
 
     @Test
+    fun dayPartFor_splitsWakingDayIntoThirds() {
+        // wake 7 sleep 22 → 15 waking hours → thirds of 5h: 7–12, 12–17, 17–22
+        assertEquals(DayPart.MORNING, dayPartFor(hour = 8, wakeHour = 7, sleepHour = 22))
+        assertEquals(DayPart.AFTERNOON, dayPartFor(hour = 14, wakeHour = 7, sleepHour = 22))
+        assertEquals(DayPart.EVENING, dayPartFor(hour = 20, wakeHour = 7, sleepHour = 22))
+        assertEquals(DayPart.MORNING, dayPartFor(hour = 5, wakeHour = 7, sleepHour = 22))
+        assertEquals(DayPart.EVENING, dayPartFor(hour = 23, wakeHour = 7, sleepHour = 22))
+    }
+
+    @Test
+    fun behindSeverity_onTrackAndBehind() {
+        assertEquals(0f, behindSeverity(progressRatio = 0.5f, expectedRatio = 0.5f))
+        assertEquals(0f, behindSeverity(progressRatio = 0.8f, expectedRatio = 0.5f))
+        assertEquals(0f, behindSeverity(progressRatio = 0.1f, expectedRatio = 0f))
+        assertEquals(1f, behindSeverity(progressRatio = 0f, expectedRatio = 0.5f))
+        assertEquals(0.5f, behindSeverity(progressRatio = 0.25f, expectedRatio = 0.5f))
+    }
+
+    @Test
     fun recommendedDailyMl_clamped() {
         assertEquals(1500, recommendedDailyMl(30))
         assertEquals(2450, recommendedDailyMl(70))

@@ -20,6 +20,60 @@ fun computeMood(
 }
 
 /**
+ * Split the waking window into morning / afternoon / evening thirds.
+ * Outside waking hours, maps to the nearest edge daypart.
+ */
+fun dayPartFor(hour: Int, wakeHour: Int, sleepHour: Int): DayPart {
+    require(hour in 0..23)
+    require(wakeHour in 0..23)
+    require(sleepHour in 0..23)
+
+    if (wakeHour == sleepHour) return DayPart.AFTERNOON
+
+    val wakingHours = if (sleepHour > wakeHour) {
+        sleepHour - wakeHour
+    } else {
+        (24 - wakeHour) + sleepHour
+    }
+    if (wakingHours <= 0) return DayPart.AFTERNOON
+
+    fun elapsedFromWake(h: Int): Int = when {
+        sleepHour > wakeHour -> {
+            when {
+                h < wakeHour -> 0
+                h >= sleepHour -> wakingHours
+                else -> h - wakeHour
+            }
+        }
+        else -> {
+            when {
+                h >= wakeHour -> h - wakeHour
+                h < sleepHour -> (24 - wakeHour) + h
+                else -> wakingHours
+            }
+        }
+    }
+
+    val elapsed = elapsedFromWake(hour)
+    val third = wakingHours / 3f
+    return when {
+        elapsed < third -> DayPart.MORNING
+        elapsed < third * 2f -> DayPart.AFTERNOON
+        else -> DayPart.EVENING
+    }
+}
+
+/**
+ * How far behind schedule, 0 = on track or ahead, 1 = far behind.
+ */
+fun behindSeverity(progressRatio: Float, expectedRatio: Float): Float {
+    if (expectedRatio <= 0f) return 0f
+    val gap = expectedRatio - progressRatio
+    if (gap <= 0f) return 0f
+    return (gap / expectedRatio).coerceIn(0f, 1f)
+}
+
+/**
  * Fraction of the waking day elapsed. 0 before wake, 1 after sleep.
  * Handles schedules that wrap midnight (sleepHour < wakeHour).
  */

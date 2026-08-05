@@ -2,6 +2,7 @@ package com.manojbuilds.nagly.notifications
 
 import com.manojbuilds.nagly.domain.PersonaCatalog
 import com.manojbuilds.nagly.domain.computeMood
+import com.manojbuilds.nagly.domain.dayPartFor
 import com.manojbuilds.nagly.domain.expectedRatio
 import com.manojbuilds.nagly.domain.pickLine
 import com.manojbuilds.nagly.domain.model.Mood
@@ -65,7 +66,11 @@ fun nudgeBody(
 ): String {
     val mood = projectedMood(atMs, goal, consumedMl, ignoredNudgeCount)
     val persona = PersonaCatalog.get(goal.personaId)
-    return pickLine(persona, mood, previousLine = previousLine)
+    val hour = Instant.fromEpochMilliseconds(atMs)
+        .toLocalDateTime(TimeZone.currentSystemDefault())
+        .hour
+    val dayPart = dayPartFor(hour, goal.wakeHour, goal.sleepHour)
+    return pickLine(persona, mood, dayPart = dayPart, previousLine = previousLine)
 }
 
 class NudgeScheduler(

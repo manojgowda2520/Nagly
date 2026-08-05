@@ -5,6 +5,7 @@ import com.manojbuilds.nagly.data.GoalRepository
 import com.manojbuilds.nagly.domain.PersonaCatalog
 import com.manojbuilds.nagly.domain.computeMood
 import com.manojbuilds.nagly.domain.currentStreak
+import com.manojbuilds.nagly.domain.dayPartFor
 import com.manojbuilds.nagly.domain.expectedRatio
 import com.manojbuilds.nagly.domain.pickLine
 import com.manojbuilds.nagly.domain.model.DrinkLog
@@ -70,7 +71,8 @@ class TodayStateHolder(
         )
 
         if (mood != cachedMood || cachedLine == null) {
-            cachedLine = pickLine(persona, mood, previousLine = cachedLine)
+            val dayPart = dayPartFor(nowHour, goal.wakeHour, goal.sleepHour)
+            cachedLine = pickLine(persona, mood, dayPart = dayPart, previousLine = cachedLine)
             cachedMood = mood
         }
 
