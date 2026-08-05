@@ -12,7 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import com.manojbuilds.nagly.ui.designsystem.NaglySpacing
 import com.manojbuilds.nagly.domain.PersonaCatalog
 import com.manojbuilds.nagly.domain.model.Persona
 import com.manojbuilds.nagly.domain.model.Relationship
@@ -39,12 +39,12 @@ fun PersonaPickerScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .padding(NaglySpacing.md),
     ) {
         Text(
             if (showVariants) "Pick their vibe" else "Pick your nagger",
             style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(bottom = 16.dp),
+            modifier = Modifier.padding(bottom = NaglySpacing.sm),
         )
 
         if (showVariants) {

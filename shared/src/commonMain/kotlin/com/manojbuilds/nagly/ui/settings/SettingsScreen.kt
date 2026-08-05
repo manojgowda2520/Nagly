@@ -9,25 +9,26 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.manojbuilds.nagly.config.Integrations
 import com.manojbuilds.nagly.domain.model.VolumeUnit
 import com.manojbuilds.nagly.domain.volumeUnitLabel
 import com.manojbuilds.nagly.platform.PlatformActions
+import com.manojbuilds.nagly.ui.designsystem.NaglySpacing
+import com.manojbuilds.nagly.ui.designsystem.components.NaglyCard
+import com.manojbuilds.nagly.ui.designsystem.components.PillButton
+import com.manojbuilds.nagly.ui.designsystem.components.PillButtonVariant
 import kotlin.math.roundToInt
 
 @Composable
@@ -59,8 +60,8 @@ fun SettingsScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
-            .padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+            .padding(NaglySpacing.md),
+        verticalArrangement = Arrangement.spacedBy(NaglySpacing.xs),
     ) {
         Text("Settings", style = MaterialTheme.typography.headlineMedium)
 
@@ -86,7 +87,7 @@ fun SettingsScreen(
             },
             steps = 20,
         )
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(horizontalArrangement = Arrangement.spacedBy(NaglySpacing.xs)) {
             FilterChip(
                 selected = state.volumeUnit == VolumeUnit.ML,
                 onClick = { onVolumeUnitChange(VolumeUnit.ML) },
@@ -138,15 +139,20 @@ fun SettingsScreen(
             }
             Switch(checked = state.notificationsEnabled, onCheckedChange = onNotificationsChange)
         }
-        OutlinedButton(onClick = onRequestPermission, modifier = Modifier.fillMaxWidth()) {
+        PillButton(
+            onClick = onRequestPermission,
+            modifier = Modifier.fillMaxWidth(),
+            variant = PillButtonVariant.Outlined,
+        ) {
             Text("Re-request notification permission")
         }
 
         SectionTitle("Subscription")
-        OutlinedButton(
+        PillButton(
             onClick = onRestorePurchases,
             enabled = !state.isSaving,
             modifier = Modifier.fillMaxWidth(),
+            variant = PillButtonVariant.Outlined,
         ) {
             Text(if (state.isSaving) "Working…" else "Restore purchases")
         }
@@ -168,7 +174,7 @@ fun SettingsScreen(
             "Version ${state.versionName}",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 16.dp),
+            modifier = Modifier.padding(top = NaglySpacing.sm),
         )
     }
 }
@@ -178,7 +184,7 @@ private fun SectionTitle(text: String) {
     Text(
         text,
         style = MaterialTheme.typography.titleLarge,
-        modifier = Modifier.padding(top = 16.dp, bottom = 4.dp),
+        modifier = Modifier.padding(top = NaglySpacing.sm, bottom = NaglySpacing.xxs),
     )
 }
 
@@ -191,9 +197,8 @@ private fun SettingsRow(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
             .clickable(onClick = onClick)
-            .padding(vertical = 12.dp),
+            .padding(vertical = NaglySpacing.xs + 4.dp),
     ) {
         Text(title, style = MaterialTheme.typography.bodyLarge)
         subtitle?.let {
@@ -209,18 +214,20 @@ private fun SettingsRow(
 
 @Composable
 private fun MessageBanner(message: String, onDismiss: () -> Unit) {
-    Row(
+    NaglyCard(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.primaryContainer)
-            .clickable(onClick = onDismiss)
-            .padding(12.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
+            .clickable(onClick = onDismiss),
+        contentPadding = NaglySpacing.xs + 4.dp,
     ) {
-        Text(message, style = MaterialTheme.typography.bodyMedium)
-        Text("✕", style = MaterialTheme.typography.labelLarge)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(message, style = MaterialTheme.typography.bodyMedium)
+            Text("✕", style = MaterialTheme.typography.labelLarge)
+        }
     }
 }
 

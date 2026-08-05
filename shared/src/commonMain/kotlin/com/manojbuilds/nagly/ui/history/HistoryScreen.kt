@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -24,8 +23,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.manojbuilds.nagly.ui.designsystem.NaglySpacing
+import com.manojbuilds.nagly.ui.designsystem.components.NaglyCard
+import com.manojbuilds.nagly.ui.designsystem.components.SpeechBubbleSimple
 
 @Composable
 fun HistoryScreen(
@@ -43,17 +46,17 @@ fun HistoryScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
-            .padding(24.dp),
+            .padding(NaglySpacing.md),
     ) {
         Text("History", style = MaterialTheme.typography.headlineMedium)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 8.dp, bottom = 20.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+                .padding(top = NaglySpacing.xs, bottom = NaglySpacing.md - 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(NaglySpacing.sm),
         ) {
-            StreakChip(label = "Current", value = state.currentStreak)
-            StreakChip(label = "Best", value = state.bestStreak)
+            StreakChip(label = "Current", value = state.currentStreak, modifier = Modifier.weight(1f))
+            StreakChip(label = "Best", value = state.bestStreak, modifier = Modifier.weight(1f))
         }
 
         if (empty) {
@@ -61,11 +64,11 @@ fun HistoryScreen(
                 text = "${state.personaName} says:",
                 style = MaterialTheme.typography.titleLarge,
             )
-            Text(
+            SpeechBubbleSimple(
                 text = "\"${state.emptyLine}\"",
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(top = 12.dp),
+                textStyle = MaterialTheme.typography.headlineMedium,
+                textColor = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(top = NaglySpacing.xs + 4.dp),
             )
         } else {
             Text("Last 7 days", style = MaterialTheme.typography.titleLarge)
@@ -73,7 +76,7 @@ fun HistoryScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
-                    .padding(vertical = 8.dp),
+                    .padding(vertical = NaglySpacing.xs),
             ) {
                 val maxMl = maxOf(state.dailyMl, state.days.maxOf { it.totalMl }, 1).toFloat()
                 val barWidth = size.width / (state.days.size * 2f)
@@ -124,7 +127,7 @@ fun HistoryScreen(
             Text(
                 text = state.monthLabel,
                 style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.padding(top = 24.dp, bottom = 8.dp),
+                modifier = Modifier.padding(top = NaglySpacing.md, bottom = NaglySpacing.xs),
             )
             CalendarHeatGrid(
                 days = state.calendarDays,
@@ -137,12 +140,10 @@ fun HistoryScreen(
 }
 
 @Composable
-private fun StreakChip(label: String, value: Int) {
-    Column(
-        modifier = Modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .padding(horizontal = 16.dp, vertical = 10.dp),
+private fun StreakChip(label: String, value: Int, modifier: Modifier = Modifier) {
+    NaglyCard(
+        modifier = modifier,
+        contentPadding = NaglySpacing.sm,
     ) {
         Text(label, style = MaterialTheme.typography.labelLarge)
         Text(
@@ -156,9 +157,9 @@ private fun StreakChip(label: String, value: Int) {
 @Composable
 private fun CalendarHeatGrid(
     days: List<CalendarDay>,
-    metColor: androidx.compose.ui.graphics.Color,
-    partialColor: androidx.compose.ui.graphics.Color,
-    emptyColor: androidx.compose.ui.graphics.Color,
+    metColor: Color,
+    partialColor: Color,
+    emptyColor: Color,
 ) {
     val dayLabels = listOf("M", "T", "W", "T", "F", "S", "S")
     Column {
@@ -179,7 +180,7 @@ private fun CalendarHeatGrid(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 4.dp),
+                    .padding(vertical = NaglySpacing.xxs),
                 horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
                 week.forEach { day ->
@@ -187,11 +188,11 @@ private fun CalendarHeatGrid(
                         modifier = Modifier
                             .weight(1f)
                             .aspectRatio(1f)
-                            .padding(2.dp)
+                            .padding(NaglySpacing.xxs)
                             .clip(RoundedCornerShape(6.dp))
                             .background(
                                 when {
-                                    day.date == null -> androidx.compose.ui.graphics.Color.Transparent
+                                    day.date == null -> Color.Transparent
                                     day.heat == DayHeat.MET -> metColor
                                     day.heat == DayHeat.PARTIAL -> partialColor
                                     else -> emptyColor

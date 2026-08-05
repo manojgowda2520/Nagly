@@ -16,14 +16,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -38,15 +34,20 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.manojbuilds.nagly.domain.model.Mood
+import com.manojbuilds.nagly.ui.designsystem.LocalNaglyColors
+import com.manojbuilds.nagly.ui.designsystem.NaglyShapes
+import com.manojbuilds.nagly.ui.designsystem.NaglySpacing
+import com.manojbuilds.nagly.ui.designsystem.components.PillButton
+import com.manojbuilds.nagly.ui.designsystem.components.PillButtonVariant
+import com.manojbuilds.nagly.ui.designsystem.components.SpeechBubbleSimple
+import com.manojbuilds.nagly.ui.designsystem.moodColor
 import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -60,6 +61,7 @@ fun TodayScreen(
     onOpenHistory: () -> Unit = {},
     onOpenPersonas: () -> Unit = {},
 ) {
+    val naglyColors = LocalNaglyColors.current
     var showCustomDialog by remember { mutableStateOf(false) }
     val animatedProgress by animateFloatAsState(
         targetValue = state.progress,
@@ -79,7 +81,7 @@ fun TodayScreen(
                 ),
             )
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 24.dp, vertical = 16.dp),
+            .padding(horizontal = NaglySpacing.md, vertical = NaglySpacing.sm),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Row(
@@ -98,14 +100,14 @@ fun TodayScreen(
                     modifier = Modifier
                         .background(
                             MaterialTheme.colorScheme.tertiary.copy(alpha = 0.15f),
-                            RoundedCornerShape(999.dp),
+                            NaglyShapes.pill,
                         )
-                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                        .padding(horizontal = NaglySpacing.xs + 4.dp, vertical = 6.dp),
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(NaglySpacing.xs))
 
         Box(
             contentAlignment = Alignment.Center,
@@ -126,23 +128,21 @@ fun TodayScreen(
             text = "${state.consumedMl} / ${state.dailyMl} ml",
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(top = 4.dp),
+            modifier = Modifier.padding(top = NaglySpacing.xxs),
         )
 
         Text(
             text = moodLabel(state.mood),
             style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.secondary,
-            modifier = Modifier.padding(top = 12.dp),
+            color = state.mood.moodColor(naglyColors),
+            modifier = Modifier.padding(top = NaglySpacing.xs + 4.dp),
         )
-        Text(
+        SpeechBubbleSimple(
             text = state.personaLine.ifBlank { "Loading your nag..." },
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.onBackground,
-            textAlign = TextAlign.Center,
+            textStyle = MaterialTheme.typography.headlineMedium,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 4.dp, bottom = 8.dp),
+                .padding(top = NaglySpacing.xxs, bottom = NaglySpacing.xs),
         )
 
         Text(
@@ -151,7 +151,7 @@ fun TodayScreen(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(NaglySpacing.sm))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -176,12 +176,10 @@ fun TodayScreen(
                     modifier = Modifier.weight(1f),
                 )
             } else {
-                OutlinedButton(
+                PillButton(
                     onClick = { showCustomDialog = true },
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(52.dp),
-                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier.weight(1f),
+                    variant = PillButtonVariant.Outlined,
                 ) {
                     Text("Custom")
                 }
@@ -194,14 +192,14 @@ fun TodayScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(NaglySpacing.xs + 4.dp))
 
         Text(
             "Today's sips",
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 8.dp),
+                .padding(bottom = NaglySpacing.xs),
         )
         if (state.drinks.isEmpty()) {
             Text(
@@ -215,7 +213,7 @@ fun TodayScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 4.dp),
+                        .padding(vertical = NaglySpacing.xxs),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
@@ -255,18 +253,10 @@ private fun QuickAdd(
     modifier: Modifier = Modifier,
     emphasized: Boolean = false,
 ) {
-    Button(
+    PillButton(
         onClick = onClick,
-        modifier = modifier.height(52.dp),
-        shape = RoundedCornerShape(16.dp),
-        colors = if (emphasized) {
-            ButtonDefaults.buttonColors()
-        } else {
-            ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.onSecondary,
-            )
-        },
+        modifier = modifier,
+        variant = if (emphasized) PillButtonVariant.Primary else PillButtonVariant.Accent,
     ) {
         Text(label)
     }
@@ -289,7 +279,6 @@ private fun FillBottle(
         val bodyWidth = w * 0.64f
         val bodyHeight = h * 0.72f
 
-        // Bottle outline
         val path = Path().apply {
             moveTo(w / 2f - neckW / 2f, 0f)
             lineTo(w / 2f + neckW / 2f, 0f)
@@ -351,7 +340,7 @@ private fun CustomAmountDialog(
         dismissButton = {
             TextButton(onClick = onDismiss) { Text("Cancel") }
         },
-        shape = RoundedCornerShape(24.dp),
+        shape = NaglyShapes.dialog,
     )
 }
 

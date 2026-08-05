@@ -1,8 +1,6 @@
 package com.manojbuilds.nagly.ui.paywall
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,9 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -26,6 +22,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.manojbuilds.nagly.billing.FakeBillingRepository
 import com.manojbuilds.nagly.domain.PersonaCatalog
+import com.manojbuilds.nagly.ui.designsystem.NaglySpacing
+import com.manojbuilds.nagly.ui.designsystem.components.NaglyCardOutlined
+import com.manojbuilds.nagly.ui.designsystem.components.PillButton
 
 @Composable
 fun PaywallScreen(
@@ -41,7 +40,7 @@ fun PaywallScreen(
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
             .verticalScroll(rememberScrollState())
-            .padding(24.dp),
+            .padding(NaglySpacing.md),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -58,7 +57,7 @@ fun PaywallScreen(
             "Free forever for logging. Pro is just more personalities.",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 8.dp, bottom = 20.dp),
+            modifier = Modifier.padding(top = NaglySpacing.xs, bottom = NaglySpacing.md - 4.dp),
         )
 
         Text("You'll get", style = MaterialTheme.typography.titleLarge)
@@ -66,13 +65,13 @@ fun PaywallScreen(
             Text(
                 text = "${persona.emoji}  ${persona.displayName}",
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(top = 8.dp),
+                modifier = Modifier.padding(top = NaglySpacing.xs),
             )
         }
 
         Column(
-            modifier = Modifier.padding(top = 28.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.padding(top = NaglySpacing.lg - 4.dp),
+            verticalArrangement = Arrangement.spacedBy(NaglySpacing.xs + 4.dp),
         ) {
             PlanCard(
                 title = "Annual",
@@ -90,12 +89,12 @@ fun PaywallScreen(
             )
         }
 
-        Button(
+        PillButton(
             onClick = { onPurchase(selected) },
             enabled = !purchasing,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 24.dp),
+                .padding(top = NaglySpacing.md),
         ) {
             Text(if (purchasing) "Working on it..." else "Go Pro")
         }
@@ -117,20 +116,10 @@ private fun PlanCard(
     badge: String?,
     onClick: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(
-                width = if (selected) 2.dp else 1.dp,
-                color = if (selected) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.outline
-                },
-                shape = RoundedCornerShape(18.dp),
-            )
-            .clickable(onClick = onClick)
-            .padding(16.dp),
+    NaglyCardOutlined(
+        modifier = Modifier.fillMaxWidth(),
+        selected = selected,
+        onClick = onClick,
     ) {
         Row {
             Text(title, style = MaterialTheme.typography.titleLarge, modifier = Modifier.weight(1f))
@@ -146,7 +135,7 @@ private fun PlanCard(
             subtitle,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 4.dp),
+            modifier = Modifier.padding(top = NaglySpacing.xxs),
         )
     }
 }

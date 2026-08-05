@@ -4,9 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -17,6 +15,10 @@ import com.manojbuilds.nagly.domain.model.DayPart
 import com.manojbuilds.nagly.domain.model.Mood
 import com.manojbuilds.nagly.domain.model.Persona
 import com.manojbuilds.nagly.domain.showAdUnlockOption
+import com.manojbuilds.nagly.ui.designsystem.NaglySpacing
+import com.manojbuilds.nagly.ui.designsystem.components.PillButton
+import com.manojbuilds.nagly.ui.designsystem.components.PillButtonVariant
+import com.manojbuilds.nagly.ui.designsystem.components.SpeechBubbleSimple
 
 @Composable
 fun UnlockSheet(
@@ -33,22 +35,22 @@ fun UnlockSheet(
         title = { Text("${persona.emoji} ${persona.displayName}") },
         text = {
             Column {
-                Text(
+                SpeechBubbleSimple(
                     text = "\"$preview\"",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.primary,
+                    textStyle = MaterialTheme.typography.titleLarge,
+                    textColor = MaterialTheme.colorScheme.primary,
                 )
                 Text(
                     text = "She's locked for free accounts — borrow her for a day, or keep her forever.",
                     style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(top = 12.dp),
+                    modifier = Modifier.padding(top = NaglySpacing.xs + 4.dp),
                 )
             }
         },
         confirmButton = {
             Column(modifier = Modifier.fillMaxWidth()) {
                 if (showAdUnlockOption(isPro)) {
-                    Button(
+                    PillButton(
                         onClick = onWatchAd,
                         enabled = !watchingAd,
                         modifier = Modifier.fillMaxWidth(),
@@ -62,11 +64,12 @@ fun UnlockSheet(
                         )
                     }
                 }
-                OutlinedButton(
+                PillButton(
                     onClick = onGoPro,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp),
+                        .padding(top = NaglySpacing.xs),
+                    variant = PillButtonVariant.Outlined,
                 ) {
                     Text("Go Pro — keep her forever")
                 }

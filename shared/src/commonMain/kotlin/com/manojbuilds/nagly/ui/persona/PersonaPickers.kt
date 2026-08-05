@@ -1,7 +1,5 @@
 package com.manojbuilds.nagly.ui.persona
 
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -11,9 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,6 +23,8 @@ import com.manojbuilds.nagly.domain.model.Mood
 import com.manojbuilds.nagly.domain.model.Persona
 import com.manojbuilds.nagly.domain.model.Relationship
 import com.manojbuilds.nagly.domain.model.Tier
+import com.manojbuilds.nagly.ui.designsystem.NaglySpacing
+import com.manojbuilds.nagly.ui.designsystem.components.NaglyCardOutlined
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -41,8 +39,8 @@ fun RelationshipGrid(
 ) {
     FlowRow(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(NaglySpacing.xs + 4.dp),
+        verticalArrangement = Arrangement.spacedBy(NaglySpacing.xs + 4.dp),
     ) {
         PersonaCatalog.relationships.forEach { relationship ->
             val accessible = isRelationshipAccessible(
@@ -53,38 +51,20 @@ fun RelationshipGrid(
             )
             val selected = relationship.id == selectedRelationshipId
             val expires = unlockExpiries[relationship.id]
-            Surface(
-                modifier = Modifier
-                    .clickable {
-                        if (accessible) onSelect(relationship.id) else onLockedClick(relationship)
-                    },
-                shape = RoundedCornerShape(18.dp),
-                color = if (selected) {
-                    MaterialTheme.colorScheme.primaryContainer
-                } else {
-                    MaterialTheme.colorScheme.surface
+            NaglyCardOutlined(
+                modifier = Modifier,
+                selected = selected,
+                contentPadding = NaglySpacing.sm,
+                onClick = {
+                    if (accessible) onSelect(relationship.id) else onLockedClick(relationship)
                 },
-                tonalElevation = if (selected) 2.dp else 0.dp,
             ) {
-                Column(
-                    modifier = Modifier
-                        .border(
-                            width = if (selected) 2.dp else 1.dp,
-                            color = if (selected) {
-                                MaterialTheme.colorScheme.primary
-                            } else {
-                                MaterialTheme.colorScheme.outline
-                            },
-                            shape = RoundedCornerShape(18.dp),
-                        )
-                        .padding(horizontal = 20.dp, vertical = 16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(relationship.emoji, style = MaterialTheme.typography.headlineMedium)
                     Text(
                         relationship.displayName,
                         style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.padding(top = 4.dp),
+                        modifier = Modifier.padding(top = NaglySpacing.xxs),
                     )
                     when {
                         expires != null && expires > nowMs && relationship.tier == Tier.PRO -> {
@@ -92,14 +72,14 @@ fun RelationshipGrid(
                                 countdownLabel(expires, nowMs),
                                 color = MaterialTheme.colorScheme.secondary,
                                 style = MaterialTheme.typography.labelLarge,
-                                modifier = Modifier.padding(top = 4.dp),
+                                modifier = Modifier.padding(top = NaglySpacing.xxs),
                             )
                         }
                         relationship.tier == Tier.PRO && !accessible -> {
                             Text(
                                 "🔒",
                                 style = MaterialTheme.typography.labelLarge,
-                                modifier = Modifier.padding(top = 4.dp),
+                                modifier = Modifier.padding(top = NaglySpacing.xxs),
                             )
                         }
                     }
@@ -123,7 +103,7 @@ fun VariantList(
 ) {
     LazyColumn(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(NaglySpacing.xs + 4.dp),
     ) {
         items(PersonaCatalog.variantsOf(relationshipId), key = { it.id }) { persona ->
             VariantCard(
@@ -153,20 +133,10 @@ fun VariantCard(
     modifier: Modifier = Modifier,
 ) {
     val preview = PersonaCatalog.linesFor(persona, Mood.NEUTRAL, DayPart.ANYTIME).first()
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .border(
-                width = if (selected) 2.dp else 1.dp,
-                color = if (selected) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.outline
-                },
-                shape = RoundedCornerShape(18.dp),
-            )
-            .clickable(onClick = onClick)
-            .padding(16.dp),
+    NaglyCardOutlined(
+        modifier = modifier.fillMaxWidth(),
+        selected = selected,
+        onClick = onClick,
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
@@ -202,7 +172,7 @@ fun VariantCard(
             text = "\"$preview\"",
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 8.dp),
+            modifier = Modifier.padding(top = NaglySpacing.xs),
         )
     }
 }

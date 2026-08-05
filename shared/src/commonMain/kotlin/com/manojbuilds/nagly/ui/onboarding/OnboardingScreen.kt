@@ -1,8 +1,6 @@
 package com.manojbuilds.nagly.ui.onboarding
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,10 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -31,6 +27,10 @@ import com.manojbuilds.nagly.domain.PersonaCatalog
 import com.manojbuilds.nagly.domain.model.ActivityLevel
 import com.manojbuilds.nagly.domain.model.Persona
 import com.manojbuilds.nagly.domain.model.Relationship
+import com.manojbuilds.nagly.ui.designsystem.NaglySpacing
+import com.manojbuilds.nagly.ui.designsystem.components.NaglyCardOutlined
+import com.manojbuilds.nagly.ui.designsystem.components.PillButton
+import com.manojbuilds.nagly.ui.designsystem.components.SpeechBubbleSimple
 import com.manojbuilds.nagly.ui.persona.RelationshipGrid
 import com.manojbuilds.nagly.ui.persona.VariantList
 import kotlin.math.roundToInt
@@ -60,7 +60,7 @@ fun OnboardingScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
-            .padding(24.dp),
+            .padding(NaglySpacing.md),
     ) {
         Text(
             text = stepTitle(state.step),
@@ -71,7 +71,7 @@ fun OnboardingScreen(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-                .padding(top = 20.dp),
+                .padding(top = NaglySpacing.md - 4.dp),
         ) {
             when (state.step) {
                 OnboardingStep.Weight -> WeightStep(
@@ -138,21 +138,21 @@ fun OnboardingScreen(
                 OnboardingStep.BuildingPlan -> Unit
                 OnboardingStep.Relationship -> Unit
                 OnboardingStep.Variant -> {
-                    Button(onClick = onNext) { Text("Continue") }
+                    PillButton(onClick = onNext) { Text("Continue") }
                 }
                 OnboardingStep.FirstGlass -> {
                     if (state.firstGlassLogged) {
-                        Button(onClick = onNext) { Text("Continue") }
+                        PillButton(onClick = onNext) { Text("Continue") }
                     }
                 }
                 OnboardingStep.Permission -> {
-                    Button(onClick = onFinish) { Text("Allow & start") }
+                    PillButton(onClick = onFinish) { Text("Allow & start") }
                 }
                 OnboardingStep.GoalReveal -> {
-                    Button(onClick = onNext) { Text("Choose who nags you") }
+                    PillButton(onClick = onNext) { Text("Choose who nags you") }
                 }
                 else -> {
-                    Button(onClick = onNext) { Text("Continue") }
+                    PillButton(onClick = onNext) { Text("Continue") }
                 }
             }
         }
@@ -175,7 +175,7 @@ private fun stepTitle(step: OnboardingStep): String = when (step) {
 private fun WeightStep(weightKg: String, onWeightChange: (String) -> Unit) {
     Column(
         modifier = Modifier.verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(NaglySpacing.sm),
     ) {
         Text(
             "We'll estimate your daily water goal from your weight.",
@@ -194,7 +194,7 @@ private fun WeightStep(weightKg: String, onWeightChange: (String) -> Unit) {
 
 @Composable
 private fun ActivityStep(selected: ActivityLevel, onSelect: (ActivityLevel) -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(NaglySpacing.xs + 4.dp)) {
         ActivityOption(
             label = "Mostly sitting",
             subtitle = "Desk job, light movement",
@@ -223,23 +223,17 @@ private fun ActivityOption(
     selected: Boolean,
     onClick: () -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .border(
-                width = if (selected) 2.dp else 1.dp,
-                color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
-                shape = RoundedCornerShape(18.dp),
-            )
-            .clickable(onClick = onClick)
-            .padding(16.dp),
+    NaglyCardOutlined(
+        modifier = Modifier.fillMaxWidth(),
+        selected = selected,
+        onClick = onClick,
     ) {
         Text(label, style = MaterialTheme.typography.titleLarge)
         Text(
             subtitle,
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(top = 4.dp),
+            modifier = Modifier.padding(top = NaglySpacing.xxs),
         )
     }
 }
@@ -256,7 +250,7 @@ private fun BuildingPlanStep() {
                 "Crunching numbers…",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = 16.dp),
+                modifier = Modifier.padding(top = NaglySpacing.sm),
             )
         }
     }
@@ -267,7 +261,7 @@ private fun GoalRevealStep(dailyMl: Int) {
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(NaglySpacing.xs + 4.dp),
     ) {
         Text(
             "$dailyMl ml",
@@ -297,7 +291,7 @@ private fun RelationshipStep(
             "Pick a relationship — then choose their exact vibe.",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(bottom = 16.dp),
+            modifier = Modifier.padding(bottom = NaglySpacing.sm),
         )
         RelationshipGrid(
             selectedRelationshipId = selectedRelationshipId,
@@ -320,7 +314,7 @@ private fun FirstGlassStep(
     val persona = PersonaCatalog.get(personaId)
     Column(
         modifier = Modifier.verticalScroll(rememberScrollState()),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(NaglySpacing.sm),
     ) {
         Text(
             "${persona.emoji} ${persona.displayName} wants to see you log one.",
@@ -328,14 +322,14 @@ private fun FirstGlassStep(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         if (!logged) {
-            Button(onClick = onLog, modifier = Modifier.fillMaxWidth()) {
+            PillButton(onClick = onLog, modifier = Modifier.fillMaxWidth()) {
                 Text("Log 250 ml")
             }
         } else {
-            Text(
+            SpeechBubbleSimple(
                 text = "\"${reactionLine ?: "Nice start!"}\"",
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.primary,
+                textStyle = MaterialTheme.typography.headlineMedium,
+                textColor = MaterialTheme.colorScheme.primary,
             )
         }
     }
@@ -348,7 +342,7 @@ private fun HoursStep(
     onWakeChange: (Int) -> Unit,
     onSleepChange: (Int) -> Unit,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(NaglySpacing.md - 4.dp)) {
         Text("Wake: ${formatHour(wakeHour)}", style = MaterialTheme.typography.titleLarge)
         Slider(
             value = wakeHour.toFloat(),
@@ -372,12 +366,12 @@ private fun PermissionStep(
     personaName: String,
     line: String,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(NaglySpacing.sm)) {
         Text("$personaEmoji $personaName", style = MaterialTheme.typography.headlineMedium)
-        Text(
+        SpeechBubbleSimple(
             text = "\"$line\"",
-            style = MaterialTheme.typography.headlineMedium,
-            color = MaterialTheme.colorScheme.primary,
+            textStyle = MaterialTheme.typography.headlineMedium,
+            textColor = MaterialTheme.colorScheme.primary,
         )
         Text(
             text = "They'll only nudge you while you're awake — and only when you're falling behind.",
