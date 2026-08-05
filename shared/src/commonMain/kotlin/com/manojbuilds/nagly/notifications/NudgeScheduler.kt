@@ -65,7 +65,7 @@ fun nudgeBody(
 ): String {
     val mood = projectedMood(atMs, goal, consumedMl, ignoredNudgeCount)
     val persona = PersonaCatalog.get(goal.personaId)
-    return pickLine(persona, mood, previousLine)
+    return pickLine(persona, mood, previousLine = previousLine)
 }
 
 class NudgeScheduler(

@@ -122,7 +122,7 @@ fun App() {
                             )
                         ) {
                             onboardingHolder.selectPersona(id)
-                        } else if (persona.isPro) {
+                        } else if (PersonaCatalog.isPro(persona)) {
                             lockedPersona = persona
                         }
                     },

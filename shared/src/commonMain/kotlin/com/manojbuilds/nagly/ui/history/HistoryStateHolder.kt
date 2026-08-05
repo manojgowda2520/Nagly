@@ -75,7 +75,17 @@ class HistoryStateHolder(
             dailyMl = goal.dailyMl,
             currentStreak = currentStreak(logsByDay, goal.dailyMl, today),
             bestStreak = bestStreak(logsByDay, goal.dailyMl),
-            emptyLine = persona.lines.getValue(Mood.WORRIED).first(),
+            emptyLine = PersonaCatalog.linesFor(
+                persona,
+                Mood.WORRIED,
+                com.manojbuilds.nagly.domain.model.DayPart.ANYTIME,
+            ).ifEmpty {
+                PersonaCatalog.linesFor(
+                    persona,
+                    Mood.WORRIED,
+                    com.manojbuilds.nagly.domain.model.DayPart.AFTERNOON,
+                )
+            }.first(),
             personaName = persona.displayName,
         )
     }.stateIn(scope, SharingStarted.Eagerly, HistoryUiState())

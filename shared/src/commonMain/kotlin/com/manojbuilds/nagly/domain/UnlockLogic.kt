@@ -16,7 +16,7 @@ fun isPersonaAccessible(
     activeUnlocks: Map<String, Long>,
     nowMs: Long,
 ): Boolean {
-    if (!persona.isPro) return true
+    if (!PersonaCatalog.isPro(persona)) return true
     if (isPro) return true
     val expires = activeUnlocks[persona.id] ?: return false
     return expires > nowMs
@@ -34,9 +34,10 @@ fun resolveExpiredSelection(
     val persona = PersonaCatalog.get(goal.personaId)
     val stillOk = isPersonaAccessible(persona, isPro, activeUnlocks, nowMs)
     if (stillOk) return goal to null
-    val message = PersonaCatalog.get(freeFallbackId).lines
-        .getValue(com.manojbuilds.nagly.domain.model.Mood.DISAPPOINTED)
-        .first()
+    val message = pickLine(
+        PersonaCatalog.get(freeFallbackId),
+        com.manojbuilds.nagly.domain.model.Mood.DISAPPOINTED,
+    )
     return goal.copy(personaId = freeFallbackId) to message
 }
 

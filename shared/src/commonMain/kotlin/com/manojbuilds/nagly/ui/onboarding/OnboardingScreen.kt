@@ -183,7 +183,7 @@ fun PersonaStep(
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.weight(1f),
                     )
-                    if (persona.isPro && !unlocked) {
+                    if (PersonaCatalog.isPro(persona) && !unlocked) {
                         Text(
                             "Pro",
                             color = MaterialTheme.colorScheme.primary,
@@ -192,7 +192,7 @@ fun PersonaStep(
                     }
                 }
                 Text(
-                    text = persona.lines.getValue(Mood.NEUTRAL).first(),
+                    text = PersonaCatalog.linesFor(persona, Mood.NEUTRAL, com.manojbuilds.nagly.domain.model.DayPart.ANYTIME).first(),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(top = 8.dp),

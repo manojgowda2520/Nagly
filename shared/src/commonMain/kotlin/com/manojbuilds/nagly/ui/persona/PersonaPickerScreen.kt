@@ -73,15 +73,16 @@ fun PersonaPickerScreen(
                             style = MaterialTheme.typography.titleLarge,
                             modifier = Modifier.weight(1f),
                         )
+                        val isProPersona = PersonaCatalog.isPro(persona)
                         when {
-                            expires != null && expires > nowMs && persona.isPro -> {
+                            expires != null && expires > nowMs && isProPersona -> {
                                 Text(
                                     countdownLabel(expires, nowMs),
                                     color = MaterialTheme.colorScheme.secondary,
                                     style = MaterialTheme.typography.labelLarge,
                                 )
                             }
-                            persona.isPro && !unlocked -> {
+                            isProPersona && !unlocked -> {
                                 Text(
                                     "Pro",
                                     color = MaterialTheme.colorScheme.primary,
@@ -91,7 +92,7 @@ fun PersonaPickerScreen(
                         }
                     }
                     Text(
-                        text = persona.lines.getValue(Mood.NEUTRAL).first(),
+                        text = PersonaCatalog.linesFor(persona, Mood.NEUTRAL, com.manojbuilds.nagly.domain.model.DayPart.ANYTIME).first(),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(top = 8.dp),

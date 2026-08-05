@@ -1,9 +1,21 @@
 package com.manojbuilds.nagly.domain.model
 
-data class Persona(
+enum class Tier { FREE, PRO }
+
+enum class DayPart { MORNING, AFTERNOON, EVENING, ANYTIME }
+
+data class Relationship(
     val id: String,
     val displayName: String,
     val emoji: String,
-    val isPro: Boolean,
-    val lines: Map<Mood, List<String>>,
+    val tier: Tier,
+)
+
+data class Persona(
+    val id: String,
+    val relationshipId: String,
+    val displayName: String,
+    val emoji: String,
+    val bodyLines: Map<Mood, Map<DayPart, List<String>>>,
+    val skipLabels: Map<Mood, List<String>>,
 )

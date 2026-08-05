@@ -109,12 +109,13 @@ class OnboardingStateHolder(
     }
 
     fun canSelect(persona: Persona, unlocked: Set<String>, isPro: Boolean): Boolean {
-        return !persona.isPro || isPro || persona.id in unlocked
+        return !PersonaCatalog.isPro(persona) || isPro || persona.id in unlocked
     }
 
     fun permissionLine(): String {
         val persona = PersonaCatalog.get(draft.value.personaId)
-        return persona.lines[Mood.NEUTRAL]?.firstOrNull()
+        return PersonaCatalog.linesFor(persona, Mood.NEUTRAL, com.manojbuilds.nagly.domain.model.DayPart.ANYTIME)
+            .firstOrNull()
             ?: "Let me nudge you when you forget to drink."
     }
 

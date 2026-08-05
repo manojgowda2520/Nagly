@@ -12,6 +12,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.manojbuilds.nagly.domain.PersonaCatalog
+import com.manojbuilds.nagly.domain.model.DayPart
 import com.manojbuilds.nagly.domain.model.Mood
 import com.manojbuilds.nagly.domain.model.Persona
 import com.manojbuilds.nagly.domain.showAdUnlockOption
@@ -25,7 +27,7 @@ fun UnlockSheet(
     onGoPro: () -> Unit,
     onDismiss: () -> Unit,
 ) {
-    val preview = persona.lines.getValue(Mood.NEUTRAL).first()
+    val preview = PersonaCatalog.linesFor(persona, Mood.NEUTRAL, DayPart.ANYTIME).first()
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("${persona.emoji} ${persona.displayName}") },

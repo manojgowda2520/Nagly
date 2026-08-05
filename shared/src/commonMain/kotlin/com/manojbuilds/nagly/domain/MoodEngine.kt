@@ -1,5 +1,6 @@
 package com.manojbuilds.nagly.domain
 
+import com.manojbuilds.nagly.domain.model.DayPart
 import com.manojbuilds.nagly.domain.model.Mood
 import com.manojbuilds.nagly.domain.model.Persona
 import kotlinx.datetime.LocalDate
@@ -116,12 +117,17 @@ fun bestStreak(logsByDay: Map<LocalDate, Int>, dailyMl: Int): Int {
     return best
 }
 
-fun pickLine(persona: Persona, mood: Mood, previousLine: String?): String {
-    val lines = persona.lines[mood].orEmpty()
-    require(lines.isNotEmpty()) { "Persona ${persona.id} has no lines for $mood" }
+fun pickLine(
+    persona: Persona,
+    mood: Mood,
+    dayPart: DayPart = DayPart.ANYTIME,
+    previousLine: String? = null,
+): String {
+    val lines = PersonaCatalog.linesFor(persona, mood, dayPart)
+    require(lines.isNotEmpty()) { "Persona ${persona.id} has no lines for $mood / $dayPart" }
     if (lines.size == 1) return lines.first()
     val candidates = if (previousLine == null) lines else lines.filter { it != previousLine }
-    return candidates.random()
+    return (if (candidates.isEmpty()) lines else candidates).random()
 }
 
 private fun LocalDate.minusDays(days: Int): LocalDate {

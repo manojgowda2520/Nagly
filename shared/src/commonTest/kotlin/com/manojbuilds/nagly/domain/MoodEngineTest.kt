@@ -1,6 +1,8 @@
 package com.manojbuilds.nagly.domain
 
+import com.manojbuilds.nagly.domain.model.DayPart
 import com.manojbuilds.nagly.domain.model.Mood
+import com.manojbuilds.nagly.domain.model.Tier
 import kotlinx.datetime.LocalDate
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -106,21 +108,50 @@ class MoodEngineTest {
     @Test
     fun pickLine_avoidsPreviousWhenPoolAllows() {
         val persona = PersonaCatalog.get("indian_mom")
-        val first = pickLine(persona, Mood.NEUTRAL, previousLine = null)
+        val first = pickLine(persona, Mood.NEUTRAL, dayPart = DayPart.ANYTIME, previousLine = null)
         repeat(20) {
-            val next = pickLine(persona, Mood.NEUTRAL, previousLine = first)
+            val next = pickLine(persona, Mood.NEUTRAL, dayPart = DayPart.ANYTIME, previousLine = first)
             assertNotEquals(first, next)
         }
     }
 
     @Test
-    fun personaCatalog_hasThreeLinesPerMood() {
+    fun linesFor_fallsBackToAnytimeWhenDayPartEmpty() {
+        val persona = PersonaCatalog.get("indian_mom")
+        val anytime = PersonaCatalog.linesFor(persona, Mood.NEUTRAL, DayPart.ANYTIME)
+        assertEquals(3, anytime.size)
+        // Neutral has only ANYTIME — requesting MORNING falls back
+        assertEquals(anytime, PersonaCatalog.linesFor(persona, Mood.NEUTRAL, DayPart.MORNING))
+    }
+
+    @Test
+    fun linesFor_usesDayPartWhenPresent() {
+        val persona = PersonaCatalog.get("indian_mom")
+        val morning = PersonaCatalog.linesFor(persona, Mood.WORRIED, DayPart.MORNING)
+        val afternoon = PersonaCatalog.linesFor(persona, Mood.WORRIED, DayPart.AFTERNOON)
+        assertEquals(3, morning.size)
+        assertEquals(3, afternoon.size)
+        assertNotEquals(morning, afternoon)
+    }
+
+    @Test
+    fun personaCatalog_taxonomyAndPlaceholders() {
+        assertEquals(4, PersonaCatalog.relationships.size)
+        assertEquals(Tier.FREE, PersonaCatalog.relationship("mom").tier)
+        assertEquals(Tier.PRO, PersonaCatalog.relationship("dad").tier)
+        assertEquals(3, PersonaCatalog.variantsOf("mom").size)
+        assertEquals(3, PersonaCatalog.free.size)
+        assertEquals(9, PersonaCatalog.pro.size)
         PersonaCatalog.all.forEach { persona ->
+            assertEquals(3, PersonaCatalog.linesFor(persona, Mood.NEUTRAL, DayPart.ANYTIME).size)
+            assertEquals(3, PersonaCatalog.linesFor(persona, Mood.PROUD, DayPart.ANYTIME).size)
+            DayPart.entries.filter { it != DayPart.ANYTIME }.forEach { part ->
+                assertEquals(3, PersonaCatalog.linesFor(persona, Mood.WORRIED, part).size, "${persona.id} worried $part")
+                assertEquals(3, PersonaCatalog.linesFor(persona, Mood.DISAPPOINTED, part).size, "${persona.id} disappointed $part")
+            }
             Mood.entries.forEach { mood ->
-                assertEquals(3, persona.lines.getValue(mood).size, "${persona.id} $mood")
+                assertTrue(persona.skipLabels.getValue(mood).size >= 2, "${persona.id} skip $mood")
             }
         }
-        assertEquals(3, PersonaCatalog.free.size)
-        assertEquals(4, PersonaCatalog.pro.size)
     }
 }
