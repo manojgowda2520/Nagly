@@ -14,7 +14,8 @@ class NudgeAlarmReceiver : BroadcastReceiver(), KoinComponent {
         val id = intent.getIntExtra(Notifier.EXTRA_ID, 1)
         val title = intent.getStringExtra(Notifier.EXTRA_TITLE).orEmpty()
         val body = intent.getStringExtra(Notifier.EXTRA_BODY).orEmpty()
+        val skipLabel = intent.getStringExtra(Notifier.EXTRA_SKIP_LABEL) ?: "Skip"
         coordinator.onNudgeDelivered()
-        Notifier.showNudge(context, id, title, body)
+        Notifier.showNudge(context, id, title, body, skipLabel)
     }
 }

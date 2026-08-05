@@ -29,13 +29,21 @@ actual class Notifier(private val context: Context) {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    actual fun schedule(id: Int, atEpochMs: Long, title: String, body: String) {
+    actual fun schedule(
+        id: Int,
+        atEpochMs: Long,
+        title: String,
+        body: String,
+        actions: NudgeActions,
+    ) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, NudgeAlarmReceiver::class.java).apply {
             action = ACTION_SHOW_NUDGE
             putExtra(EXTRA_ID, id)
             putExtra(EXTRA_TITLE, title)
             putExtra(EXTRA_BODY, body)
+            putExtra(EXTRA_SKIP_LABEL, actions.skipLabel)
+            putExtra(EXTRA_MOOD, actions.mood.name)
         }
         val pending = PendingIntent.getBroadcast(
             context,
@@ -43,10 +51,33 @@ actual class Notifier(private val context: Context) {
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, atEpochMs, pending)
+        val canExact = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            alarmManager.canScheduleExactAlarms()
         } else {
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, atEpochMs, pending)
+            true
+        }
+        try {
+            when {
+                canExact && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
+                    alarmManager.setExactAndAllowWhileIdle(
+                        AlarmManager.RTC_WAKEUP,
+                        atEpochMs,
+                        pending,
+                    )
+                }
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
+                    alarmManager.setAndAllowWhileIdle(
+                        AlarmManager.RTC_WAKEUP,
+                        atEpochMs,
+                        pending,
+                    )
+                }
+                else -> {
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, atEpochMs, pending)
+                }
+            }
+        } catch (_: SecurityException) {
+            alarmManager.set(AlarmManager.RTC_WAKEUP, atEpochMs, pending)
         }
     }
 
@@ -82,28 +113,43 @@ actual class Notifier(private val context: Context) {
     companion object {
         const val CHANNEL_ID = "nagly_nudges"
         const val ACTION_SHOW_NUDGE = "com.manojbuilds.nagly.SHOW_NUDGE"
-        const val ACTION_LOGGED_IT = "com.manojbuilds.nagly.LOGGED_IT"
+        const val ACTION_NUDGE = "com.manojbuilds.nagly.NUDGE_ACTION"
         const val EXTRA_ID = "id"
         const val EXTRA_TITLE = "title"
         const val EXTRA_BODY = "body"
+        const val EXTRA_SKIP_LABEL = "skip_label"
+        const val EXTRA_MOOD = "mood"
+        const val EXTRA_ACTION_ID = "action_id"
 
-        fun showNudge(context: Context, id: Int, title: String, body: String) {
-            val logIntent = Intent(context, LogDrinkReceiver::class.java).apply {
-                action = ACTION_LOGGED_IT
+        fun showNudge(
+            context: Context,
+            id: Int,
+            title: String,
+            body: String,
+            skipLabel: String,
+        ) {
+            fun actionPending(actionId: String, requestCode: Int): PendingIntent {
+                val intent = Intent(context, LogDrinkReceiver::class.java).apply {
+                    action = ACTION_NUDGE
+                    putExtra(EXTRA_ACTION_ID, actionId)
+                    putExtra(EXTRA_ID, id)
+                }
+                return PendingIntent.getBroadcast(
+                    context,
+                    requestCode,
+                    intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+                )
             }
-            val logPending = PendingIntent.getBroadcast(
-                context,
-                1000 + id,
-                logIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-            )
             val notification = NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(android.R.drawable.ic_dialog_info)
                 .setContentTitle(title)
                 .setContentText(body)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setAutoCancel(true)
-                .addAction(0, "Logged it", logPending)
+                .addAction(0, "+250 ml", actionPending(NudgeActionIds.ADD_250, 2000 + id))
+                .addAction(0, "+500 ml", actionPending(NudgeActionIds.ADD_500, 3000 + id))
+                .addAction(0, skipLabel, actionPending(NudgeActionIds.SKIP, 4000 + id))
                 .build()
             NotificationManagerCompat.from(context).notify(id, notification)
         }

@@ -1,5 +1,6 @@
 package com.manojbuilds.nagly.notifications
 
+import com.manojbuilds.nagly.domain.model.Mood
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.suspendCancellableCoroutine
 import platform.UserNotifications.UNAuthorizationOptionAlert
@@ -21,7 +22,7 @@ import kotlin.time.Clock
 actual class Notifier {
 
     init {
-        registerCategory()
+        registerCategories()
     }
 
     actual suspend fun requestPermission(): Boolean = suspendCancellableCoroutine { cont ->
@@ -33,12 +34,18 @@ actual class Notifier {
         }
     }
 
-    actual fun schedule(id: Int, atEpochMs: Long, title: String, body: String) {
+    actual fun schedule(
+        id: Int,
+        atEpochMs: Long,
+        title: String,
+        body: String,
+        actions: NudgeActions,
+    ) {
         val content = UNMutableNotificationContent().apply {
             setTitle(title)
             setBody(body)
             setSound(UNNotificationSound.defaultSound)
-            setCategoryIdentifier(CATEGORY_ID)
+            setCategoryIdentifier(actions.iosCategoryId)
         }
         val nowMs = Clock.System.now().toEpochMilliseconds()
         val intervalSec = ((atEpochMs - nowMs).coerceAtLeast(1_000L)) / 1000.0
@@ -61,24 +68,31 @@ actual class Notifier {
         center.removeAllDeliveredNotifications()
     }
 
-    private fun registerCategory() {
-        val action = UNNotificationAction.actionWithIdentifier(
-            identifier = ACTION_LOGGED_IT,
-            title = "Logged it",
-            options = UNNotificationActionOptionNone,
-        )
-        val category = UNNotificationCategory.categoryWithIdentifier(
-            identifier = CATEGORY_ID,
-            actions = listOf(action),
-            intentIdentifiers = emptyList<String>(),
-            options = UNNotificationCategoryOptionNone,
-        )
+    private fun registerCategories() {
+        val categories = Mood.entries.map { mood ->
+            val add250 = UNNotificationAction.actionWithIdentifier(
+                identifier = NudgeActionIds.ADD_250,
+                title = "+250 ml",
+                options = UNNotificationActionOptionNone,
+            )
+            val add500 = UNNotificationAction.actionWithIdentifier(
+                identifier = NudgeActionIds.ADD_500,
+                title = "+500 ml",
+                options = UNNotificationActionOptionNone,
+            )
+            val skip = UNNotificationAction.actionWithIdentifier(
+                identifier = NudgeActionIds.SKIP,
+                title = iosSkipTitle(mood),
+                options = UNNotificationActionOptionNone,
+            )
+            UNNotificationCategory.categoryWithIdentifier(
+                identifier = iosCategoryIdFor(mood),
+                actions = listOf(add250, add500, skip),
+                intentIdentifiers = emptyList<String>(),
+                options = UNNotificationCategoryOptionNone,
+            )
+        }
         UNUserNotificationCenter.currentNotificationCenter()
-            .setNotificationCategories(setOf(category))
-    }
-
-    companion object {
-        const val CATEGORY_ID = "WATER_NUDGE"
-        const val ACTION_LOGGED_IT = "LOGGED_IT"
+            .setNotificationCategories(categories.toSet())
     }
 }

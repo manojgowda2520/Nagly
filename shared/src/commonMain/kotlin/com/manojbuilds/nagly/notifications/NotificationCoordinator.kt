@@ -8,11 +8,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 /**
  * Keeps local nudges in sync with goal + today's consumption.
+ * Decision logic for notification actions lives here / commonMain.
  */
 class NotificationCoordinator(
     private val goalRepository: GoalRepository,
@@ -40,12 +42,37 @@ class NotificationCoordinator(
         }
     }
 
-    suspend fun logFromNotification(amountMl: Int = 250) {
+    suspend fun logFromNotification(amountMl: Int) {
         ignoredNudgeStore.onLogged()
         drinkLogRepository.add(amountMl)
     }
 
+    fun handleAction(actionId: String) {
+        when {
+            isSkipAction(actionId) -> skipFromNotification()
+            else -> {
+                val amount = amountForAction(actionId) ?: return
+                scope.launch { logFromNotification(amount) }
+            }
+        }
+    }
+
+    fun skipFromNotification() {
+        ignoredNudgeStore.onNudgeFired()
+        scope.launch { rescheduleNow() }
+    }
+
     fun onNudgeDelivered() {
         ignoredNudgeStore.onNudgeFired()
+    }
+
+    private suspend fun rescheduleNow() {
+        val goal = goalRepository.observeGoal().first()
+        val consumed = drinkLogRepository.observeToday().first().sumOf { it.amountMl }
+        scheduler.reschedule(
+            nowMs = clock.now().toEpochMilliseconds(),
+            goal = goal,
+            consumedMl = consumed,
+        )
     }
 }

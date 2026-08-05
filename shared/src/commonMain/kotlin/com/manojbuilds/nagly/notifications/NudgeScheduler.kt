@@ -91,6 +91,7 @@ class NudgeScheduler(
         val times = nextNudgeTimes(nowMs, goal, consumedMl)
         val persona = PersonaCatalog.get(goal.personaId)
         times.forEachIndexed { index, atMs ->
+            val mood = projectedMood(atMs, goal, consumedMl, ignoredNudgeStore.count)
             val body = nudgeBody(
                 atMs = atMs,
                 goal = goal,
@@ -104,6 +105,7 @@ class NudgeScheduler(
                 atEpochMs = atMs,
                 title = "${persona.emoji} ${persona.displayName}",
                 body = body,
+                actions = buildNudgeActions(persona, mood),
             )
         }
     }

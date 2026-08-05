@@ -10,9 +10,10 @@ object IosNotificationBridge : KoinComponent {
     private val coordinator: NotificationCoordinator by inject()
 
     fun handleAction(actionId: String) {
-        if (actionId != Notifier.ACTION_LOGGED_IT) return
+        if (actionId == "com.apple.UNNotificationDefaultActionIdentifier") return
+        if (actionId == "com.apple.UNNotificationDismissActionIdentifier") return
         CoroutineScope(Dispatchers.Default).launch {
-            coordinator.logFromNotification(250)
+            coordinator.handleAction(actionId)
         }
     }
 
