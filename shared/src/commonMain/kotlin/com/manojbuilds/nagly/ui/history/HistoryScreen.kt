@@ -6,17 +6,25 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,52 +34,243 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.manojbuilds.nagly.ui.designsystem.LocalNaglyColors
 import com.manojbuilds.nagly.ui.designsystem.NaglySpacing
 import com.manojbuilds.nagly.ui.designsystem.components.NaglyCard
+import com.manojbuilds.nagly.ui.designsystem.components.PillButton
+import com.manojbuilds.nagly.ui.designsystem.components.PillButtonVariant
 import com.manojbuilds.nagly.ui.designsystem.components.SpeechBubbleSimple
+
+private enum class HistoryViewMode {
+    Conversation,
+    Chart,
+}
 
 @Composable
 fun HistoryScreen(
     state: HistoryUiState,
 ) {
-    val barColor = MaterialTheme.colorScheme.primary
-    val goalColor = MaterialTheme.colorScheme.secondary
-    val trackColor = MaterialTheme.colorScheme.surfaceVariant
-    val metColor = MaterialTheme.colorScheme.primary
-    val partialColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)
+    val colors = LocalNaglyColors.current
+    var viewMode by remember { mutableStateOf(HistoryViewMode.Conversation) }
     val empty = state.days.all { it.totalMl == 0 }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .verticalScroll(rememberScrollState())
+            .background(colors.background)
             .padding(NaglySpacing.md),
     ) {
-        Text("History", style = MaterialTheme.typography.headlineMedium)
+        Text("History", style = MaterialTheme.typography.headlineMedium, color = colors.textPrimary)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = NaglySpacing.xs, bottom = NaglySpacing.md - 4.dp),
+                .padding(top = NaglySpacing.xs, bottom = NaglySpacing.sm),
             horizontalArrangement = Arrangement.spacedBy(NaglySpacing.sm),
         ) {
             StreakChip(label = "Current", value = state.currentStreak, modifier = Modifier.weight(1f))
             StreakChip(label = "Best", value = state.bestStreak, modifier = Modifier.weight(1f))
         }
 
-        if (empty) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = NaglySpacing.sm),
+            horizontalArrangement = Arrangement.spacedBy(NaglySpacing.xs),
+        ) {
+            PillButton(
+                onClick = { viewMode = HistoryViewMode.Conversation },
+                modifier = Modifier.weight(1f),
+                variant = if (viewMode == HistoryViewMode.Conversation) {
+                    PillButtonVariant.Primary
+                } else {
+                    PillButtonVariant.Outlined
+                },
+            ) { Text("Conversation") }
+            PillButton(
+                onClick = { viewMode = HistoryViewMode.Chart },
+                modifier = Modifier.weight(1f),
+                variant = if (viewMode == HistoryViewMode.Chart) {
+                    PillButtonVariant.Primary
+                } else {
+                    PillButtonVariant.Outlined
+                },
+            ) { Text("Chart") }
+        }
+
+        when (viewMode) {
+            HistoryViewMode.Conversation -> ConversationView(state, empty, colors)
+            HistoryViewMode.Chart -> ChartView(state, empty, colors)
+        }
+    }
+}
+
+@Composable
+private fun ConversationView(
+    state: HistoryUiState,
+    empty: Boolean,
+    colors: com.manojbuilds.nagly.ui.designsystem.NaglyColors,
+) {
+    if (empty || state.chatItems.isEmpty()) {
+        Column(modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = "${state.personaName} says:",
+                text = "${state.personaEmoji} ${state.personaName} says:",
                 style = MaterialTheme.typography.titleLarge,
+                color = colors.textPrimary,
             )
             SpeechBubbleSimple(
                 text = "\"${state.emptyLine}\"",
-                textStyle = MaterialTheme.typography.headlineMedium,
-                textColor = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(top = NaglySpacing.xs + 4.dp),
+                textStyle = MaterialTheme.typography.titleMedium,
+                textColor = colors.textPrimary,
+                backgroundColor = colors.card,
+                modifier = Modifier.padding(top = NaglySpacing.sm),
+            )
+        }
+        return
+    }
+
+    val listState = rememberLazyListState()
+    LaunchedEffect(state.chatItems.size) {
+        if (state.chatItems.isNotEmpty()) {
+            listState.animateScrollToItem(state.chatItems.lastIndex)
+        }
+    }
+
+    LazyColumn(
+        state = listState,
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(NaglySpacing.xxs),
+    ) {
+        items(state.chatItems, key = { item ->
+            when (item) {
+                is ChatItem.DayDivider -> "d-${item.label}"
+                is ChatItem.Message -> item.message.id
+            }
+        }) { item ->
+            when (item) {
+                is ChatItem.DayDivider -> DayDividerChip(item.label, colors)
+                is ChatItem.Message -> ChatBubble(item.message, colors)
+            }
+        }
+    }
+}
+
+@Composable
+private fun DayDividerChip(label: String, colors: com.manojbuilds.nagly.ui.designsystem.NaglyColors) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = NaglySpacing.sm),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+    ) {
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .height(1.dp)
+                .background(colors.outline.copy(alpha = 0.3f)),
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelMedium,
+            color = colors.textSecondary,
+            modifier = Modifier.padding(horizontal = NaglySpacing.sm),
+        )
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .height(1.dp)
+                .background(colors.outline.copy(alpha = 0.3f)),
+        )
+    }
+}
+
+@Composable
+private fun ChatBubble(
+    message: ChatMessage,
+    colors: com.manojbuilds.nagly.ui.designsystem.NaglyColors,
+) {
+    val bubbleColor = if (message.isUser) colors.primary.copy(alpha = 0.15f) else colors.card
+    val textColor = if (message.isUser) colors.primary else colors.textPrimary
+    val shape = if (message.isUser) {
+        RoundedCornerShape(16.dp, 4.dp, 16.dp, 16.dp)
+    } else {
+        RoundedCornerShape(4.dp, 16.dp, 16.dp, 16.dp)
+    }
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = if (message.isUser) Alignment.End else Alignment.Start,
+    ) {
+        Row(
+            verticalAlignment = Alignment.Bottom,
+            horizontalArrangement = if (message.isUser) Arrangement.End else Arrangement.Start,
+        ) {
+            if (!message.isUser && message.personaEmoji != null) {
+                Text(
+                    text = message.personaEmoji,
+                    modifier = Modifier.padding(end = NaglySpacing.xxs),
+                    style = MaterialTheme.typography.titleLarge,
+                )
+            }
+            Column(
+                horizontalAlignment = if (message.isUser) Alignment.End else Alignment.Start,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .widthIn(max = 280.dp)
+                        .clip(shape)
+                        .background(bubbleColor)
+                        .padding(horizontal = NaglySpacing.sm, vertical = NaglySpacing.xs),
+                ) {
+                    Text(
+                        text = message.text,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = textColor,
+                    )
+                }
+                Text(
+                    text = formatChatTime(message.timestampMs),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = colors.textSecondary,
+                    modifier = Modifier.padding(top = 2.dp, start = 4.dp, end = 4.dp),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ChartView(
+    state: HistoryUiState,
+    empty: Boolean,
+    colors: com.manojbuilds.nagly.ui.designsystem.NaglyColors,
+) {
+    val barColor = colors.primary
+    val goalColor = colors.accent
+    val trackColor = colors.outline.copy(alpha = 0.2f)
+    val metColor = colors.primary
+    val partialColor = colors.primary.copy(alpha = 0.35f)
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = NaglySpacing.md),
+    ) {
+        if (empty) {
+            Text(
+                text = "${state.personaEmoji} ${state.personaName} says:",
+                style = MaterialTheme.typography.titleLarge,
+                color = colors.textPrimary,
+            )
+            SpeechBubbleSimple(
+                text = "\"${state.emptyLine}\"",
+                textStyle = MaterialTheme.typography.titleMedium,
+                textColor = colors.textPrimary,
+                backgroundColor = colors.card,
+                modifier = Modifier.padding(top = NaglySpacing.sm),
             )
         } else {
-            Text("Last 7 days", style = MaterialTheme.typography.titleLarge)
+            Text("Last 7 days", style = MaterialTheme.typography.titleLarge, color = colors.textPrimary)
             Canvas(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -113,11 +312,11 @@ fun HistoryScreen(
             ) {
                 state.days.forEach { day ->
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(day.label, style = MaterialTheme.typography.labelLarge)
+                        Text(day.label, style = MaterialTheme.typography.labelLarge, color = colors.textSecondary)
                         Text(
                             "${day.totalMl}",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = colors.textPrimary,
                             textAlign = TextAlign.Center,
                         )
                     }
@@ -127,6 +326,7 @@ fun HistoryScreen(
             Text(
                 text = state.monthLabel,
                 style = MaterialTheme.typography.titleLarge,
+                color = colors.textPrimary,
                 modifier = Modifier.padding(top = NaglySpacing.md, bottom = NaglySpacing.xs),
             )
             CalendarHeatGrid(
@@ -210,7 +410,7 @@ private fun CalendarHeatGrid(
                     }
                 }
                 repeat(7 - week.size) {
-                    Box(modifier = Modifier.weight(1f))
+                    Spacer(modifier = Modifier.weight(1f))
                 }
             }
         }

@@ -50,6 +50,8 @@ data class HistoryUiState(
     val bestStreak: Int = 0,
     val emptyLine: String = "",
     val personaName: String = "",
+    val personaEmoji: String = "",
+    val chatItems: List<ChatItem> = emptyList(),
     val isLoading: Boolean = false,
 )
 
@@ -63,7 +65,7 @@ class HistoryStateHolder(
 
     val uiState: StateFlow<HistoryUiState> = combine(
         goalRepository.observeGoal(),
-        drinkLogRepository.observeRange(fromMs = monthStartMs(), toMs = rangeEndMs()),
+        drinkLogRepository.observeRange(fromMs = chatRangeStartMs(), toMs = rangeEndMs()),
     ) { goal, logs ->
         val today = clock.now().toLocalDateTime(timeZone).date
         val monthStart = LocalDate(today.year, today.month, 1)
@@ -100,6 +102,8 @@ class HistoryStateHolder(
                 )
             }.first(),
             personaName = persona.displayName,
+            personaEmoji = persona.emoji,
+            chatItems = buildChatTimeline(logs, goal, persona, timeZone),
         )
     }.stateIn(scope, SharingStarted.Eagerly, HistoryUiState())
 
@@ -133,6 +137,12 @@ class HistoryStateHolder(
     ): Int = logs.filter {
         Instant.fromEpochMilliseconds(it.timestampMs).toLocalDateTime(timeZone).date == date
     }.sumOf { it.amountMl }
+
+    private fun chatRangeStartMs(): Long {
+        val today = clock.now().toLocalDateTime(timeZone).date
+        val twoWeeksAgo = today.minus(13, DateTimeUnit.DAY)
+        return twoWeeksAgo.atStartOfDayIn(timeZone).toEpochMilliseconds()
+    }
 
     private fun monthStartMs(): Long {
         val today = clock.now().toLocalDateTime(timeZone).date
