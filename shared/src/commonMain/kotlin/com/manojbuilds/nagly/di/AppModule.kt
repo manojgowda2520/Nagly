@@ -5,6 +5,7 @@ import com.manojbuilds.nagly.data.DrinkLogRepository
 import com.manojbuilds.nagly.data.GoalRepository
 import com.manojbuilds.nagly.data.UnlockRepository
 import com.manojbuilds.nagly.db.NaglyDatabase
+import com.manojbuilds.nagly.ui.history.HistoryStateHolder
 import com.manojbuilds.nagly.ui.onboarding.OnboardingStateHolder
 import com.manojbuilds.nagly.ui.today.TodayStateHolder
 import org.koin.core.context.startKoin
@@ -19,6 +20,7 @@ fun commonModule(): Module = module {
     single { UnlockRepository(get()) }
     single { TodayStateHolder(get(), get()) }
     single { OnboardingStateHolder(get(), get(), get()) }
+    single { HistoryStateHolder(get(), get()) }
 }
 
 fun initKoin(

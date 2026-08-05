@@ -14,6 +14,8 @@ import androidx.compose.ui.Modifier
 import com.manojbuilds.nagly.data.GoalRepository
 import com.manojbuilds.nagly.domain.PersonaCatalog
 import com.manojbuilds.nagly.ui.common.PlaceholderScreen
+import com.manojbuilds.nagly.ui.history.HistoryScreen
+import com.manojbuilds.nagly.ui.history.HistoryStateHolder
 import com.manojbuilds.nagly.ui.navigation.Screen
 import com.manojbuilds.nagly.ui.onboarding.OnboardingScreen
 import com.manojbuilds.nagly.ui.onboarding.OnboardingStateHolder
@@ -49,6 +51,8 @@ fun App() {
             val todayState by todayStateHolder.uiState.collectAsState()
             val onboardingHolder = koinInject<OnboardingStateHolder>()
             val onboardingState by onboardingHolder.uiState.collectAsState()
+            val historyHolder = koinInject<HistoryStateHolder>()
+            val historyState by historyHolder.uiState.collectAsState()
 
             when (currentScreen) {
                 Screen.Today -> TodayScreen(
@@ -58,8 +62,8 @@ fun App() {
                     onOpenHistory = { screen = Screen.History },
                     onOpenPersonas = { screen = Screen.PersonaPicker },
                 )
-                Screen.History -> PlaceholderScreen(
-                    title = "History",
+                Screen.History -> HistoryScreen(
+                    state = historyState,
                     onBack = { screen = Screen.Today },
                 )
                 Screen.PersonaPicker -> PersonaPickerScreen(
