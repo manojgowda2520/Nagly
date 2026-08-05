@@ -1,5 +1,6 @@
 package com.manojbuilds.nagly.domain
 
+import com.manojbuilds.nagly.domain.model.ActivityLevel
 import com.manojbuilds.nagly.domain.model.DayPart
 import com.manojbuilds.nagly.domain.model.Mood
 import com.manojbuilds.nagly.domain.model.Tier
@@ -71,9 +72,16 @@ class MoodEngineTest {
 
     @Test
     fun recommendedDailyMl_clamped() {
-        assertEquals(1500, recommendedDailyMl(30))
-        assertEquals(2450, recommendedDailyMl(70))
-        assertEquals(4000, recommendedDailyMl(200))
+        assertEquals(1500, recommendedDailyMl(30, ActivityLevel.SEDENTARY))
+        assertEquals(2695, recommendedDailyMl(70))
+        assertEquals(4000, recommendedDailyMl(200, ActivityLevel.SEDENTARY))
+    }
+
+    @Test
+    fun recommendedDailyMl_activityMultipliers() {
+        assertEquals(2205, recommendedDailyMl(63, ActivityLevel.SEDENTARY))
+        assertEquals(2695, recommendedDailyMl(70, ActivityLevel.LIGHT))
+        assertEquals(2940, recommendedDailyMl(70, ActivityLevel.ACTIVE))
     }
 
     @Test

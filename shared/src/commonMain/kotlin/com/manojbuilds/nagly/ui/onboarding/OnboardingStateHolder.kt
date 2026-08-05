@@ -1,17 +1,21 @@
 package com.manojbuilds.nagly.ui.onboarding
 
 import com.manojbuilds.nagly.billing.BillingRepository
+import com.manojbuilds.nagly.data.DrinkLogRepository
 import com.manojbuilds.nagly.data.GoalRepository
 import com.manojbuilds.nagly.data.UnlockRepository
 import com.manojbuilds.nagly.domain.PersonaCatalog
-import com.manojbuilds.nagly.domain.recommendedDailyMl
+import com.manojbuilds.nagly.domain.model.ActivityLevel
+import com.manojbuilds.nagly.domain.model.DayPart
 import com.manojbuilds.nagly.domain.model.Mood
 import com.manojbuilds.nagly.domain.model.Persona
 import com.manojbuilds.nagly.domain.model.UserGoal
+import com.manojbuilds.nagly.domain.recommendedDailyMl
 import com.manojbuilds.nagly.notifications.Notifier
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -22,21 +26,28 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 enum class OnboardingStep {
-    Goal,
-    Persona,
+    Weight,
+    Activity,
     Hours,
+    BuildingPlan,
+    GoalReveal,
+    Relationship,
+    Variant,
+    FirstGlass,
     Permission,
 }
 
 data class OnboardingUiState(
-    val step: OnboardingStep = OnboardingStep.Goal,
+    val step: OnboardingStep = OnboardingStep.Weight,
     val weightKg: String = "70",
-    val dailyMl: Int = recommendedDailyMl(70),
-    val useManualMl: Boolean = false,
-    val manualMl: String = "2000",
+    val activity: ActivityLevel = ActivityLevel.LIGHT,
+    val dailyMl: Int = recommendedDailyMl(70, ActivityLevel.LIGHT),
     val personaId: String = "indian_mom",
+    val selectedRelationshipId: String? = "mom",
     val wakeHour: Int = 7,
     val sleepHour: Int = 22,
+    val firstGlassLogged: Boolean = false,
+    val reactionLine: String? = null,
     val unlockedIds: Set<String> = emptySet(),
     val isPro: Boolean = false,
 )
@@ -44,6 +55,7 @@ data class OnboardingUiState(
 class OnboardingStateHolder(
     private val goalRepository: GoalRepository,
     unlockRepository: UnlockRepository,
+    private val drinkLogRepository: DrinkLogRepository,
     private val notifier: Notifier,
     billingRepository: BillingRepository,
 ) {
@@ -61,20 +73,21 @@ class OnboardingStateHolder(
     fun setWeight(value: String) {
         draft.update {
             val kg = value.filter(Char::isDigit).take(3)
-            val daily = kg.toIntOrNull()?.let(::recommendedDailyMl) ?: it.dailyMl
-            it.copy(weightKg = kg, dailyMl = daily, useManualMl = false)
+            val weight = kg.toIntOrNull() ?: 70
+            val daily = recommendedDailyMl(weight, it.activity)
+            it.copy(weightKg = kg, dailyMl = daily)
         }
     }
 
-    fun setManualMl(value: String) {
+    fun setActivity(level: ActivityLevel) {
         draft.update {
-            val ml = value.filter(Char::isDigit).take(4)
-            it.copy(
-                manualMl = ml,
-                dailyMl = ml.toIntOrNull()?.coerceIn(500, 6000) ?: it.dailyMl,
-                useManualMl = true,
-            )
+            val weight = it.weightKg.toIntOrNull() ?: 70
+            it.copy(activity = level, dailyMl = recommendedDailyMl(weight, level))
         }
+    }
+
+    fun selectRelationship(id: String) {
+        draft.update { it.copy(selectedRelationshipId = id, step = OnboardingStep.Variant) }
     }
 
     fun selectPersona(id: String) {
@@ -87,24 +100,53 @@ class OnboardingStateHolder(
     fun next() {
         draft.update {
             val next = when (it.step) {
-                OnboardingStep.Goal -> OnboardingStep.Persona
-                OnboardingStep.Persona -> OnboardingStep.Hours
-                OnboardingStep.Hours -> OnboardingStep.Permission
+                OnboardingStep.Weight -> OnboardingStep.Activity
+                OnboardingStep.Activity -> OnboardingStep.Hours
+                OnboardingStep.Hours -> OnboardingStep.BuildingPlan
+                OnboardingStep.BuildingPlan -> it.step
+                OnboardingStep.GoalReveal -> OnboardingStep.Relationship
+                OnboardingStep.Relationship -> it.step
+                OnboardingStep.Variant -> OnboardingStep.FirstGlass
+                OnboardingStep.FirstGlass -> if (it.firstGlassLogged) OnboardingStep.Permission else it.step
                 OnboardingStep.Permission -> it.step
             }
             it.copy(step = next)
+        }
+        if (draft.value.step == OnboardingStep.BuildingPlan) {
+            startBuildingPlan()
         }
     }
 
     fun back() {
         draft.update {
             val prev = when (it.step) {
-                OnboardingStep.Goal -> it.step
-                OnboardingStep.Persona -> OnboardingStep.Goal
-                OnboardingStep.Hours -> OnboardingStep.Persona
-                OnboardingStep.Permission -> OnboardingStep.Hours
+                OnboardingStep.Weight -> it.step
+                OnboardingStep.Activity -> OnboardingStep.Weight
+                OnboardingStep.Hours -> OnboardingStep.Activity
+                OnboardingStep.BuildingPlan -> OnboardingStep.Hours
+                OnboardingStep.GoalReveal -> OnboardingStep.Hours
+                OnboardingStep.Relationship -> OnboardingStep.GoalReveal
+                OnboardingStep.Variant -> OnboardingStep.Relationship
+                OnboardingStep.FirstGlass -> OnboardingStep.Variant
+                OnboardingStep.Permission -> OnboardingStep.FirstGlass
             }
             it.copy(step = prev)
+        }
+    }
+
+    private fun startBuildingPlan() {
+        scope.launch {
+            delay(1800)
+            draft.update { it.copy(step = OnboardingStep.GoalReveal) }
+        }
+    }
+
+    fun logFirstGlass() {
+        scope.launch {
+            drinkLogRepository.add(250)
+            val persona = PersonaCatalog.get(draft.value.personaId)
+            val line = PersonaCatalog.linesFor(persona, Mood.PROUD, DayPart.ANYTIME).first()
+            draft.update { it.copy(firstGlassLogged = true, reactionLine = line) }
         }
     }
 
@@ -114,7 +156,7 @@ class OnboardingStateHolder(
 
     fun permissionLine(): String {
         val persona = PersonaCatalog.get(draft.value.personaId)
-        return PersonaCatalog.linesFor(persona, Mood.NEUTRAL, com.manojbuilds.nagly.domain.model.DayPart.ANYTIME)
+        return PersonaCatalog.linesFor(persona, Mood.NEUTRAL, DayPart.ANYTIME)
             .firstOrNull()
             ?: "Let me nudge you when you forget to drink."
     }

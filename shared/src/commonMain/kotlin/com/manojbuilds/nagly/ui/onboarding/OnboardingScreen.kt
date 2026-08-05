@@ -4,18 +4,18 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
@@ -25,25 +25,36 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.manojbuilds.nagly.domain.PersonaCatalog
-import com.manojbuilds.nagly.domain.model.Mood
+import com.manojbuilds.nagly.domain.model.ActivityLevel
 import com.manojbuilds.nagly.domain.model.Persona
+import com.manojbuilds.nagly.domain.model.Relationship
+import com.manojbuilds.nagly.ui.persona.RelationshipGrid
+import com.manojbuilds.nagly.ui.persona.VariantList
 import kotlin.math.roundToInt
+import kotlin.time.Clock
 
 @Composable
 fun OnboardingScreen(
     state: OnboardingUiState,
     onWeightChange: (String) -> Unit,
-    onManualMlChange: (String) -> Unit,
+    onActivityChange: (ActivityLevel) -> Unit,
+    onSelectRelationship: (String) -> Unit,
     onSelectPersona: (String) -> Unit,
+    onLockedRelationship: (Relationship) -> Unit,
+    onLockedPersona: (Persona) -> Unit,
     onWakeChange: (Int) -> Unit,
     onSleepChange: (Int) -> Unit,
+    onLogFirstGlass: () -> Unit,
     onNext: () -> Unit,
     onBack: () -> Unit,
     onFinish: () -> Unit,
     canSelectPersona: (Persona) -> Boolean,
     permissionLine: String,
+    unlockExpiries: Map<String, Long> = emptyMap(),
+    nowMs: Long = Clock.System.now().toEpochMilliseconds(),
 ) {
     Column(
         modifier = Modifier
@@ -52,12 +63,7 @@ fun OnboardingScreen(
             .padding(24.dp),
     ) {
         Text(
-            text = when (state.step) {
-                OnboardingStep.Goal -> "Your daily goal"
-                OnboardingStep.Persona -> "Who's going to nag you?"
-                OnboardingStep.Hours -> "When are you awake?"
-                OnboardingStep.Permission -> "Let her reach you"
-            },
+            text = stepTitle(state.step),
             style = MaterialTheme.typography.headlineMedium,
         )
 
@@ -68,21 +74,48 @@ fun OnboardingScreen(
                 .padding(top = 20.dp),
         ) {
             when (state.step) {
-                OnboardingStep.Goal -> GoalStep(
-                    state = state,
+                OnboardingStep.Weight -> WeightStep(
+                    weightKg = state.weightKg,
                     onWeightChange = onWeightChange,
-                    onManualMlChange = onManualMlChange,
                 )
-                OnboardingStep.Persona -> PersonaStep(
-                    selectedId = state.personaId,
-                    onSelect = onSelectPersona,
-                    canSelect = canSelectPersona,
+                OnboardingStep.Activity -> ActivityStep(
+                    selected = state.activity,
+                    onSelect = onActivityChange,
                 )
                 OnboardingStep.Hours -> HoursStep(
                     wakeHour = state.wakeHour,
                     sleepHour = state.sleepHour,
                     onWakeChange = onWakeChange,
                     onSleepChange = onSleepChange,
+                )
+                OnboardingStep.BuildingPlan -> BuildingPlanStep()
+                OnboardingStep.GoalReveal -> GoalRevealStep(dailyMl = state.dailyMl)
+                OnboardingStep.Relationship -> RelationshipStep(
+                    selectedRelationshipId = state.selectedRelationshipId,
+                    unlockExpiries = unlockExpiries,
+                    isPro = state.isPro,
+                    onSelect = onSelectRelationship,
+                    onLockedClick = onLockedRelationship,
+                    nowMs = nowMs,
+                )
+                OnboardingStep.Variant -> {
+                    val relationshipId = state.selectedRelationshipId ?: "mom"
+                    VariantList(
+                        relationshipId = relationshipId,
+                        selectedId = state.personaId,
+                        unlockExpiries = unlockExpiries,
+                        isPro = state.isPro,
+                        onSelect = onSelectPersona,
+                        onLockedClick = onLockedPersona,
+                        canSelect = canSelectPersona,
+                        nowMs = nowMs,
+                    )
+                }
+                OnboardingStep.FirstGlass -> FirstGlassStep(
+                    personaId = state.personaId,
+                    logged = state.firstGlassLogged,
+                    reactionLine = state.reactionLine,
+                    onLog = onLogFirstGlass,
                 )
                 OnboardingStep.Permission -> PermissionStep(
                     personaEmoji = PersonaCatalog.get(state.personaId).emoji,
@@ -96,108 +129,214 @@ fun OnboardingScreen(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            if (state.step != OnboardingStep.Goal) {
+            if (state.step != OnboardingStep.Weight && state.step != OnboardingStep.BuildingPlan) {
                 TextButton(onClick = onBack) { Text("Back") }
             } else {
                 TextButton(onClick = {}, enabled = false) { Text("") }
             }
-            Button(
-                onClick = {
-                    if (state.step == OnboardingStep.Permission) onFinish() else onNext()
-                },
-            ) {
-                Text(if (state.step == OnboardingStep.Permission) "Allow & start" else "Continue")
+            when (state.step) {
+                OnboardingStep.BuildingPlan -> Unit
+                OnboardingStep.Relationship -> Unit
+                OnboardingStep.Variant -> {
+                    Button(onClick = onNext) { Text("Continue") }
+                }
+                OnboardingStep.FirstGlass -> {
+                    if (state.firstGlassLogged) {
+                        Button(onClick = onNext) { Text("Continue") }
+                    }
+                }
+                OnboardingStep.Permission -> {
+                    Button(onClick = onFinish) { Text("Allow & start") }
+                }
+                OnboardingStep.GoalReveal -> {
+                    Button(onClick = onNext) { Text("Choose who nags you") }
+                }
+                else -> {
+                    Button(onClick = onNext) { Text("Continue") }
+                }
             }
         }
     }
 }
 
+private fun stepTitle(step: OnboardingStep): String = when (step) {
+    OnboardingStep.Weight -> "What's your weight?"
+    OnboardingStep.Activity -> "How active are you?"
+    OnboardingStep.Hours -> "When are you awake?"
+    OnboardingStep.BuildingPlan -> "Building your plan…"
+    OnboardingStep.GoalReveal -> "Your daily goal"
+    OnboardingStep.Relationship -> "Choose who nags you"
+    OnboardingStep.Variant -> "Pick their vibe"
+    OnboardingStep.FirstGlass -> "Log your first glass"
+    OnboardingStep.Permission -> "Let them reach you"
+}
+
 @Composable
-private fun GoalStep(
-    state: OnboardingUiState,
-    onWeightChange: (String) -> Unit,
-    onManualMlChange: (String) -> Unit,
-) {
+private fun WeightStep(weightKg: String, onWeightChange: (String) -> Unit) {
     Column(
         modifier = Modifier.verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Text(
-            "Enter your weight and we'll estimate, or set milliliters yourself.",
+            "We'll estimate your daily water goal from your weight.",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         OutlinedTextField(
-            value = state.weightKg,
+            value = weightKg,
             onValueChange = onWeightChange,
             label = { Text("Weight (kg)") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth(),
         )
-        OutlinedTextField(
-            value = state.manualMl,
-            onValueChange = onManualMlChange,
-            label = { Text("Or daily goal (ml)") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            modifier = Modifier.fillMaxWidth(),
+    }
+}
+
+@Composable
+private fun ActivityStep(selected: ActivityLevel, onSelect: (ActivityLevel) -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        ActivityOption(
+            label = "Mostly sitting",
+            subtitle = "Desk job, light movement",
+            selected = selected == ActivityLevel.SEDENTARY,
+            onClick = { onSelect(ActivityLevel.SEDENTARY) },
         )
-        Text(
-            text = "Goal: ${state.dailyMl} ml / day",
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.primary,
+        ActivityOption(
+            label = "Somewhat active",
+            subtitle = "Walks, gym a few times a week",
+            selected = selected == ActivityLevel.LIGHT,
+            onClick = { onSelect(ActivityLevel.LIGHT) },
+        )
+        ActivityOption(
+            label = "Very active",
+            subtitle = "Daily workouts or physical job",
+            selected = selected == ActivityLevel.ACTIVE,
+            onClick = { onSelect(ActivityLevel.ACTIVE) },
         )
     }
 }
 
 @Composable
-fun PersonaStep(
-    selectedId: String,
-    onSelect: (String) -> Unit,
-    canSelect: (Persona) -> Boolean,
-    onLockedClick: ((Persona) -> Unit)? = null,
+private fun ActivityOption(
+    label: String,
+    subtitle: String,
+    selected: Boolean,
+    onClick: () -> Unit,
 ) {
-    LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        items(PersonaCatalog.all, key = { it.id }) { persona ->
-            val unlocked = canSelect(persona)
-            val selected = persona.id == selectedId
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .border(
-                        width = if (selected) 2.dp else 1.dp,
-                        color = if (selected) {
-                            MaterialTheme.colorScheme.primary
-                        } else {
-                            MaterialTheme.colorScheme.outline
-                        },
-                        shape = RoundedCornerShape(18.dp),
-                    )
-                    .clickable {
-                        if (unlocked) onSelect(persona.id) else onLockedClick?.invoke(persona)
-                    }
-                    .padding(16.dp),
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "${persona.emoji}  ${persona.displayName}",
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.weight(1f),
-                    )
-                    if (PersonaCatalog.isPro(persona) && !unlocked) {
-                        Text(
-                            "Pro",
-                            color = MaterialTheme.colorScheme.primary,
-                            style = MaterialTheme.typography.labelLarge,
-                        )
-                    }
-                }
-                Text(
-                    text = PersonaCatalog.linesFor(persona, Mood.NEUTRAL, com.manojbuilds.nagly.domain.model.DayPart.ANYTIME).first(),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 8.dp),
-                )
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(
+                width = if (selected) 2.dp else 1.dp,
+                color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                shape = RoundedCornerShape(18.dp),
+            )
+            .clickable(onClick = onClick)
+            .padding(16.dp),
+    ) {
+        Text(label, style = MaterialTheme.typography.titleLarge)
+        Text(
+            subtitle,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 4.dp),
+        )
+    }
+}
+
+@Composable
+private fun BuildingPlanStep() {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+            Text(
+                "Crunching numbers…",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 16.dp),
+            )
+        }
+    }
+}
+
+@Composable
+private fun GoalRevealStep(dailyMl: Int) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Text(
+            "$dailyMl ml",
+            style = MaterialTheme.typography.displayLarge,
+            color = MaterialTheme.colorScheme.primary,
+        )
+        Text(
+            "per day — tuned to your weight and activity.",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+        )
+    }
+}
+
+@Composable
+private fun RelationshipStep(
+    selectedRelationshipId: String?,
+    unlockExpiries: Map<String, Long>,
+    isPro: Boolean,
+    onSelect: (String) -> Unit,
+    onLockedClick: (Relationship) -> Unit,
+    nowMs: Long,
+) {
+    Column {
+        Text(
+            "Pick a relationship — then choose their exact vibe.",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(bottom = 16.dp),
+        )
+        RelationshipGrid(
+            selectedRelationshipId = selectedRelationshipId,
+            unlockExpiries = unlockExpiries,
+            isPro = isPro,
+            onSelect = onSelect,
+            onLockedClick = onLockedClick,
+            nowMs = nowMs,
+        )
+    }
+}
+
+@Composable
+private fun FirstGlassStep(
+    personaId: String,
+    logged: Boolean,
+    reactionLine: String?,
+    onLog: () -> Unit,
+) {
+    val persona = PersonaCatalog.get(personaId)
+    Column(
+        modifier = Modifier.verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        Text(
+            "${persona.emoji} ${persona.displayName} wants to see you log one.",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        if (!logged) {
+            Button(onClick = onLog, modifier = Modifier.fillMaxWidth()) {
+                Text("Log 250 ml")
             }
+        } else {
+            Text(
+                text = "\"${reactionLine ?: "Nice start!"}\"",
+                style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.primary,
+            )
         }
     }
 }
@@ -241,7 +380,7 @@ private fun PermissionStep(
             color = MaterialTheme.colorScheme.primary,
         )
         Text(
-            text = "She'll only nudge you while you're awake — and only when you're falling behind.",
+            text = "They'll only nudge you while you're awake — and only when you're falling behind.",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )

@@ -1,5 +1,6 @@
 package com.manojbuilds.nagly.domain
 
+import com.manojbuilds.nagly.domain.model.ActivityLevel
 import com.manojbuilds.nagly.domain.model.DayPart
 import com.manojbuilds.nagly.domain.model.Mood
 import com.manojbuilds.nagly.domain.model.Persona
@@ -111,8 +112,17 @@ fun expectedRatio(nowHour: Int, wakeHour: Int, sleepHour: Int): Float {
     return (elapsed.toFloat() / wakingHours.toFloat()).coerceIn(0f, 1f)
 }
 
-fun recommendedDailyMl(weightKg: Int): Int {
-    return (weightKg * 35).coerceIn(1500, 4000)
+fun recommendedDailyMl(
+    weightKg: Int,
+    activity: ActivityLevel = ActivityLevel.LIGHT,
+): Int {
+    val base = (weightKg * 35).coerceIn(1500, 4000)
+    val multiplier = when (activity) {
+        ActivityLevel.SEDENTARY -> 1.0f
+        ActivityLevel.LIGHT -> 1.1f
+        ActivityLevel.ACTIVE -> 1.2f
+    }
+    return (base * multiplier).toInt().coerceIn(1500, 4800)
 }
 
 /**
