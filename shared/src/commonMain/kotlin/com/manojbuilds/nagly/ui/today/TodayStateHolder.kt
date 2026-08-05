@@ -123,6 +123,7 @@ class TodayStateHolder(
             behindMl = behind,
             streak = currentStreak(logsByDay, goal.dailyMl, today),
             progress = progressRatio.coerceIn(0f, 1.2f).coerceAtMost(1f),
+            expectedProgress = expected,
             guiltProgress = guilt,
             hourOfDay = nowHour,
             canUndo = todayLogs.isNotEmpty(),

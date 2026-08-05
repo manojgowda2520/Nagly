@@ -13,6 +13,7 @@ data class TodayUiState(
     val behindMl: Int = 0,
     val streak: Int = 0,
     val progress: Float = 0f,
+    val expectedProgress: Float = 0f,
     val guiltProgress: Float = 0.3f,
     val hourOfDay: Int = 12,
     val canUndo: Boolean = false,

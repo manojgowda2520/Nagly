@@ -7,7 +7,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -31,20 +30,15 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -59,6 +53,7 @@ import com.manojbuilds.nagly.ui.designsystem.components.MoodRing
 import com.manojbuilds.nagly.ui.designsystem.components.PillButton
 import com.manojbuilds.nagly.ui.designsystem.components.PillButtonVariant
 import com.manojbuilds.nagly.ui.designsystem.components.SpeechBubble
+import com.manojbuilds.nagly.ui.designsystem.components.WaveBottle
 import com.manojbuilds.nagly.ui.designsystem.moodColor
 import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
@@ -76,6 +71,14 @@ fun TodayScreen(
 ) {
     val colors = LocalNaglyColors.current
     var showCustomDialog by remember { mutableStateOf(false) }
+    var logPulse by remember { mutableStateOf(false) }
+    var prevConsumed by remember { mutableStateOf(state.consumedMl) }
+    LaunchedEffect(state.consumedMl) {
+        if (state.consumedMl > prevConsumed) {
+            logPulse = !logPulse
+        }
+        prevConsumed = state.consumedMl
+    }
     val animatedProgress by animateFloatAsState(
         targetValue = state.progress,
         animationSpec = tween(durationMillis = NaglyMotion.DurationSlow, easing = FastOutSlowInEasing),
@@ -172,9 +175,16 @@ fun TodayScreen(
             modifier = Modifier.padding(top = NaglySpacing.xxs, bottom = NaglySpacing.sm),
         )
 
-        // Bottle (enhanced in Step 3)
+        // Bottle with animated wave fill
         Box(contentAlignment = Alignment.Center, modifier = Modifier.size(130.dp, 180.dp)) {
-            SimpleFillBottle(progress = animatedProgress, waterColor = colors.primary)
+            WaveBottle(
+                progress = animatedProgress,
+                expectedProgress = state.expectedProgress,
+                waterColor = colors.primary,
+                modifier = Modifier.fillMaxSize(),
+                onLogPulse = logPulse,
+                goalReached = state.progress >= 1f,
+            )
         }
 
         Text(
@@ -301,44 +311,6 @@ fun TodayScreen(
             },
             shape = NaglyShapes.card,
         )
-    }
-}
-
-@Composable
-private fun SimpleFillBottle(progress: Float, waterColor: Color) {
-    val glass = LocalNaglyColors.current.outline
-    val foam = LocalNaglyColors.current.card
-    Canvas(modifier = Modifier.fillMaxSize()) {
-        val w = size.width
-        val h = size.height
-        val neckW = w * 0.28f
-        val bodyTop = h * 0.18f
-        val bodyLeft = w * 0.18f
-        val bodyWidth = w * 0.64f
-        val bodyHeight = h * 0.72f
-        val path = Path().apply {
-            moveTo(w / 2f - neckW / 2f, 0f)
-            lineTo(w / 2f + neckW / 2f, 0f)
-            lineTo(w / 2f + neckW / 2f, bodyTop)
-            lineTo(bodyLeft + bodyWidth, bodyTop)
-            lineTo(bodyLeft + bodyWidth, bodyTop + bodyHeight)
-            quadraticTo(bodyLeft + bodyWidth / 2f, h, bodyLeft, bodyTop + bodyHeight)
-            lineTo(bodyLeft, bodyTop)
-            lineTo(w / 2f - neckW / 2f, bodyTop)
-            close()
-        }
-        drawPath(path, color = foam.copy(alpha = 0.4f))
-        drawPath(path, color = glass, style = Stroke(width = 4.dp.toPx(), cap = StrokeCap.Round))
-        val fillH = bodyHeight * progress.coerceIn(0f, 1f)
-        if (fillH > 0f) {
-            val fillTop = bodyTop + bodyHeight - fillH
-            drawRoundRect(
-                color = waterColor.copy(alpha = 0.8f),
-                topLeft = Offset(bodyLeft + 3.dp.toPx(), fillTop),
-                size = Size(bodyWidth - 6.dp.toPx(), fillH),
-                cornerRadius = CornerRadius(12.dp.toPx(), 12.dp.toPx()),
-            )
-        }
     }
 }
 
