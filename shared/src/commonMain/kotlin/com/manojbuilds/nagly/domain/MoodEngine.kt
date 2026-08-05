@@ -61,10 +61,15 @@ fun recommendedDailyMl(weightKg: Int): Int {
 }
 
 /**
- * Consecutive days ending at the most recent day that met the goal.
- * Today incomplete does not break a prior streak; a gap does.
+ * Consecutive completed days ending on [today] or yesterday.
+ * A run that ended earlier is not a current streak (returns 0).
+ * Today incomplete does not break a prior streak ending yesterday.
  */
-fun currentStreak(logsByDay: Map<LocalDate, Int>, dailyMl: Int): Int {
+fun currentStreak(
+    logsByDay: Map<LocalDate, Int>,
+    dailyMl: Int,
+    today: LocalDate,
+): Int {
     if (logsByDay.isEmpty() || dailyMl <= 0) return 0
 
     val completedDays = logsByDay
@@ -72,6 +77,10 @@ fun currentStreak(logsByDay: Map<LocalDate, Int>, dailyMl: Int): Int {
         .keys
         .sorted()
     if (completedDays.isEmpty()) return 0
+
+    val runEnd = completedDays.last()
+    val yesterday = today.minusDays(1)
+    if (runEnd != today && runEnd != yesterday) return 0
 
     var streak = 1
     for (i in completedDays.lastIndex downTo 1) {

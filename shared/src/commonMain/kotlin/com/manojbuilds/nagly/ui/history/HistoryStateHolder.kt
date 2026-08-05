@@ -73,7 +73,7 @@ class HistoryStateHolder(
         HistoryUiState(
             days = days,
             dailyMl = goal.dailyMl,
-            currentStreak = currentStreak(logsByDay, goal.dailyMl),
+            currentStreak = currentStreak(logsByDay, goal.dailyMl, today),
             bestStreak = bestStreak(logsByDay, goal.dailyMl),
             emptyLine = persona.lines.getValue(Mood.WORRIED).first(),
             personaName = persona.displayName,

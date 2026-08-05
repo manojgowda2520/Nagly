@@ -74,6 +74,7 @@ class TodayStateHolder(
             cachedMood = mood
         }
 
+        val today = clock.now().toLocalDateTime(TimeZone.currentSystemDefault()).date
         val logsByDay = recentLogs.groupBy { it.localDate() }
             .mapValues { (_, logs) -> logs.sumOf { it.amountMl } }
 
@@ -84,7 +85,7 @@ class TodayStateHolder(
             mood = mood,
             consumedMl = consumed,
             dailyMl = goal.dailyMl,
-            streak = currentStreak(logsByDay, goal.dailyMl),
+            streak = currentStreak(logsByDay, goal.dailyMl, today),
             progress = progressRatio.coerceIn(0f, 1f),
             canUndo = todayLogs.isNotEmpty(),
             isLoading = false,

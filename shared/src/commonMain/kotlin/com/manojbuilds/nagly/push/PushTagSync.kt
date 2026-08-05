@@ -40,18 +40,18 @@ fun computePushTags(
             .date
     }.mapValues { (_, logs) -> logs.sumOf { it.amountMl } }
 
+    val today = Instant.fromEpochMilliseconds(nowMs).toLocalDateTime(timeZone).date
     val lastLogMs = recentLogs.maxOfOrNull { it.timestampMs }
     val lastLogDaysAgo = if (lastLogMs == null) {
         999
     } else {
-        val today = Instant.fromEpochMilliseconds(nowMs).toLocalDateTime(timeZone).date
         val lastDay = Instant.fromEpochMilliseconds(lastLogMs).toLocalDateTime(timeZone).date
         (today.toEpochDays() - lastDay.toEpochDays()).toInt().coerceAtLeast(0)
     }
 
     return PushTags(
         personaId = goal.personaId,
-        currentStreak = currentStreak(logsByDay, goal.dailyMl),
+        currentStreak = currentStreak(logsByDay, goal.dailyMl, today),
         dailyGoalMl = goal.dailyMl,
         lastLogDaysAgo = lastLogDaysAgo,
         isPro = isPro,

@@ -56,31 +56,51 @@ class MoodEngineTest {
     }
 
     @Test
-    fun currentStreak_emptyAndGaps() {
-        assertEquals(0, currentStreak(emptyMap(), dailyMl = 2000))
-
-        val d1 = LocalDate(2026, 8, 1)
-        val d2 = LocalDate(2026, 8, 2)
-        val d4 = LocalDate(2026, 8, 4)
-        val logs = mapOf(
-            d1 to 2000,
-            d2 to 2000,
-            d4 to 2000,
-        )
-        assertEquals(1, currentStreak(logs, dailyMl = 2000))
+    fun currentStreak_empty() {
+        assertEquals(0, currentStreak(emptyMap(), dailyMl = 2000, today = LocalDate(2026, 8, 5)))
     }
 
     @Test
-    fun currentStreak_todayIncompleteDoesNotBreakPrior() {
-        val d1 = LocalDate(2026, 8, 1)
-        val d2 = LocalDate(2026, 8, 2)
-        val d3 = LocalDate(2026, 8, 3)
+    fun currentStreak_runEndingToday() {
+        val today = LocalDate(2026, 8, 5)
         val logs = mapOf(
-            d1 to 2000,
-            d2 to 2000,
-            d3 to 500, // today incomplete
+            LocalDate(2026, 8, 3) to 2000,
+            LocalDate(2026, 8, 4) to 2000,
+            today to 2000,
         )
-        assertEquals(2, currentStreak(logs, dailyMl = 2000))
+        assertEquals(3, currentStreak(logs, dailyMl = 2000, today = today))
+    }
+
+    @Test
+    fun currentStreak_runEndingYesterday() {
+        val today = LocalDate(2026, 8, 5)
+        val logs = mapOf(
+            LocalDate(2026, 8, 3) to 2000,
+            LocalDate(2026, 8, 4) to 2000,
+            today to 500, // today incomplete
+        )
+        assertEquals(2, currentStreak(logs, dailyMl = 2000, today = today))
+    }
+
+    @Test
+    fun currentStreak_runEndingThreeDaysAgo_isZero() {
+        val today = LocalDate(2026, 8, 5)
+        val logs = mapOf(
+            LocalDate(2026, 8, 1) to 2000,
+            LocalDate(2026, 8, 2) to 2000,
+        )
+        assertEquals(0, currentStreak(logs, dailyMl = 2000, today = today))
+    }
+
+    @Test
+    fun currentStreak_threeWeekOldRun_isZero() {
+        val today = LocalDate(2026, 8, 5)
+        val logs = mapOf(
+            LocalDate(2026, 7, 12) to 2000,
+            LocalDate(2026, 7, 13) to 2000,
+            LocalDate(2026, 7, 14) to 2000,
+        )
+        assertEquals(0, currentStreak(logs, dailyMl = 2000, today = today))
     }
 
     @Test
