@@ -12,44 +12,48 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
-private val WarmCoral = Color(0xFFE07A5F)
-private val DeepTeal = Color(0xFF3D5A5B)
-private val SoftCream = Color(0xFFFFF6EF)
-private val Ink = Color(0xFF2B2118)
-private val SoftBlush = Color(0xFFF2C6B8)
-private val NightInk = Color(0xFF1A1410)
-private val NightSurface = Color(0xFF2A211C)
-private val NightCoral = Color(0xFFFF9B82)
-private val NightTeal = Color(0xFF8FB4B5)
+// Teal-forward palette (#0E7C86 family) — warm character, not clinical
+private val Teal = Color(0xFF0E7C86)
+private val TealDeep = Color(0xFF0A5C63)
+private val TealSoft = Color(0xFF5BA8B0)
+private val Mist = Color(0xFFE8F4F5)
+private val Foam = Color(0xFFF4FBFC)
+private val Ink = Color(0xFF1A2E30)
+private val CoralAccent = Color(0xFFE07A5F)
+
+private val NightBg = Color(0xFF0C1A1C)
+private val NightSurface = Color(0xFF152628)
+private val NightTeal = Color(0xFF4DB8C2)
+private val NightOn = Color(0xFFE8F4F5)
 
 private val LightColors = lightColorScheme(
-    primary = WarmCoral,
+    primary = Teal,
     onPrimary = Color.White,
-    secondary = DeepTeal,
+    secondary = TealDeep,
     onSecondary = Color.White,
-    tertiary = SoftBlush,
-    background = SoftCream,
+    tertiary = CoralAccent,
+    background = Foam,
     onBackground = Ink,
-    surface = Color(0xFFFFFCFA),
+    surface = Color.White,
     onSurface = Ink,
-    surfaceVariant = Color(0xFFF7E8DF),
-    onSurfaceVariant = Color(0xFF5C4A3D),
-    outline = Color(0xFFD7C2B4),
+    surfaceVariant = Mist,
+    onSurfaceVariant = Color(0xFF3D5A5B),
+    outline = Color(0xFFB5D4D7),
 )
 
 private val DarkColors = darkColorScheme(
-    primary = NightCoral,
-    onPrimary = NightInk,
-    secondary = NightTeal,
-    onSecondary = NightInk,
-    tertiary = SoftBlush,
-    background = NightInk,
-    onBackground = Color(0xFFF8EFE7),
+    primary = NightTeal,
+    onPrimary = NightBg,
+    secondary = TealSoft,
+    onSecondary = NightBg,
+    tertiary = CoralAccent,
+    background = NightBg,
+    onBackground = NightOn,
     surface = NightSurface,
-    onSurface = Color(0xFFF8EFE7),
-    surfaceVariant = Color(0xFF3A2E27),
-    onSurfaceVariant = Color(0xFFD8C4B6),
-    outline = Color(0xFF6A5649),
+    onSurface = NightOn,
+    surfaceVariant = Color(0xFF1E3437),
+    onSurfaceVariant = Color(0xFFB5D4D7),
+    outline = Color(0xFF3D5A5B),
 )
 
 private val NaglyTypography = Typography(

@@ -26,13 +26,18 @@ import com.manojbuilds.nagly.domain.UnlockExpiryWatcher
 import com.manojbuilds.nagly.domain.model.Persona
 import com.manojbuilds.nagly.ui.history.HistoryScreen
 import com.manojbuilds.nagly.ui.history.HistoryStateHolder
+import com.manojbuilds.nagly.ui.navigation.MainShell
+import com.manojbuilds.nagly.ui.navigation.MainTab
 import com.manojbuilds.nagly.ui.navigation.Screen
+import com.manojbuilds.nagly.ui.navigation.toMainTabOrNull
+import com.manojbuilds.nagly.ui.navigation.toScreen
 import com.manojbuilds.nagly.ui.onboarding.OnboardingScreen
 import com.manojbuilds.nagly.ui.onboarding.OnboardingStateHolder
 import com.manojbuilds.nagly.ui.paywall.PaywallScreen
 import com.manojbuilds.nagly.ui.persona.FakeAdOverlay
 import com.manojbuilds.nagly.ui.persona.PersonaPickerScreen
 import com.manojbuilds.nagly.ui.persona.UnlockSheet
+import com.manojbuilds.nagly.ui.settings.SettingsScreen
 import com.manojbuilds.nagly.ui.theme.NaglyTheme
 import com.manojbuilds.nagly.ui.today.TodayScreen
 import com.manojbuilds.nagly.ui.today.TodayStateHolder
@@ -79,89 +84,103 @@ fun App() {
             var lockedPersona by remember { mutableStateOf<Persona?>(null) }
             var watchingAd by remember { mutableStateOf(false) }
 
-            when (currentScreen) {
-                Screen.Today -> TodayScreen(
-                    state = todayState,
-                    onLog = todayStateHolder::log,
-                    onUndo = todayStateHolder::undo,
-                    onOpenHistory = { screen = Screen.History },
-                    onOpenPersonas = { screen = Screen.PersonaPicker },
-                )
-                Screen.History -> HistoryScreen(
-                    state = historyState,
-                    onBack = { screen = Screen.Today },
-                )
-                Screen.PersonaPicker -> PersonaPickerScreen(
-                    selectedId = goal.personaId,
-                    unlockExpiries = unlockExpiries,
-                    onSelect = { id ->
-                        onboardingHolder.savePersonaOnly(id) {
-                            screen = Screen.Today
-                        }
-                    },
-                    canSelect = { persona ->
-                        onboardingHolder.canSelect(
-                            persona,
-                            onboardingState.unlockedIds,
-                            onboardingState.isPro,
+            val mainTab = currentScreen.toMainTabOrNull()
+            if (mainTab != null) {
+                MainShell(
+                    selectedTab = mainTab,
+                    onTabSelected = { tab -> screen = tab.toScreen() },
+                ) {
+                    when (currentScreen) {
+                        Screen.Today -> TodayScreen(
+                            state = todayState,
+                            onLog = todayStateHolder::log,
+                            onUndo = todayStateHolder::undo,
+                            onOpenHistory = { screen = Screen.History },
+                            onOpenPersonas = { screen = Screen.Personas },
                         )
-                    },
-                    onLockedClick = { persona -> lockedPersona = persona },
-                    onBack = { screen = Screen.Today },
-                )
-                Screen.Onboarding -> OnboardingScreen(
-                    state = onboardingState,
-                    onWeightChange = onboardingHolder::setWeight,
-                    onManualMlChange = onboardingHolder::setManualMl,
-                    onSelectPersona = { id ->
-                        val persona = PersonaCatalog.get(id)
-                        if (onboardingHolder.canSelect(
+                        Screen.History -> HistoryScreen(
+                            state = historyState,
+                            onBack = { screen = Screen.Today },
+                        )
+                        Screen.Personas -> PersonaPickerScreen(
+                            selectedId = goal.personaId,
+                            unlockExpiries = unlockExpiries,
+                            onSelect = { id ->
+                                onboardingHolder.savePersonaOnly(id) {
+                                    screen = Screen.Today
+                                }
+                            },
+                            canSelect = { persona ->
+                                onboardingHolder.canSelect(
+                                    persona,
+                                    onboardingState.unlockedIds,
+                                    onboardingState.isPro,
+                                )
+                            },
+                            onLockedClick = { persona -> lockedPersona = persona },
+                            onBack = { screen = Screen.Today },
+                        )
+                        Screen.Settings -> SettingsScreen()
+                        else -> Unit
+                    }
+                }
+            } else {
+                when (currentScreen) {
+                    Screen.Onboarding -> OnboardingScreen(
+                        state = onboardingState,
+                        onWeightChange = onboardingHolder::setWeight,
+                        onManualMlChange = onboardingHolder::setManualMl,
+                        onSelectPersona = { id ->
+                            val persona = PersonaCatalog.get(id)
+                            if (onboardingHolder.canSelect(
+                                    persona,
+                                    onboardingState.unlockedIds,
+                                    onboardingState.isPro,
+                                )
+                            ) {
+                                onboardingHolder.selectPersona(id)
+                            } else if (PersonaCatalog.isPro(persona)) {
+                                lockedPersona = persona
+                            }
+                        },
+                        onWakeChange = onboardingHolder::setWakeHour,
+                        onSleepChange = onboardingHolder::setSleepHour,
+                        onNext = onboardingHolder::next,
+                        onBack = onboardingHolder::back,
+                        onFinish = {
+                            onboardingHolder.finish { screen = Screen.Today }
+                        },
+                        canSelectPersona = { persona ->
+                            onboardingHolder.canSelect(
                                 persona,
                                 onboardingState.unlockedIds,
                                 onboardingState.isPro,
                             )
-                        ) {
-                            onboardingHolder.selectPersona(id)
-                        } else if (PersonaCatalog.isPro(persona)) {
-                            lockedPersona = persona
-                        }
-                    },
-                    onWakeChange = onboardingHolder::setWakeHour,
-                    onSleepChange = onboardingHolder::setSleepHour,
-                    onNext = onboardingHolder::next,
-                    onBack = onboardingHolder::back,
-                    onFinish = {
-                        onboardingHolder.finish { screen = Screen.Today }
-                    },
-                    canSelectPersona = { persona ->
-                        onboardingHolder.canSelect(
-                            persona,
-                            onboardingState.unlockedIds,
-                            onboardingState.isPro,
-                        )
-                    },
-                    permissionLine = onboardingHolder.permissionLine(),
-                )
-                Screen.Paywall -> PaywallScreen(
-                    purchasing = purchasing,
-                    onPurchase = { packageId ->
-                        scope.launch {
-                            purchasing = true
-                            billing.purchase(packageId)
-                            purchasing = false
-                            screen = Screen.PersonaPicker
-                        }
-                    },
-                    onRestore = {
-                        scope.launch {
-                            purchasing = true
-                            billing.restore()
-                            purchasing = false
-                            if (billing.isPro.value) screen = Screen.PersonaPicker
-                        }
-                    },
-                    onClose = { screen = Screen.PersonaPicker },
-                )
+                        },
+                        permissionLine = onboardingHolder.permissionLine(),
+                    )
+                    Screen.Paywall -> PaywallScreen(
+                        purchasing = purchasing,
+                        onPurchase = { packageId ->
+                            scope.launch {
+                                purchasing = true
+                                billing.purchase(packageId)
+                                purchasing = false
+                                screen = Screen.Personas
+                            }
+                        },
+                        onRestore = {
+                            scope.launch {
+                                purchasing = true
+                                billing.restore()
+                                purchasing = false
+                                if (billing.isPro.value) screen = Screen.Personas
+                            }
+                        },
+                        onClose = { screen = Screen.Personas },
+                    )
+                    else -> Unit
+                }
             }
 
             lockedPersona?.let { persona ->
@@ -205,7 +224,7 @@ fun App() {
             expiryMessage?.let { message ->
                 AlertDialog(
                     onDismissRequest = expiryWatcher::clearExpiryMessage,
-                    title = { Text("She's gone for now") },
+                    title = { Text("They're gone for now") },
                     text = { Text(message) },
                     confirmButton = {
                         TextButton(onClick = expiryWatcher::clearExpiryMessage) {
