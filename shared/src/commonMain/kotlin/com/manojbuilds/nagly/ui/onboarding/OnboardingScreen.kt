@@ -20,7 +20,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,7 +53,6 @@ fun OnboardingScreen(
     onSleepChange: (Int) -> Unit,
     onLogFirstGlass: () -> Unit,
     onNext: () -> Unit,
-    onBack: () -> Unit,
     onFinish: () -> Unit,
     canSelectPersona: (Persona) -> Boolean,
     permissionLine: String,
@@ -145,13 +143,8 @@ fun OnboardingScreen(
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.End,
         ) {
-            if (state.step != OnboardingStep.Weight && state.step != OnboardingStep.BuildingPlan) {
-                TextButton(onClick = onBack) { Text("Back") }
-            } else {
-                TextButton(onClick = {}, enabled = false) { Text("") }
-            }
             when (state.step) {
                 OnboardingStep.BuildingPlan -> Unit
                 OnboardingStep.Relationship -> Unit

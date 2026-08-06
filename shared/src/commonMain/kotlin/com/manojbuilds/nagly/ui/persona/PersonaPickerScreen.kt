@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,6 +14,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.manojbuilds.nagly.domain.RelationshipLevel
+import com.manojbuilds.nagly.ui.navigation.NaglyBackHandler
 import com.manojbuilds.nagly.ui.designsystem.NaglySpacing
 import com.manojbuilds.nagly.ui.designsystem.dayPartBrush
 import com.manojbuilds.nagly.ui.designsystem.components.RelationshipMeterChip
@@ -44,6 +44,10 @@ fun PersonaPickerScreen(
     var showVariants by rememberSaveable { mutableStateOf(false) }
     val tabTint = dayPartBrush(intensity = 0.45f)
 
+    NaglyBackHandler(enabled = showVariants) {
+        showVariants = false
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -65,9 +69,6 @@ fun PersonaPickerScreen(
         )
 
         if (showVariants) {
-            TextButton(onClick = { showVariants = false }) {
-                Text("← All relationships")
-            }
             VariantList(
                 relationshipId = relationshipId,
                 selectedId = selectedId,

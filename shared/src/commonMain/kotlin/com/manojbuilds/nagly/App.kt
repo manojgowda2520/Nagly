@@ -31,11 +31,14 @@ import com.manojbuilds.nagly.ui.insights.InsightsScreen
 import com.manojbuilds.nagly.ui.insights.InsightsStateHolder
 import com.manojbuilds.nagly.ui.navigation.MainShell
 import com.manojbuilds.nagly.ui.navigation.MainTab
+import com.manojbuilds.nagly.ui.navigation.NaglyBackHandler
 import com.manojbuilds.nagly.ui.navigation.Screen
+import com.manojbuilds.nagly.ui.navigation.rememberNavBackStack
 import com.manojbuilds.nagly.ui.navigation.toMainTabOrNull
 import com.manojbuilds.nagly.ui.navigation.toScreen
 import com.manojbuilds.nagly.ui.onboarding.OnboardingScreen
 import com.manojbuilds.nagly.ui.onboarding.OnboardingStateHolder
+import com.manojbuilds.nagly.ui.onboarding.OnboardingStep
 import com.manojbuilds.nagly.ui.paywall.PaywallScreen
 import com.manojbuilds.nagly.ui.persona.FakeAdOverlay
 import com.manojbuilds.nagly.ui.persona.PersonaPickerScreen
@@ -61,11 +64,12 @@ fun App() {
             if (showSplash) {
                 SplashScreen(onFinished = { showSplash = false })
             } else {
-                AppContent(                )
+                AppContent()
             }
         }
     }
 }
+
 @Composable
 private fun AppContent() {
     Surface(
@@ -73,202 +77,244 @@ private fun AppContent() {
             .fillMaxSize()
             .safeContentPadding(),
     ) {
-            val goalRepository = koinInject<GoalRepository>()
-            val unlockRepository = koinInject<UnlockRepository>()
-            val goal by goalRepository.observeGoal().collectAsState(
-                initial = GoalRepository.DEFAULT_GOAL,
-            )
-            val unlockExpiries by unlockRepository.observeUnlockExpiries()
-                .collectAsState(initial = emptyMap())
-            var screen by remember { mutableStateOf<Screen?>(null) }
-            LaunchedEffect(goal.onboarded) {
-                if (screen == null) {
-                    screen = if (goal.onboarded) Screen.Today else Screen.Onboarding
-                } else if (!goal.onboarded && screen == Screen.Today) {
-                    screen = Screen.Onboarding
-                }
+        val goalRepository = koinInject<GoalRepository>()
+        val unlockRepository = koinInject<UnlockRepository>()
+        val goal by goalRepository.observeGoal().collectAsState(
+            initial = GoalRepository.DEFAULT_GOAL,
+        )
+        val unlockExpiries by unlockRepository.observeUnlockExpiries()
+            .collectAsState(initial = emptyMap())
+        val navStack = rememberNavBackStack(Screen.Today)
+        var navReady by remember { mutableStateOf(false) }
+        LaunchedEffect(goal.onboarded) {
+            if (!navReady) {
+                navStack.resetTo(if (goal.onboarded) Screen.Today else Screen.Onboarding)
+                navReady = true
+            } else if (!goal.onboarded && navStack.current == Screen.Today) {
+                navStack.resetTo(Screen.Onboarding)
             }
-            val currentScreen = screen ?: return@Surface
+        }
+        if (!navReady) return@Surface
 
-            val todayStateHolder = koinInject<TodayStateHolder>()
-            val todayState by todayStateHolder.uiState.collectAsState()
-            val onboardingHolder = koinInject<OnboardingStateHolder>()
-            val onboardingState by onboardingHolder.uiState.collectAsState()
-            val historyHolder = koinInject<HistoryStateHolder>()
-            val historyState by historyHolder.uiState.collectAsState()
-            val insightsHolder = koinInject<InsightsStateHolder>()
-            val insightsState by insightsHolder.uiState.collectAsState()
-            val settingsHolder = koinInject<SettingsStateHolder>()
-            val settingsState by settingsHolder.uiState.collectAsState()
-            val billing = koinInject<BillingRepository>()
-            val adClient = koinInject<AdClient>()
-            val expiryWatcher = koinInject<UnlockExpiryWatcher>()
-            val expiryMessage by expiryWatcher.expiryMessage.collectAsState()
-            val scope = rememberCoroutineScope()
-            var purchasing by remember { mutableStateOf(false) }
-            var lockedPersona by remember { mutableStateOf<Persona?>(null) }
-            var watchingAd by remember { mutableStateOf(false) }
+        val currentScreen = navStack.current
 
-            val mainTab = currentScreen.toMainTabOrNull()
-            if (mainTab != null) {
-                MainShell(
-                    selectedTab = mainTab,
-                    onTabSelected = { tab -> screen = tab.toScreen() },
-                ) {
-                    when (currentScreen) {
-                        Screen.Today -> TodayScreen(
-                            state = todayState,
-                            onLog = todayStateHolder::log,
-                            onUndo = todayStateHolder::undo,
-                            onUndoEntry = todayStateHolder::undoEntry,
-                            onCycleLine = todayStateHolder::cycleLine,
-                            onOpenHistory = { screen = Screen.History },
-                            onOpenPersonas = { screen = Screen.Personas },
-                        )
-                        Screen.History -> HistoryScreen(state = historyState)
-                        Screen.Personas -> PersonaPickerScreen(
-                            selectedId = goal.personaId,
-                            unlockExpiries = unlockExpiries,
-                            isPro = onboardingState.isPro,
-                            relationshipLevel = todayState.relationshipLevel,
-                            relationshipProgress = todayState.relationshipProgress,
-                            onSelect = { id ->
-                                onboardingHolder.savePersonaOnly(id) {}
-                            },
-                            canSelect = { persona ->
-                                onboardingHolder.canSelect(
-                                    persona,
-                                    onboardingState.unlockedIds,
-                                    onboardingState.isPro,
-                                )
-                            },
-                            onLockedClick = { persona -> lockedPersona = persona },
-                            onLockedRelationship = { relationship ->
-                                lockedPersona = previewPersonaForRelationship(relationship.id)
-                            },
-                        )
-                        Screen.Insights -> InsightsScreen(state = insightsState)
-                        Screen.Settings -> SettingsScreen(
-                            state = settingsState,
-                            onDailyGoalChange = settingsHolder::setDailyDisplay,
-                            onVolumeUnitChange = settingsHolder::setVolumeUnit,
-                            onWakeChange = settingsHolder::setWakeHour,
-                            onSleepChange = settingsHolder::setSleepHour,
-                            onNotificationsChange = settingsHolder::setNotificationsEnabled,
-                            onOpenPersonas = { screen = Screen.Personas },
-                            onRestorePurchases = settingsHolder::restorePurchases,
-                            onRequestPermission = settingsHolder::requestNotificationPermission,
-                            onDismissMessage = settingsHolder::clearMessages,
-                        )
-                        else -> Unit
+        val todayStateHolder = koinInject<TodayStateHolder>()
+        val todayState by todayStateHolder.uiState.collectAsState()
+        val onboardingHolder = koinInject<OnboardingStateHolder>()
+        val onboardingState by onboardingHolder.uiState.collectAsState()
+        val historyHolder = koinInject<HistoryStateHolder>()
+        val historyState by historyHolder.uiState.collectAsState()
+        val insightsHolder = koinInject<InsightsStateHolder>()
+        val insightsState by insightsHolder.uiState.collectAsState()
+        val settingsHolder = koinInject<SettingsStateHolder>()
+        val settingsState by settingsHolder.uiState.collectAsState()
+        val billing = koinInject<BillingRepository>()
+        val adClient = koinInject<AdClient>()
+        val expiryWatcher = koinInject<UnlockExpiryWatcher>()
+        val expiryMessage by expiryWatcher.expiryMessage.collectAsState()
+        val scope = rememberCoroutineScope()
+        var purchasing by remember { mutableStateOf(false) }
+        var lockedPersona by remember { mutableStateOf<Persona?>(null) }
+        var watchingAd by remember { mutableStateOf(false) }
+
+        val currentTab = currentScreen.toMainTabOrNull()
+        val consumeBack = when {
+            lockedPersona != null -> true
+            watchingAd -> true
+            currentScreen == Screen.Onboarding ->
+                onboardingState.step != OnboardingStep.BuildingPlan
+            currentScreen == Screen.Paywall -> true
+            currentTab != null -> navStack.canPop || currentTab != MainTab.Home
+            else -> false
+        }
+
+        NaglyBackHandler(enabled = consumeBack) {
+            when {
+                lockedPersona != null -> lockedPersona = null
+                watchingAd -> {
+                    (adClient as? FakeAdClient)?.cancel()
+                    watchingAd = false
+                }
+                currentScreen == Screen.Onboarding -> onboardingHolder.back()
+                currentScreen == Screen.Paywall -> navStack.pop()
+                currentTab != null -> {
+                    if (navStack.canPop) {
+                        navStack.pop()
+                    } else if (currentTab != MainTab.Home) {
+                        navStack.resetTo(Screen.Today)
                     }
                 }
-            } else {
+            }
+        }
+
+        if (currentTab != null) {
+            MainShell(
+                selectedTab = currentTab,
+                onTabSelected = { tab -> navStack.navigateToTab(tab) },
+            ) {
                 when (currentScreen) {
-                    Screen.Onboarding -> OnboardingScreen(
-                        state = onboardingState,
-                        onWeightChange = onboardingHolder::setWeight,
-                        onActivityChange = onboardingHolder::setActivity,
-                        onSelectRelationship = onboardingHolder::selectRelationship,
-                        onSelectPersona = onboardingHolder::selectPersona,
-                        onLockedRelationship = { relationship ->
-                            lockedPersona = previewPersonaForRelationship(relationship.id)
+                    Screen.Today -> TodayScreen(
+                        state = todayState,
+                        onLog = todayStateHolder::log,
+                        onUndo = todayStateHolder::undo,
+                        onUndoEntry = todayStateHolder::undoEntry,
+                        onCycleLine = todayStateHolder::cycleLine,
+                        onOpenHistory = { navStack.push(Screen.History) },
+                        onOpenPersonas = { navStack.push(Screen.Personas) },
+                    )
+                    Screen.History -> HistoryScreen(state = historyState)
+                    Screen.Personas -> PersonaPickerScreen(
+                        selectedId = goal.personaId,
+                        unlockExpiries = unlockExpiries,
+                        isPro = onboardingState.isPro,
+                        relationshipLevel = todayState.relationshipLevel,
+                        relationshipProgress = todayState.relationshipProgress,
+                        onSelect = { id ->
+                            onboardingHolder.savePersonaOnly(id) {}
                         },
-                        onLockedPersona = { persona ->
-                            if (PersonaCatalog.isPro(persona)) {
-                                lockedPersona = persona
-                            }
-                        },
-                        onWakeChange = onboardingHolder::setWakeHour,
-                        onSleepChange = onboardingHolder::setSleepHour,
-                        onLogFirstGlass = onboardingHolder::logFirstGlass,
-                        onNext = onboardingHolder::next,
-                        onBack = onboardingHolder::back,
-                        onFinish = {
-                            onboardingHolder.finish { screen = Screen.Today }
-                        },
-                        canSelectPersona = { persona ->
+                        canSelect = { persona ->
                             onboardingHolder.canSelect(
                                 persona,
                                 onboardingState.unlockedIds,
                                 onboardingState.isPro,
                             )
                         },
-                        permissionLine = onboardingHolder.permissionLine(),
-                        unlockExpiries = unlockExpiries,
+                        onLockedClick = { persona -> lockedPersona = persona },
+                        onLockedRelationship = { relationship ->
+                            lockedPersona = previewPersonaForRelationship(relationship.id)
+                        },
                     )
-                    Screen.Paywall -> PaywallScreen(
-                        purchasing = purchasing,
-                        onPurchase = { packageId ->
-                            scope.launch {
-                                purchasing = true
-                                billing.purchase(packageId)
-                                purchasing = false
-                                screen = Screen.Personas
-                            }
-                        },
-                        onRestore = {
-                            scope.launch {
-                                purchasing = true
-                                billing.restore()
-                                purchasing = false
-                                if (billing.isPro.value) screen = Screen.Personas
-                            }
-                        },
-                        onClose = { screen = Screen.Personas },
+                    Screen.Insights -> InsightsScreen(state = insightsState)
+                    Screen.Settings -> SettingsScreen(
+                        state = settingsState,
+                        onDailyGoalChange = settingsHolder::setDailyDisplay,
+                        onVolumeUnitChange = settingsHolder::setVolumeUnit,
+                        onWakeChange = settingsHolder::setWakeHour,
+                        onSleepChange = settingsHolder::setSleepHour,
+                        onNotificationsChange = settingsHolder::setNotificationsEnabled,
+                        onOpenPersonas = { navStack.push(Screen.Personas) },
+                        onRestorePurchases = settingsHolder::restorePurchases,
+                        onRequestPermission = settingsHolder::requestNotificationPermission,
+                        onDismissMessage = settingsHolder::clearMessages,
                     )
                     else -> Unit
                 }
             }
-
-            lockedPersona?.let { persona ->
-                UnlockSheet(
-                    persona = persona,
-                    isPro = onboardingState.isPro,
-                    watchingAd = watchingAd,
-                    onWatchAd = {
+        } else {
+            when (currentScreen) {
+                Screen.Onboarding -> OnboardingScreen(
+                    state = onboardingState,
+                    onWeightChange = onboardingHolder::setWeight,
+                    onActivityChange = onboardingHolder::setActivity,
+                    onSelectRelationship = onboardingHolder::selectRelationship,
+                    onSelectPersona = onboardingHolder::selectPersona,
+                    onLockedRelationship = { relationship ->
+                        lockedPersona = previewPersonaForRelationship(relationship.id)
+                    },
+                    onLockedPersona = { persona ->
+                        if (PersonaCatalog.isPro(persona)) {
+                            lockedPersona = persona
+                        }
+                    },
+                    onWakeChange = onboardingHolder::setWakeHour,
+                    onSleepChange = onboardingHolder::setSleepHour,
+                    onLogFirstGlass = onboardingHolder::logFirstGlass,
+                    onNext = onboardingHolder::next,
+                    onFinish = {
+                        onboardingHolder.finish { navStack.resetTo(Screen.Today) }
+                    },
+                    canSelectPersona = { persona ->
+                        onboardingHolder.canSelect(
+                            persona,
+                            onboardingState.unlockedIds,
+                            onboardingState.isPro,
+                        )
+                    },
+                    permissionLine = onboardingHolder.permissionLine(),
+                    unlockExpiries = unlockExpiries,
+                )
+                Screen.Paywall -> PaywallScreen(
+                    purchasing = purchasing,
+                    onPurchase = { packageId ->
                         scope.launch {
-                            watchingAd = true
-                            adClient.loadRewarded()
-                            val result = adClient.showRewarded()
-                            watchingAd = false
-                            if (result.isSuccess) {
-                                unlockRepository.grant(persona.relationshipId, TEMP_UNLOCK_MS)
-                                onboardingHolder.selectPersona(persona.id)
-                                onboardingHolder.savePersonaOnly(persona.id) {}
-                                lockedPersona = null
+                            purchasing = true
+                            billing.purchase(packageId)
+                            purchasing = false
+                            if (navStack.canPop) {
+                                navStack.pop()
+                            } else {
+                                navStack.navigateToTab(MainTab.Characters)
                             }
                         }
                     },
-                    onGoPro = {
-                        lockedPersona = null
-                        screen = Screen.Paywall
-                    },
-                    onDismiss = { lockedPersona = null },
-                )
-            }
-
-            if (watchingAd) {
-                FakeAdOverlay(
-                    personaName = lockedPersona?.displayName ?: "her",
-                    onCancel = {
-                        (adClient as? FakeAdClient)?.cancel()
-                        watchingAd = false
-                    },
-                )
-            }
-
-            expiryMessage?.let { message ->
-                AlertDialog(
-                    onDismissRequest = expiryWatcher::clearExpiryMessage,
-                    title = { Text("They're gone for now") },
-                    text = { Text(message) },
-                    confirmButton = {
-                        TextButton(onClick = expiryWatcher::clearExpiryMessage) {
-                            Text("Okay")
+                    onRestore = {
+                        scope.launch {
+                            purchasing = true
+                            billing.restore()
+                            purchasing = false
+                            if (billing.isPro.value) {
+                                if (navStack.canPop) {
+                                    navStack.pop()
+                                } else {
+                                    navStack.navigateToTab(MainTab.Characters)
+                                }
+                            }
                         }
                     },
+                    onClose = { navStack.pop() },
                 )
+                else -> Unit
             }
         }
+
+        lockedPersona?.let { persona ->
+            UnlockSheet(
+                persona = persona,
+                isPro = onboardingState.isPro,
+                watchingAd = watchingAd,
+                onWatchAd = {
+                    scope.launch {
+                        watchingAd = true
+                        adClient.loadRewarded()
+                        val result = adClient.showRewarded()
+                        watchingAd = false
+                        if (result.isSuccess) {
+                            unlockRepository.grant(persona.relationshipId, TEMP_UNLOCK_MS)
+                            onboardingHolder.selectPersona(persona.id)
+                            onboardingHolder.savePersonaOnly(persona.id) {}
+                            lockedPersona = null
+                        }
+                    }
+                },
+                onGoPro = {
+                    lockedPersona = null
+                    navStack.push(Screen.Paywall)
+                },
+                onDismiss = { lockedPersona = null },
+            )
+        }
+
+        if (watchingAd) {
+            FakeAdOverlay(
+                personaName = lockedPersona?.displayName ?: "her",
+                onCancel = {
+                    (adClient as? FakeAdClient)?.cancel()
+                    watchingAd = false
+                },
+            )
+        }
+
+        expiryMessage?.let { message ->
+            AlertDialog(
+                onDismissRequest = expiryWatcher::clearExpiryMessage,
+                title = { Text("They're gone for now") },
+                text = { Text(message) },
+                confirmButton = {
+                    TextButton(onClick = expiryWatcher::clearExpiryMessage) {
+                        Text("Okay")
+                    }
+                },
+            )
+        }
     }
+}
