@@ -26,6 +26,7 @@ import com.manojbuilds.nagly.domain.model.VolumeUnit
 import com.manojbuilds.nagly.domain.volumeUnitLabel
 import com.manojbuilds.nagly.platform.PlatformActions
 import com.manojbuilds.nagly.ui.designsystem.NaglySpacing
+import com.manojbuilds.nagly.ui.designsystem.dayPartBrush
 import com.manojbuilds.nagly.ui.designsystem.components.NaglyCard
 import com.manojbuilds.nagly.ui.designsystem.components.PersonaEmptyState
 import com.manojbuilds.nagly.ui.designsystem.components.PillButton
@@ -45,12 +46,16 @@ fun SettingsScreen(
     onRequestPermission: () -> Unit,
     onDismissMessage: () -> Unit,
 ) {
+    val tabTint = dayPartBrush(intensity = 0.45f)
+
     if (state.isLoading) {
         PersonaEmptyState(
             personaEmoji = state.personaEmoji,
             personaName = state.personaLabel.substringAfter(" ").ifBlank { "Your nagger" },
             line = state.loadingLine,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(tabTint),
         )
         return
     }
@@ -58,7 +63,7 @@ fun SettingsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(tabTint)
             .verticalScroll(rememberScrollState())
             .padding(NaglySpacing.md),
         verticalArrangement = Arrangement.spacedBy(NaglySpacing.xs),

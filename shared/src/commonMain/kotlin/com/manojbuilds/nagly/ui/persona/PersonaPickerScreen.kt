@@ -1,5 +1,6 @@
 package com.manojbuilds.nagly.ui.persona
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.manojbuilds.nagly.domain.RelationshipLevel
 import com.manojbuilds.nagly.ui.designsystem.NaglySpacing
+import com.manojbuilds.nagly.ui.designsystem.dayPartBrush
 import com.manojbuilds.nagly.ui.designsystem.components.RelationshipMeterChip
 import com.manojbuilds.nagly.domain.PersonaCatalog
 import com.manojbuilds.nagly.domain.model.Persona
@@ -40,10 +42,12 @@ fun PersonaPickerScreen(
         mutableStateOf(PersonaCatalog.relationshipOf(PersonaCatalog.get(selectedId)).id)
     }
     var showVariants by rememberSaveable { mutableStateOf(false) }
+    val tabTint = dayPartBrush(intensity = 0.45f)
 
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(tabTint)
             .padding(NaglySpacing.md),
     ) {
         Text(

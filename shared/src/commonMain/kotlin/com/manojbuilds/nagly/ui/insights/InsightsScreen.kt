@@ -14,17 +14,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.manojbuilds.nagly.ui.designsystem.LocalNaglyColors
 import com.manojbuilds.nagly.ui.designsystem.NaglySpacing
+import com.manojbuilds.nagly.ui.designsystem.dayPartBrush
 import com.manojbuilds.nagly.ui.designsystem.components.NaglyCard
 import com.manojbuilds.nagly.ui.designsystem.components.PersonaEmptyState
 
 @Composable
 fun InsightsScreen(state: InsightsUiState) {
     val colors = LocalNaglyColors.current
+    val tabTint = dayPartBrush(colors = colors, intensity = 0.45f)
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(colors.background)
+            .background(tabTint)
             .verticalScroll(rememberScrollState())
             .padding(NaglySpacing.md),
     ) {

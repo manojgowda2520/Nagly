@@ -36,6 +36,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.manojbuilds.nagly.ui.designsystem.LocalNaglyColors
 import com.manojbuilds.nagly.ui.designsystem.NaglySpacing
+import com.manojbuilds.nagly.ui.designsystem.dayPartBrush
 import com.manojbuilds.nagly.ui.designsystem.components.NaglyCard
 import com.manojbuilds.nagly.ui.designsystem.components.PillButton
 import com.manojbuilds.nagly.ui.designsystem.components.PillButtonVariant
@@ -53,11 +54,12 @@ fun HistoryScreen(
     val colors = LocalNaglyColors.current
     var viewMode by remember { mutableStateOf(HistoryViewMode.Conversation) }
     val empty = state.days.all { it.totalMl == 0 }
+    val tabTint = dayPartBrush(colors = colors, intensity = 0.45f)
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(colors.background)
+            .background(tabTint)
             .padding(NaglySpacing.md),
     ) {
         Text("History", style = MaterialTheme.typography.headlineMedium, color = colors.textPrimary)
