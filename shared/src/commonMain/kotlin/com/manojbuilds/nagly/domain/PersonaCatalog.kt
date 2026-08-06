@@ -11,7 +11,7 @@ object PersonaCatalog {
         Relationship("mom", "Mom", "👩", Tier.FREE),
         Relationship("dad", "Dad", "👨", Tier.PRO),
         Relationship("grandparent", "Grandparent", "🧓", Tier.PRO),
-        Relationship("bestie", "Bestie", "✨", Tier.PRO),
+        Relationship("bestie", "Bestie", "🤗", Tier.PRO),
     )
 
     private val relationshipsById = relationships.associateBy { it.id }
@@ -19,7 +19,7 @@ object PersonaCatalog {
     val all: List<Persona> = listOf(
         // Mom (FREE)
         buildPersona(
-            id = "indian_mom", relationshipId = "mom", displayName = "Indian Mom", emoji = "🍛",
+            id = "indian_mom", relationshipId = "mom", displayName = "Indian Mom", emoji = "👩",
             neutral = listOf("Beta, sip some water.", "I'm not nagging, I'm caring.", "Water first, then chai."),
             proud = listOf("That's my child!", "Goal done. Amma is proud.", "See? Listening works."),
             worriedMorning = listOf("Morning and already behind, beta.", "Start the day with water.", "Don't skip the first sip."),
@@ -31,7 +31,7 @@ object PersonaCatalog {
             skips = moodSkips("Not now", "Later, Amma", "Busy", "I'm fine", "Skip", "Ugh"),
         ),
         buildPersona(
-            id = "jewish_mom", relationshipId = "mom", displayName = "Jewish Mom", emoji = "🥯",
+            id = "jewish_mom", relationshipId = "mom", displayName = "Jewish Mom", emoji = "👩‍🦰",
             neutral = listOf("Drink. For me.", "A little water never killed anyone.", "Hydrate, sweetheart."),
             proud = listOf("Look at you, all hydrated!", "Such a good drinker today.", "I knew you had it in you."),
             worriedMorning = listOf("Morning worry: drink something.", "Start hydrated, sweetheart.", "Don't make me worry early."),
@@ -43,7 +43,7 @@ object PersonaCatalog {
             skips = moodSkips("Later", "Busy", "Not thirsty", "Skip", "I'm fine", "Nope"),
         ),
         buildPersona(
-            id = "southern_mom", relationshipId = "mom", displayName = "Southern Mom", emoji = "🍑",
+            id = "southern_mom", relationshipId = "mom", displayName = "Southern Mom", emoji = "👩🏼",
             neutral = listOf("Sugar, take a sip.", "Water's waitin' on you.", "Don't make me ask twice, honey."),
             proud = listOf("Bless your heart — goal met!", "That's my baby.", "Proud doesn't cover it."),
             worriedMorning = listOf("Mornin' and you're already dry.", "Sip before the day runs off.", "Mama's gettin' concerned early."),
@@ -56,7 +56,7 @@ object PersonaCatalog {
         ),
         // Dad (PRO)
         buildPersona(
-            id = "punjabi_dad", relationshipId = "dad", displayName = "Punjabi Dad", emoji = "🚜",
+            id = "punjabi_dad", relationshipId = "dad", displayName = "Punjabi Dad", emoji = "🧔",
             neutral = listOf("Paani pi le, beta.", "Strong day starts with water.", "Don't argue. Drink."),
             proud = listOf("Shabash! Goal done.", "That's my child.", "Strong work today."),
             worriedMorning = listOf("Morning and no water yet?", "Start right, beta.", "Bottle first."),
@@ -68,7 +68,7 @@ object PersonaCatalog {
             skips = moodSkips("Later, Papa", "Busy", "Skip", "Not now", "I'm fine", "Nope"),
         ),
         buildPersona(
-            id = "corny_dad", relationshipId = "dad", displayName = "Corny Dad", emoji = "😂",
+            id = "corny_dad", relationshipId = "dad", displayName = "Corny Dad", emoji = "👨‍🦳",
             neutral = listOf("H2-Oh yeah — drink up!", "Water you waiting for?", "Sip happens."),
             proud = listOf("You're on a roll — hydrated!", "Dad joke levels: proud.", "Liquid win!"),
             worriedMorning = listOf("Rise and hydrate, champ.", "Morning pun: drink!", "Don't stream dry."),
@@ -80,7 +80,7 @@ object PersonaCatalog {
             skips = moodSkips("Groan", "Busy", "Skip", "Dad, no", "Later", "Ugh"),
         ),
         buildPersona(
-            id = "silent_dad", relationshipId = "dad", displayName = "Silent Dad", emoji = "😐",
+            id = "silent_dad", relationshipId = "dad", displayName = "Silent Dad", emoji = "😶",
             neutral = listOf("Drink.", "Water.", "Now."),
             proud = listOf("Good.", "Done.", "Okay."),
             worriedMorning = listOf("Behind.", "Morning. Drink.", "Start."),
@@ -93,7 +93,7 @@ object PersonaCatalog {
         ),
         // Grandparent (PRO)
         buildPersona(
-            id = "dadi_nani", relationshipId = "grandparent", displayName = "Dadi / Nani", emoji = "🪷",
+            id = "dadi_nani", relationshipId = "grandparent", displayName = "Dadi / Nani", emoji = "🧕",
             neutral = listOf("Beta, thoda paani.", "Listen to Dadi.", "Sip slowly, sip often."),
             proud = listOf("Bahut accha!", "Dadi is happy.", "My smart child."),
             worriedMorning = listOf("Morning without water?", "Start with a glass.", "Dadi is waiting."),
@@ -105,7 +105,7 @@ object PersonaCatalog {
             skips = moodSkips("Later, Dadi", "Busy", "Skip", "Not now", "Fine", "Soon"),
         ),
         buildPersona(
-            id = "italian_nonna", relationshipId = "grandparent", displayName = "Italian Nonna", emoji = "🍝",
+            id = "italian_nonna", relationshipId = "grandparent", displayName = "Italian Nonna", emoji = "👵",
             neutral = listOf("Bevi, amore.", "Water before the espresso.", "Nonna is watching."),
             proud = listOf("Perfetto! Goal done.", "That's my grandchild.", "Hydrated and loved."),
             worriedMorning = listOf("Mattina — drink, amore.", "Start strong.", "Nonna waits."),
@@ -117,7 +117,7 @@ object PersonaCatalog {
             skips = moodSkips("Later, Nonna", "Busy", "Skip", "Not now", "Fine", "No"),
         ),
         buildPersona(
-            id = "sweet_granny", relationshipId = "grandparent", displayName = "Sweet Granny", emoji = "🧶",
+            id = "sweet_granny", relationshipId = "grandparent", displayName = "Sweet Granny", emoji = "🧓",
             neutral = listOf("Have a little water, dear.", "Granny packed love — and a sip.", "Drink for me."),
             proud = listOf("Oh, I'm so proud!", "You did it, dear.", "Granny's smiling."),
             worriedMorning = listOf("Morning, dear — a sip?", "Start gentle and wet.", "Granny's checking in."),
@@ -130,7 +130,7 @@ object PersonaCatalog {
         ),
         // Bestie (PRO)
         buildPersona(
-            id = "the_bestie", relationshipId = "bestie", displayName = "The Bestie", emoji = "💅",
+            id = "the_bestie", relationshipId = "bestie", displayName = "The Bestie", emoji = "💁",
             neutral = listOf("Hydrate, bestie.", "Water check — go.", "Sip sip, no skip."),
             proud = listOf("Slay. Goal crushed.", "That's my bestie.", "Hydration icon."),
             worriedMorning = listOf("Morning and dry already?", "Start cute, start wet.", "Drink, then we gossip."),
@@ -142,7 +142,7 @@ object PersonaCatalog {
             skips = moodSkips("Later", "Busy", "Skip", "Not now", "Brb", "Nah"),
         ),
         buildPersona(
-            id = "gym_coach", relationshipId = "bestie", displayName = "Gym Coach", emoji = "💪",
+            id = "gym_coach", relationshipId = "bestie", displayName = "Gym Coach", emoji = "🏋️",
             neutral = listOf("Sip up, champ.", "Gains need water.", "Hydrate or die-drate."),
             proud = listOf("Crushed the goal!", "Championship hydration.", "Proud of you."),
             worriedMorning = listOf("AM session: drink.", "Start the reps with water.", "Bottle. Now."),
@@ -154,7 +154,7 @@ object PersonaCatalog {
             skips = moodSkips("Rest day", "Busy", "Skip", "Not now", "Later", "Nah"),
         ),
         buildPersona(
-            id = "corporate_hr", relationshipId = "bestie", displayName = "Corporate HR", emoji = "📎",
+            id = "corporate_hr", relationshipId = "bestie", displayName = "Corporate HR", emoji = "🧑‍💼",
             neutral = listOf("Friendly reminder: hydrate.", "Please log your water intake.", "Wellness ping: drink up."),
             proud = listOf("Goal achieved. Nice work.", "You've met today's KPI.", "Recognized: hydration champion."),
             worriedMorning = listOf("AM progress below target.", "Start-of-day action: drink.", "Please comply."),

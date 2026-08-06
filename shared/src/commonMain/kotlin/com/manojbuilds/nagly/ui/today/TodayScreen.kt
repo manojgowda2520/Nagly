@@ -373,12 +373,7 @@ private fun guiltGaugeColor(
     }
 }
 
-private fun expressiveFace(mood: Mood, personaEmoji: String): String = when (mood) {
-    Mood.NEUTRAL -> personaEmoji
-    Mood.WORRIED -> "😟"
-    Mood.DISAPPOINTED -> "😤"
-    Mood.PROUD -> "🥰"
-}
+private fun expressiveFace(mood: Mood, personaEmoji: String): String = personaEmoji
 
 private fun moodCaption(mood: Mood): String = when (mood) {
     Mood.NEUTRAL -> "Keeping an eye on you"
