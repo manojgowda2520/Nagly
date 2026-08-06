@@ -3,18 +3,22 @@ package com.manojbuilds.nagly.ui.navigation
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.BarChart
+import androidx.compose.material.icons.outlined.ChatBubbleOutline
+import androidx.compose.material.icons.outlined.Face
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -23,9 +27,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.manojbuilds.nagly.ui.designsystem.LocalNaglyColors
 import com.manojbuilds.nagly.ui.designsystem.NaglySpacing
 
@@ -33,49 +37,24 @@ import com.manojbuilds.nagly.ui.designsystem.NaglySpacing
 fun MainShell(
     selectedTab: MainTab,
     onTabSelected: (MainTab) -> Unit,
-    onQuickAddWater: () -> Unit,
     content: @Composable () -> Unit,
 ) {
     val naglyColors = LocalNaglyColors.current
-    val leftTabs = listOf(MainTab.Home, MainTab.History)
-    val rightTabs = listOf(MainTab.Characters, MainTab.Insights, MainTab.Profile)
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         containerColor = MaterialTheme.colorScheme.background,
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = onQuickAddWater,
-                shape = CircleShape,
-                containerColor = naglyColors.accent,
-                contentColor = naglyColors.onPrimary,
-                modifier = Modifier
-                    .size(56.dp)
-                    .offset(y = 28.dp),
-            ) {
-                Text("💧", fontSize = 24.sp)
-            }
-        },
         bottomBar = {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(80.dp)
+                    .height(72.dp)
                     .background(naglyColors.card)
                     .padding(horizontal = NaglySpacing.xxs),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                leftTabs.forEach { tab ->
-                    BottomNavItem(
-                        tab = tab,
-                        selected = tab == selectedTab,
-                        onClick = { onTabSelected(tab) },
-                        modifier = Modifier.weight(1f),
-                    )
-                }
-                Box(modifier = Modifier.weight(1f))
-                rightTabs.forEach { tab ->
+                MainTab.entries.forEach { tab ->
                     BottomNavItem(
                         tab = tab,
                         selected = tab == selectedTab,
@@ -104,6 +83,7 @@ private fun BottomNavItem(
     modifier: Modifier = Modifier,
 ) {
     val naglyColors = LocalNaglyColors.current
+    val tint = if (selected) naglyColors.primary else naglyColors.textSecondary
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
@@ -115,18 +95,29 @@ private fun BottomNavItem(
             )
             .padding(vertical = NaglySpacing.xxs),
     ) {
-        Text(
-            text = tab.emoji,
-            fontSize = if (selected) 20.sp else 17.sp,
-            textAlign = TextAlign.Center,
+        Icon(
+            imageVector = tab.icon,
+            contentDescription = tab.label,
+            tint = tint,
+            modifier = Modifier.size(24.dp),
         )
+        Spacer(modifier = Modifier.height(4.dp))
         Text(
             tab.label,
             style = MaterialTheme.typography.labelSmall,
-            color = if (selected) naglyColors.primary else naglyColors.textSecondary,
+            color = tint,
             maxLines = 1,
             softWrap = false,
             textAlign = TextAlign.Center,
         )
     }
 }
+
+private val MainTab.icon: ImageVector
+    get() = when (this) {
+        MainTab.Home -> Icons.Outlined.Home
+        MainTab.History -> Icons.Outlined.ChatBubbleOutline
+        MainTab.Characters -> Icons.Outlined.Face
+        MainTab.Insights -> Icons.Outlined.BarChart
+        MainTab.Profile -> Icons.Outlined.Person
+    }
