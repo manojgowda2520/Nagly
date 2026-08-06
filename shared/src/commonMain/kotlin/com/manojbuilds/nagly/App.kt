@@ -114,7 +114,6 @@ private fun AppContent() {
                 MainShell(
                     selectedTab = mainTab,
                     onTabSelected = { tab -> screen = tab.toScreen() },
-                    onQuickAddWater = { todayStateHolder.log(250) },
                 ) {
                     when (currentScreen) {
                         Screen.Today -> TodayScreen(
