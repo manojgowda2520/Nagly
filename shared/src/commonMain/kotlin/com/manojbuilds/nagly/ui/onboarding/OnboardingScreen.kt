@@ -5,9 +5,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -20,6 +24,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -62,17 +67,29 @@ fun OnboardingScreen(
             .background(MaterialTheme.colorScheme.background)
             .padding(NaglySpacing.md),
     ) {
+        OnboardingProgressDots(currentStep = state.step)
+
+        Spacer(modifier = Modifier.height(NaglySpacing.sm))
+
         Text(
             text = stepTitle(state.step),
             style = MaterialTheme.typography.headlineMedium,
         )
 
-        Column(
+        Box(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
                 .padding(top = NaglySpacing.md - 4.dp),
+            contentAlignment = Alignment.Center,
         ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .then(stepScrollModifier(state.step)),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
             when (state.step) {
                 OnboardingStep.Weight -> WeightStep(
                     weightKg = state.weightKg,
@@ -123,6 +140,7 @@ fun OnboardingScreen(
                     line = permissionLine,
                 )
             }
+            }
         }
 
         Row(
@@ -159,6 +177,58 @@ fun OnboardingScreen(
     }
 }
 
+private const val ONBOARDING_PROGRESS_STEPS = 8
+
+private fun OnboardingStep.progressIndex(): Int = when (this) {
+    OnboardingStep.Weight -> 0
+    OnboardingStep.Activity -> 1
+    OnboardingStep.Hours -> 2
+    OnboardingStep.BuildingPlan -> 3
+    OnboardingStep.GoalReveal -> 3
+    OnboardingStep.Relationship -> 4
+    OnboardingStep.Variant -> 5
+    OnboardingStep.FirstGlass -> 6
+    OnboardingStep.Permission -> 7
+}
+
+@Composable
+private fun OnboardingProgressDots(currentStep: OnboardingStep) {
+    val activeIndex = currentStep.progressIndex()
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        repeat(ONBOARDING_PROGRESS_STEPS) { index ->
+            val active = index == activeIndex
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 4.dp)
+                    .size(if (active) 10.dp else 8.dp)
+                    .clip(CircleShape)
+                    .background(
+                        if (active) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.outline.copy(alpha = 0.35f)
+                        },
+                    ),
+            )
+        }
+    }
+}
+
+@Composable
+private fun stepScrollModifier(step: OnboardingStep): Modifier = when (step) {
+    OnboardingStep.Weight,
+    OnboardingStep.FirstGlass,
+    OnboardingStep.Relationship,
+    OnboardingStep.Variant,
+    -> Modifier.verticalScroll(rememberScrollState())
+
+    else -> Modifier
+}
+
 private fun stepTitle(step: OnboardingStep): String = when (step) {
     OnboardingStep.Weight -> "What's your weight?"
     OnboardingStep.Activity -> "How active are you?"
@@ -174,7 +244,7 @@ private fun stepTitle(step: OnboardingStep): String = when (step) {
 @Composable
 private fun WeightStep(weightKg: String, onWeightChange: (String) -> Unit) {
     Column(
-        modifier = Modifier.verticalScroll(rememberScrollState()),
+        modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(NaglySpacing.sm),
     ) {
         Text(
@@ -194,7 +264,10 @@ private fun WeightStep(weightKg: String, onWeightChange: (String) -> Unit) {
 
 @Composable
 private fun ActivityStep(selected: ActivityLevel, onSelect: (ActivityLevel) -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(NaglySpacing.xs + 4.dp)) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(NaglySpacing.xs + 4.dp),
+    ) {
         ActivityOption(
             label = "Mostly sitting",
             subtitle = "Desk job, light movement",
@@ -240,19 +313,14 @@ private fun ActivityOption(
 
 @Composable
 private fun BuildingPlanStep() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-            Text(
-                "Crunching numbers…",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = NaglySpacing.sm),
-            )
-        }
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+        Text(
+            "Crunching numbers…",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = NaglySpacing.sm),
+        )
     }
 }
 
@@ -286,7 +354,7 @@ private fun RelationshipStep(
     onLockedClick: (Relationship) -> Unit,
     nowMs: Long,
 ) {
-    Column {
+    Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             "Pick a relationship — then choose their exact vibe.",
             style = MaterialTheme.typography.bodyLarge,
@@ -313,7 +381,7 @@ private fun FirstGlassStep(
 ) {
     val persona = PersonaCatalog.get(personaId)
     Column(
-        modifier = Modifier.verticalScroll(rememberScrollState()),
+        modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(NaglySpacing.sm),
     ) {
         Text(
@@ -342,7 +410,10 @@ private fun HoursStep(
     onWakeChange: (Int) -> Unit,
     onSleepChange: (Int) -> Unit,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(NaglySpacing.md - 4.dp)) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(NaglySpacing.md - 4.dp),
+    ) {
         Text("Wake: ${formatHour(wakeHour)}", style = MaterialTheme.typography.titleLarge)
         Slider(
             value = wakeHour.toFloat(),
@@ -366,7 +437,10 @@ private fun PermissionStep(
     personaName: String,
     line: String,
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(NaglySpacing.sm)) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(NaglySpacing.sm),
+    ) {
         Text("$personaEmoji $personaName", style = MaterialTheme.typography.headlineMedium)
         SpeechBubbleSimple(
             text = "\"$line\"",
