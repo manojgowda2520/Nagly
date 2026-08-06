@@ -57,7 +57,7 @@ import com.manojbuilds.nagly.ui.designsystem.components.PillButtonVariant
 import com.manojbuilds.nagly.ui.designsystem.components.RelationshipMeterChip
 import com.manojbuilds.nagly.ui.designsystem.components.SpeechBubbleAnimated
 import com.manojbuilds.nagly.ui.designsystem.components.WaveBottle
-import com.manojbuilds.nagly.ui.designsystem.moodColor
+import com.manojbuilds.nagly.ui.designsystem.dayPartBrush
 import kotlin.time.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -102,7 +102,7 @@ fun TodayScreen(
         label = "fill",
     )
     val guiltColor = guiltGaugeColor(state.mood, state.guiltProgress, colors.primary, colors.warning, colors.danger)
-    val dayBrush = timeOfDayBrush(state.hourOfDay, colors)
+    val dayBrush = dayPartBrush(hour = state.hourOfDay, colors = colors, intensity = 1f)
 
     val breath = rememberInfiniteTransition(label = "breath")
     val bob by breath.animateFloat(
@@ -197,7 +197,7 @@ fun TodayScreen(
             tailAtStart = false,
         )
         Text(
-            "Tap to hear more",
+            "Tap for more",
             style = MaterialTheme.typography.bodyMedium,
             color = colors.textSecondary,
             modifier = Modifier.padding(top = NaglySpacing.xxs, bottom = NaglySpacing.sm),
@@ -340,23 +340,6 @@ fun TodayScreen(
             shape = NaglyShapes.card,
         )
     }
-}
-
-@Composable
-private fun timeOfDayBrush(hour: Int, colors: com.manojbuilds.nagly.ui.designsystem.NaglyColors): Brush {
-    val top = when (hour) {
-        in 5..10 -> Color(0xFFFFE0B2) // sunrise
-        in 11..16 -> Color(0xFFB3E5FC) // bright afternoon
-        in 17..20 -> Color(0xFFFFCC80) // warm evening
-        else -> Color(0xFF0E1A24) // night navy
-    }
-    val bottom = when (hour) {
-        in 5..10 -> colors.background
-        in 11..16 -> colors.background
-        in 17..20 -> colors.background
-        else -> colors.card
-    }
-    return Brush.verticalGradient(listOf(top.copy(alpha = 0.85f), bottom))
 }
 
 private fun guiltGaugeColor(

@@ -69,7 +69,7 @@ private data class ConfettiPiece(
     val bornAt: Long,
 )
 
-private val MILESTONES = listOf(0.5f to "☀️", 0.75f to "🌤")
+private val MILESTONES = listOf(0.5f, 0.75f)
 
 @Composable
 fun WaveBottle(
@@ -197,12 +197,12 @@ fun WaveBottle(
             val w = size.width
             val h = size.height
             val neckW = w * 0.28f
-            val bodyTop = h * 0.18f
-            val bodyLeft = w * 0.18f
-            val bodyWidth = w * 0.64f
-            val bodyHeight = h * 0.72f
+            val bodyTop = h * 0.14f
+            val bodyLeft = w * 0.22f
+            val bodyWidth = w * 0.56f
+            val bodyHeight = h * 0.78f
 
-            val bottlePath = bottleOutline(w, h, neckW, bodyTop, bodyLeft, bodyWidth, bodyHeight)
+            val bottlePath = glassOutline(w, h, neckW, bodyTop, bodyLeft, bodyWidth, bodyHeight)
 
             translate(left = shake.value) {
                 if (glowAlpha.value > 0f) {
@@ -260,13 +260,13 @@ fun WaveBottle(
                         }
                     }
 
-                    MILESTONES.forEach { (ratio, _) ->
+                    MILESTONES.forEach { ratio ->
                         val markY = bodyTop + bodyHeight * (1f - ratio)
                         drawLine(
-                            color = glass.copy(alpha = 0.7f),
-                            start = Offset(bodyLeft + 4.dp.toPx(), markY),
-                            end = Offset(bodyLeft + bodyWidth - 4.dp.toPx(), markY),
-                            strokeWidth = 1.5f,
+                            color = glass.copy(alpha = 0.55f),
+                            start = Offset(bodyLeft + 6.dp.toPx(), markY),
+                            end = Offset(bodyLeft + 18.dp.toPx(), markY),
+                            strokeWidth = 2f,
                             cap = StrokeCap.Round,
                         )
                     }
@@ -300,25 +300,24 @@ fun WaveBottle(
             }
         }
 
-        MILESTONES.forEach { (ratio, emoji) ->
+        MILESTONES.forEach { ratio ->
             val showWarning = expectedProgress >= ratio && progress < ratio
+            if (!showWarning) return@forEach
             val yFraction = 1f - ratio
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .offset(x = 4.dp, y = (130.dp * 0.18f + 130.dp * 0.72f * yFraction - 8.dp)),
+                    .offset(x = 2.dp, y = (130.dp * 0.14f + 130.dp * 0.78f * yFraction - 8.dp)),
                 contentAlignment = Alignment.Center,
             ) {
-                Text(
-                    text = if (showWarning) "⚠️" else emoji,
-                    fontSize = if (showWarning) 12.sp else 10.sp,
-                )
+                Text(text = "⚠️", fontSize = 11.sp)
             }
         }
     }
 }
 
-private fun bottleOutline(
+/** Tall rounded glass / water bottle — not a jerrycan silhouette. */
+private fun glassOutline(
     w: Float,
     h: Float,
     neckW: Float,
@@ -327,14 +326,44 @@ private fun bottleOutline(
     bodyWidth: Float,
     bodyHeight: Float,
 ): Path = Path().apply {
-    moveTo(w / 2f - neckW / 2f, 0f)
-    lineTo(w / 2f + neckW / 2f, 0f)
-    lineTo(w / 2f + neckW / 2f, bodyTop)
-    lineTo(bodyLeft + bodyWidth, bodyTop)
-    lineTo(bodyLeft + bodyWidth, bodyTop + bodyHeight)
-    quadraticTo(bodyLeft + bodyWidth / 2f, h, bodyLeft, bodyTop + bodyHeight)
-    lineTo(bodyLeft, bodyTop)
-    lineTo(w / 2f - neckW / 2f, bodyTop)
+    val rimTop = h * 0.02f
+    val lip = 3f
+    val corner = bodyWidth * 0.18f
+    val cx = w / 2f
+    // rim
+    moveTo(cx - neckW / 2f - lip, rimTop)
+    lineTo(cx + neckW / 2f + lip, rimTop)
+    lineTo(cx + neckW / 2f, bodyTop * 0.55f)
+    // right shoulder into rounded body
+    lineTo(bodyLeft + bodyWidth - corner, bodyTop)
+    quadraticTo(
+        bodyLeft + bodyWidth,
+        bodyTop,
+        bodyLeft + bodyWidth,
+        bodyTop + corner,
+    )
+    lineTo(bodyLeft + bodyWidth, bodyTop + bodyHeight - corner)
+    quadraticTo(
+        bodyLeft + bodyWidth,
+        bodyTop + bodyHeight,
+        bodyLeft + bodyWidth - corner,
+        bodyTop + bodyHeight,
+    )
+    lineTo(bodyLeft + corner, bodyTop + bodyHeight)
+    quadraticTo(
+        bodyLeft,
+        bodyTop + bodyHeight,
+        bodyLeft,
+        bodyTop + bodyHeight - corner,
+    )
+    lineTo(bodyLeft, bodyTop + corner)
+    quadraticTo(
+        bodyLeft,
+        bodyTop,
+        bodyLeft + corner,
+        bodyTop,
+    )
+    lineTo(cx - neckW / 2f, bodyTop * 0.55f)
     close()
 }
 
