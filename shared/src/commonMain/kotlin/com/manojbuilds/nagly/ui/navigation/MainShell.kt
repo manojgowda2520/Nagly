@@ -125,6 +125,7 @@ private fun BottomNavItem(
             style = MaterialTheme.typography.labelSmall,
             color = if (selected) naglyColors.primary else naglyColors.textSecondary,
             maxLines = 1,
+            softWrap = false,
             textAlign = TextAlign.Center,
         )
     }

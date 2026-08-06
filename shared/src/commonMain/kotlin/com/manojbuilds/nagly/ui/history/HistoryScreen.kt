@@ -85,7 +85,9 @@ fun HistoryScreen(
                 } else {
                     PillButtonVariant.Outlined
                 },
-            ) { Text("Conversation") }
+            ) {
+                Text("Conversation", maxLines = 1, softWrap = false)
+            }
             PillButton(
                 onClick = { viewMode = HistoryViewMode.Chart },
                 modifier = Modifier.weight(1f),
@@ -94,7 +96,9 @@ fun HistoryScreen(
                 } else {
                     PillButtonVariant.Outlined
                 },
-            ) { Text("Chart") }
+            ) {
+                Text("Chart", maxLines = 1, softWrap = false)
+            }
         }
 
         when (viewMode) {

@@ -13,7 +13,7 @@ sealed interface Screen {
 enum class MainTab(val label: String, val emoji: String) {
     Home("Home", "🏠"),
     History("History", "📅"),
-    Characters("Characters", "💬"),
+    Characters("Chars", "💬"),
     Insights("Insights", "📊"),
     Profile("Profile", "👤"),
 }

@@ -35,7 +35,7 @@ fun PillButton(
     variant: PillButtonVariant = PillButtonVariant.Primary,
     enabled: Boolean = true,
     shape: Shape = NaglyShapes.pill,
-    contentPadding: PaddingValues = ButtonDefaults.ContentPadding,
+    contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable RowScope.() -> Unit,
 ) {

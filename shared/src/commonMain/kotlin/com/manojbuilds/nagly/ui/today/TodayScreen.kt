@@ -247,25 +247,25 @@ fun TodayScreen(
                 onClick = { logWithFeedback(250) },
                 modifier = Modifier.weight(1f),
                 variant = PillButtonVariant.Primary,
-            ) { Text("+250") }
+            ) { Text("+250", maxLines = 1, softWrap = false) }
             PillButton(
                 onClick = { logWithFeedback(500) },
                 modifier = Modifier.weight(1f),
                 variant = PillButtonVariant.Accent,
-            ) { Text("+500") }
+            ) { Text("+500", maxLines = 1, softWrap = false) }
             val custom = state.recentCustomMl
             if (custom != null) {
                 PillButton(
                     onClick = { logWithFeedback(custom) },
                     modifier = Modifier.weight(1f),
                     variant = PillButtonVariant.Outlined,
-                ) { Text("+$custom") }
+                ) { Text("+$custom", maxLines = 1, softWrap = false) }
             } else {
                 PillButton(
                     onClick = { showCustomDialog = true },
                     modifier = Modifier.weight(1f),
                     variant = PillButtonVariant.Outlined,
-                ) { Text("Custom") }
+                ) { Text("Custom", maxLines = 1, softWrap = false) }
             }
         }
         if (state.recentCustomMl != null) {
