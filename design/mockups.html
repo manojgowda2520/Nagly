@@ -1,0 +1,721 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}</style></head><body>
+<title>Nagly — Full App Mockups</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{
+  --ground:#EEF3F5; --panel:#FCFDFE; --ink:#122730; --muted:#5C7682; --line:#D9E3E8;
+  --brand:#0E7C86; --brand-soft:#0e7c8618; --sky:#1F93B4; --coral:#E85D3B;
+  --shadow:0 24px 60px -28px rgba(16,45,58,.45), 0 4px 14px -8px rgba(16,45,58,.25);
+  --font-display:"SF Pro Rounded",ui-rounded,"Segoe UI",system-ui,-apple-system,sans-serif;
+  --font-body:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-mono:ui-monospace,"SF Mono","Cascadia Mono",Consolas,monospace;
+  --bg:#FAFBFC;--card:#FFFFFF;--pri:#4FC3F7;--acc:#FF8A65;--tp:#212121;--ts:#757575;
+  --out:#E0E0E0;--sv:#F0F4F8;--ok:#4CAF50;--warn:#FFC107;--brandc:#0E7C86;
+  --med:#7E6BE0;--meal:#F2994A;--move:#27AE8B;--sleep:#5B7FC4;
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(1100px 560px at 82% -8%,var(--brand-soft),transparent 60%),var(--ground);
+  color:var(--ink);font-family:var(--font-body);line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1240px;margin:0 auto;padding:clamp(28px,5vw,64px) clamp(16px,4vw,40px) 100px}
+.mast{display:flex;flex-direction:column;gap:14px;margin-bottom:20px}
+.eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--brand);margin:0}
+h1{font-family:var(--font-display);font-weight:800;font-size:clamp(30px,5vw,50px);line-height:1.03;letter-spacing:-.02em;margin:.1em 0 0;text-wrap:balance;max-width:20ch}
+.lede{font-size:clamp(15px,2vw,18px);color:var(--muted);max-width:66ch;margin:0}
+.lede b{color:var(--ink);font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.lg{display:flex;align-items:center;gap:7px;padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:var(--panel);font-size:12.5px;font-weight:600}
+.lg i{width:12px;height:12px;border-radius:4px}
+
+.sec{margin-top:56px}
+.sec-h{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:8px}
+.sec-h h2{font-family:var(--font-display);font-size:22px;font-weight:800;margin:0;letter-spacing:-.01em}
+.sec-h .num{font-family:var(--font-mono);font-size:12px;color:var(--brand);font-weight:700}
+.sec-h p{font-size:13.5px;color:var(--muted);margin:0}
+.grid{display:flex;flex-wrap:wrap;gap:clamp(22px,3vw,38px);justify-content:center;margin-top:26px}
+
+.mock{width:290px;display:flex;flex-direction:column;gap:13px}
+.cap h3{font-family:var(--font-display);font-size:16px;font-weight:700;margin:0}
+.cap p{font-size:12.5px;color:var(--muted);margin:4px 0 0}
+.step-no{font-family:var(--font-mono);font-size:11px;color:var(--brand);font-weight:700}
+
+/* phone */
+.phone{width:290px;height:610px;border-radius:42px;padding:10px;position:relative;
+  background:linear-gradient(150deg,#25333c,#0c141a);box-shadow:var(--shadow),inset 0 0 0 1.5px #ffffff14}
+.phone::before{content:"";position:absolute;top:14px;left:50%;transform:translateX(-50%);width:86px;height:6px;border-radius:99px;background:#0006;z-index:5}
+.scr{width:100%;height:100%;border-radius:33px;overflow:hidden;position:relative;display:flex;flex-direction:column;font-size:13.5px;background:var(--bg);color:var(--tp)}
+.status{display:flex;justify-content:space-between;align-items:center;padding:13px 20px 3px;font-size:12.5px;font-weight:600;font-variant-numeric:tabular-nums;flex:none}
+.status svg{width:16px;height:12px;opacity:.85}
+.app{flex:1;overflow:hidden;display:flex;flex-direction:column;padding:6px 18px 0}
+.h-lg{font-family:var(--font-display);font-size:22px;font-weight:800;letter-spacing:-.02em;margin:6px 0 0;text-wrap:balance}
+.h-sm{font-family:var(--font-display);font-size:16px;font-weight:700;margin:0}
+.sub{color:var(--ts);font-size:12.5px;margin:3px 0 0}
+.spacer{flex:1}
+.cta{margin:14px 0 18px;text-align:center;padding:14px;border-radius:15px;background:var(--pri);color:#03303f;font-weight:800;font-size:14.5px;flex:none}
+.cta.soft{background:var(--sv);color:var(--tp)}
+.ghostbtn{text-align:center;color:var(--ts);font-size:12px;padding:8px}
+
+/* onboarding progress */
+.oprog{display:flex;gap:4px;margin:8px 0 4px;flex:none}
+.oprog i{height:4px;border-radius:99px;background:var(--out);flex:1}
+.oprog i.on{background:var(--pri)}
+
+/* persona bubble */
+.pbubble{display:flex;gap:10px;align-items:flex-start;margin:12px 0 2px}
+.pbubble .ava{width:40px;height:40px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-size:22px;box-shadow:0 0 0 3px var(--moodc,#FFE082);flex:none}
+.pbubble .txt{background:var(--card);border:1px solid var(--out);border-radius:6px 15px 15px 15px;padding:9px 12px;font-size:13px;line-height:1.36}
+.pbubble .who{font-size:10px;font-weight:700;color:var(--brandc);margin-bottom:2px}
+
+/* big number input */
+.bignum{margin:auto 0;text-align:center}
+.bignum .val{font-family:var(--font-display);font-weight:800;font-size:64px;letter-spacing:-.03em;line-height:1;font-variant-numeric:tabular-nums}
+.bignum .val span{font-size:24px;color:var(--ts)}
+.bignum .track{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:22px}
+.bignum .track b{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--out);display:grid;place-items:center;font-size:22px;color:var(--tp)}
+.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:auto 0 0}
+.keys b{padding:12px 0;text-align:center;font-weight:700;font-size:17px;border-radius:11px;background:var(--sv)}
+
+/* choice cards */
+.choices{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.choice{display:flex;align-items:center;gap:13px;padding:14px;border-radius:16px;border:1.5px solid var(--out);background:var(--card)}
+.choice.sel{border-color:var(--pri);box-shadow:0 0 0 3px #4FC3F733}
+.choice .e{font-size:26px;width:34px;text-align:center;flex:none}
+.choice .n{font-weight:700;font-size:14.5px}
+.choice .d{font-size:11.5px;color:var(--ts)}
+.choice .tag{margin-left:auto;font-size:10px;font-weight:800;letter-spacing:.03em;flex:none}
+.choice .free{color:var(--ok)} .choice .pro{color:var(--acc)}
+.choice .mini{display:flex;gap:4px;margin-top:5px;font-size:13px}
+.choice .r{margin-left:auto;width:19px;height:19px;border-radius:50%;border:2px solid var(--out);flex:none}
+.choice.sel .r{border-color:var(--pri);background:var(--pri);box-shadow:inset 0 0 0 3px var(--card)}
+.choice .lock{margin-left:auto;font-size:10.5px;font-weight:700;color:var(--acc);flex:none}
+
+/* hours */
+.hours{display:flex;gap:12px;margin:20px 0 0}
+.hour{flex:1;background:var(--card);border:1.5px solid var(--out);border-radius:16px;padding:16px;text-align:center}
+.hour .k{font-size:11px;color:var(--ts);font-weight:600}
+.hour .t{font-family:var(--font-display);font-weight:800;font-size:26px;margin-top:4px;font-variant-numeric:tabular-nums}
+.dial{margin:22px auto 0;width:150px;height:150px;border-radius:50%;background:
+  conic-gradient(var(--pri) 0 62%, var(--sv) 62% 100%);display:grid;place-items:center;position:relative}
+.dial::after{content:"";position:absolute;inset:16px;border-radius:50%;background:var(--bg)}
+.dial b{position:relative;z-index:1;font-size:12px;color:var(--ts);text-align:center;line-height:1.3}
+
+/* loader */
+.loader{margin:auto;text-align:center}
+.spin{width:66px;height:66px;border-radius:50%;border:5px solid var(--sv);border-top-color:var(--pri);margin:0 auto 18px;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loader .t{font-family:var(--font-display);font-weight:800;font-size:19px}
+.loader .s{color:var(--ts);font-size:12.5px;margin-top:4px}
+
+/* goal reveal */
+.reveal{margin:auto 0;text-align:center}
+.reveal .ring{width:150px;height:150px;border-radius:50%;margin:0 auto 6px;display:grid;place-items:center;
+  background:conic-gradient(var(--pri) 0 100%,var(--sv) 0);box-shadow:0 16px 34px -20px var(--pri)}
+.reveal .ring div{width:120px;height:120px;border-radius:50%;background:var(--bg);display:grid;place-items:center;flex-direction:column}
+.reveal .big{font-family:var(--font-display);font-weight:800;font-size:34px;line-height:1;font-variant-numeric:tabular-nums}
+.reveal .big span{font-size:16px;color:var(--ts)}
+.reveal .lab{font-size:12.5px;color:var(--ts);margin-top:12px}
+
+/* bottle */
+.bcenter{display:flex;flex-direction:column;align-items:center;margin-top:8px}
+.bottle{width:78px;height:140px;border-radius:14px 14px 20px 20px;border:2.5px solid var(--out);position:relative;overflow:hidden;background:var(--sv);flex:none}
+.bottle .cap{position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:30px;height:10px;border-radius:5px;background:var(--out)}
+.bottle .fill{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(180deg,#4FC3F7,#0E7C86);opacity:.92}
+.bottle .fill::before{content:"";position:absolute;top:-9px;left:-25%;width:150%;height:18px;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='18'><path d='M0 10 Q30 2 60 10 T120 10 V18 H0 Z' fill='%234FC3F7'/></svg>");
+  background-size:56px 18px;background-repeat:repeat-x;animation:wave 3.4s linear infinite}
+.bottle .pct{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--font-display);font-weight:800;font-size:18px;color:#fff;text-shadow:0 1px 4px #0006}
+@keyframes wave{to{transform:translateX(-56px)}}
+.tapnote{font-size:12px;color:var(--ts);margin-top:14px;text-align:center}
+
+/* home hero */
+.hero-top{display:flex;justify-content:space-between;align-items:flex-start;padding-top:4px}
+.level{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700}
+.bond{margin-top:6px;width:104px;height:5px;border-radius:99px;background:var(--sv);overflow:hidden}
+.bond i{display:block;height:100%;width:64%;background:linear-gradient(90deg,var(--pri),#0E7C86)}
+.hero-mid{display:flex;flex-direction:column;align-items:center;margin-top:4px}
+.avatar{width:82px;height:82px;border-radius:50%;display:grid;place-items:center;font-size:44px;background:var(--card);box-shadow:0 0 0 4px var(--moodc,#FFE082),0 10px 22px -12px #0006;animation:float 5s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.saybubble{margin-top:12px;max-width:220px;background:var(--card);border:1px solid var(--out);border-radius:16px 16px 16px 6px;padding:11px 13px;font-size:13px;line-height:1.38;text-align:center}
+.readrow{display:flex;align-items:center;justify-content:center;gap:16px;margin:14px 0 2px}
+.readrow .big{font-family:var(--font-display);font-size:26px;font-weight:800;font-variant-numeric:tabular-nums}
+.readrow .big span{font-size:13px;color:var(--ts)}
+.readrow .behind{font-size:11.5px;color:var(--acc);font-weight:600}
+.adds{display:flex;gap:8px;margin-top:12px}
+.add{flex:1;text-align:center;padding:12px 3px;border-radius:13px;font-weight:700;font-size:13px;background:var(--pri);color:#03303f}
+.add.ghost{background:transparent;border:1.5px solid var(--out);color:var(--tp)}
+
+/* health home cards */
+.bmini{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--out);border-radius:15px;padding:11px 13px;margin-top:2px}
+.bmini .b{width:30px;height:46px;border-radius:6px 6px 9px 9px;border:2px solid var(--pri);position:relative;overflow:hidden;flex:none;background:var(--sv)}
+.bmini .b i{position:absolute;left:0;right:0;bottom:0;height:60%;background:linear-gradient(180deg,#4FC3F7,#0E7C86)}
+.bmini .big{font-family:var(--font-display);font-weight:800;font-size:18px;font-variant-numeric:tabular-nums}
+.bmini .k{font-size:11px;color:var(--ts)}
+.bmini .add{margin-left:auto;background:var(--pri);color:#03303f;font-weight:700;font-size:12px;padding:8px 12px;border-radius:10px}
+.carelist{display:flex;flex-direction:column;gap:9px;margin-top:9px;overflow:hidden}
+.care{display:flex;align-items:center;gap:11px;background:var(--card);border:1px solid var(--out);border-radius:15px;padding:11px 13px}
+.care .ic{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;font-size:19px;color:#fff;flex:none}
+.care .n{font-weight:700;font-size:13.5px}
+.care .time{font-family:var(--font-mono);font-size:9.5px;color:var(--ts);display:block;margin-top:2px}
+.care .btn{margin-left:auto;font-weight:700;font-size:12px;padding:7px 12px;border-radius:10px;border:1.5px solid var(--out);color:var(--tp);flex:none}
+.care.done{opacity:.6}
+.care.done .btn{background:var(--ok);border-color:var(--ok);color:#fff}
+
+/* chat */
+.chat{flex:1;overflow:hidden;display:flex;flex-direction:column;gap:8px;padding:6px 16px 0}
+.divider{align-self:center;font-size:10.5px;font-weight:700;color:var(--ts);background:var(--sv);padding:4px 11px;border-radius:99px;margin:4px 0 2px}
+.msg{max-width:78%;padding:8px 12px;border-radius:15px;font-size:13px;line-height:1.34;position:relative}
+.msg .t{display:block;font-size:9px;color:var(--ts);margin-top:3px;font-variant-numeric:tabular-nums}
+.msg.them{align-self:flex-start;background:var(--card);border:1px solid var(--out);border-bottom-left-radius:5px;padding-left:38px}
+.msg.them .ava{position:absolute;left:-4px;top:-4px;width:32px;height:32px;border-radius:50%;background:var(--sv);display:grid;place-items:center;font-size:17px;box-shadow:0 0 0 3px var(--card)}
+.msg.me{align-self:flex-end;background:linear-gradient(180deg,#4FC3F7,#37a8dd);color:#03303f;font-weight:700;border-bottom-right-radius:5px;font-variant-numeric:tabular-nums}
+.msg.me .t{color:#03303faa}
+.mw{box-shadow:-3px 0 0 0 #FFC107 inset}.mp{box-shadow:-3px 0 0 0 #4FC3F7 inset}.md{box-shadow:-3px 0 0 0 #B0BEC5 inset}
+
+/* personas picker */
+.steps{display:flex;gap:8px;margin:6px 0 14px;font-size:11.5px}
+.steps b{background:var(--pri);color:#03303f;padding:5px 11px;border-radius:99px;font-weight:700}
+.steps span{color:var(--ts);padding:5px 3px}
+.relrow{display:flex;gap:8px;overflow:hidden;margin-bottom:14px}
+.relmini{flex:none;width:58px;text-align:center;padding:10px 3px;border-radius:14px;border:1.5px solid var(--out);font-size:24px;position:relative}
+.relmini.sel{border-color:var(--pri);background:var(--sv)}
+.relmini b{display:block;font-size:9.5px;font-weight:700;margin-top:3px}
+.relmini .l{position:absolute;top:4px;right:5px;font-size:9px}
+.var{display:flex;align-items:center;gap:12px;padding:12px;border-radius:15px;border:1.5px solid var(--out);margin-bottom:9px}
+.var.sel{border-color:var(--pri);box-shadow:0 0 0 3px #4FC3F730}
+.var .e{font-size:27px}.var .n{font-weight:700;font-size:14px}.var .p{font-size:11.5px;color:var(--ts);font-style:italic}
+.var .r{margin-left:auto;width:19px;height:19px;border-radius:50%;border:2px solid var(--out)}
+.var.sel .r{border-color:var(--pri);background:var(--pri);box-shadow:inset 0 0 0 3px var(--card)}
+
+/* toggles */
+.cats{display:flex;flex-direction:column;margin-top:8px}
+.cat{display:flex;align-items:center;gap:12px;padding:12px 2px;border-bottom:1px solid var(--out)}
+.cat .ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-size:18px;color:#fff;flex:none}
+.cat .n{font-weight:700;font-size:13.5px}.cat .d{font-size:11px;color:var(--ts);font-style:italic}
+.toggle{margin-left:auto;width:40px;height:23px;border-radius:99px;background:var(--out);position:relative;flex:none}
+.toggle i{position:absolute;top:2.5px;left:2.5px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .2s}
+.toggle.on{background:var(--pri)}.toggle.on i{left:19.5px}
+
+/* paywall */
+.pw{flex:1;overflow:hidden;padding:6px 18px 0;display:flex;flex-direction:column}
+.back{font-size:20px;margin-bottom:4px}
+.gets{margin:12px 0 2px;display:flex;flex-direction:column;gap:6px}
+.gets .g{display:flex;align-items:center;gap:10px;font-size:13px}.gets .g .e{font-size:19px}
+.plan{display:flex;align-items:center;padding:13px;border-radius:15px;border:1.5px solid var(--out);margin-top:9px}
+.plan.sel{border-color:var(--pri);box-shadow:0 0 0 3px #4FC3F72e}
+.plan .pt{font-family:var(--font-display);font-weight:800;font-size:15.5px}
+.plan .ps{font-size:11.5px;color:var(--ts);margin-top:2px}
+.plan .badge{margin-left:auto;font-size:10px;font-weight:800;color:var(--pri);letter-spacing:.03em;flex:none}
+.gopro{margin-top:13px;text-align:center;padding:15px;border-radius:15px;background:linear-gradient(120deg,#4FC3F7,#0E7C86);color:#fff;font-weight:800;font-size:15px;flex:none}
+.restore{text-align:center;color:var(--ts);font-size:11.5px;margin-top:10px}
+
+/* bottom sheet overlay */
+.dim{position:absolute;inset:0;background:#0b1a24aa;display:flex;align-items:flex-end;z-index:6}
+.sheet{background:var(--card);width:100%;border-radius:24px 24px 0 0;padding:20px 20px 26px;box-shadow:0 -12px 40px -12px #0009}
+.sheet .grip{width:38px;height:4px;border-radius:99px;background:var(--out);margin:0 auto 14px}
+.sheet .e{font-size:40px;text-align:center}
+.sheet h4{font-family:var(--font-display);font-size:18px;font-weight:800;text-align:center;margin:8px 0 4px}
+.sheet p{font-size:12.5px;color:var(--ts);text-align:center;margin:0 0 16px}
+.watch{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--acc);color:#3a1400;font-weight:800;font-size:14px;padding:14px;border-radius:14px}
+.sheet .alt{text-align:center;color:var(--brand);font-size:12.5px;font-weight:700;margin-top:12px}
+
+/* insights */
+.ins{flex:1;overflow:hidden;padding:6px 18px 0;display:flex;flex-direction:column;gap:12px}
+.bars{display:flex;align-items:flex-end;gap:8px;height:112px;padding-top:6px;position:relative}
+.bars .goal{position:absolute;left:0;right:0;top:32px;border-top:1.5px dashed var(--acc)}
+.bars .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;height:100%;justify-content:flex-end}
+.bars .col i{width:100%;border-radius:5px 5px 3px 3px;background:linear-gradient(180deg,#4FC3F7,#0E7C86)}
+.bars .col.miss i{background:var(--out)}
+.bars .col b{font-size:9px;color:var(--ts);font-weight:600}
+.statgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.stat{background:var(--card);border:1px solid var(--out);border-radius:13px;padding:11px}
+.stat .k{font-size:10.5px;color:var(--ts);font-weight:600}
+.stat .v{font-family:var(--font-display);font-weight:800;font-size:19px;margin-top:2px;font-variant-numeric:tabular-nums}
+.stat .v small{font-size:11px;color:var(--ts);font-weight:600}
+
+/* settings */
+.set{flex:1;overflow:hidden;padding:6px 18px 0;display:flex;flex-direction:column;gap:6px}
+.slabel{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ts);margin:10px 0 -2px}
+.srow{display:flex;align-items:center;gap:11px;padding:12px 2px;border-bottom:1px solid var(--out);font-size:13.5px}
+.srow .e{width:20px;text-align:center}.srow .k{font-weight:600}
+.srow .val{margin-left:auto;color:var(--ts);font-size:12.5px;font-variant-numeric:tabular-nums}
+.srow .toggle{margin-left:auto}
+
+/* nav */
+.nav{display:flex;justify-content:space-around;align-items:center;padding:10px 6px 24px;border-top:1px solid var(--out);background:var(--card);flex:none}
+.nav a{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--ts);font-size:9px;font-weight:600}
+.nav a svg{width:21px;height:21px}.nav a.on{color:var(--pri)}
+
+/* notifications — the core product */
+.lock{background:linear-gradient(168deg,#0E7C86 0%,#0c3d4d 55%,#0a2531 100%);color:#fff}
+.lock .clock{text-align:center;padding:34px 0 20px;flex:none}
+.lock .clock .t{font-family:var(--font-display);font-size:52px;font-weight:800;line-height:1;letter-spacing:-.02em}
+.lock .clock .d{font-size:12.5px;opacity:.85;margin-top:2px}
+.notifs{padding:0 11px;display:flex;flex-direction:column;gap:9px;overflow:hidden}
+.notif{background:rgba(255,255,255,.96);color:var(--tp);border-radius:17px;padding:11px 13px}
+.notif.stack{opacity:.9;transform:scale(.98)}
+.notif .ntop{display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--ts);font-weight:600;margin-bottom:5px}
+.notif .ntop .dot{width:15px;height:15px;border-radius:5px;background:linear-gradient(160deg,#4FC3F7,#0E7C86);display:grid;place-items:center}
+.notif .ntop .dot svg{width:10px;height:10px}
+.notif .ntop .cloud{margin-left:auto;font-weight:700;color:var(--brand)}
+.notif .nbody{display:flex;gap:10px;align-items:flex-start}
+.notif .nbody .txt{flex:1}
+.notif .nbody .who{font-weight:800;font-size:13.5px}
+.notif .nbody .line{font-size:12.5px;margin-top:1px;line-height:1.34}
+.notif .nbody .ava{width:36px;height:36px;border-radius:50%;background:var(--sv);display:grid;place-items:center;font-size:20px;flex:none;box-shadow:0 0 0 2px var(--moodc,#FFE082)}
+.notif .acts{display:flex;gap:6px;margin-top:10px;border-top:1px solid var(--out);padding-top:8px}
+.notif .acts b{flex:1;text-align:center;font-size:11.5px;font-weight:700;color:var(--pri);padding:5px 2px;border-radius:8px;background:var(--sv)}
+.notif .acts b.jab{color:var(--ts)}
+/* OneSignal journey engine */
+.journey{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:22px;margin-top:26px;position:relative}
+.jcol h5{font-family:var(--font-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--brand);margin:0 0 4px;font-weight:700}
+.jcol .hint{font-size:11px;color:var(--muted);margin:0 0 10px}
+.jnode{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 11px;font-size:12.5px;margin-top:8px}
+.jnode b{font-weight:700;display:block}
+.jnode code{font-family:var(--font-mono);font-size:10.5px;color:var(--brand)}
+.jnode .m{font-size:11.5px;color:var(--muted);font-style:italic;margin-top:3px}
+.jnode.msg{border-left:3px solid var(--pri)}
+.jnode.msg.win{border-left-color:var(--acc)}
+.jnode.msg.streak{border-left-color:var(--ok)}
+.jnode.msg.trial{border-left-color:var(--med)}
+.jarrow{text-align:center;color:var(--muted);font-size:11px;font-family:var(--font-mono);margin:6px 0 -2px}
+.iamcard{background:var(--card);border-radius:22px;padding:22px 20px;text-align:center;box-shadow:0 22px 50px -16px #000a;max-width:248px;margin:0 auto}
+.iamcard .e{font-size:44px}
+.iamcard h4{font-family:var(--font-display);font-size:18px;font-weight:800;margin:8px 0 5px}
+.iamcard p{font-size:12.5px;color:var(--ts);margin:0 0 16px;line-height:1.4}
+@media (max-width:720px){.journey{grid-template-columns:1fr}}
+.foot{margin-top:64px;padding-top:22px;border-top:1px solid var(--line);color:var(--muted);font-size:13px;display:flex;flex-wrap:wrap;gap:6px 20px}
+.foot b{color:var(--ink)}.foot code{font-family:var(--font-mono);color:var(--brand)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <p class="eyebrow">Nagly · Full App Mockups</p>
+    <h1>The whole app, one white system.</h1>
+    <p class="lede">Every screen — onboarding funnel, daily use, personas &amp; care modes, monetization, insights, settings — in Nagly's real tokens and voice. <b>Free = Mom + Water.</b> Pro unlocks every persona and care mode, via a 7-day trial → Lifetime / Annual / Monthly.</p>
+    <div class="legend">
+      <span class="lg"><i style="background:#4FC3F7"></i>Water</span>
+      <span class="lg"><i style="background:#7E6BE0"></i>Medication</span>
+      <span class="lg"><i style="background:#F2994A"></i>Meals</span>
+      <span class="lg"><i style="background:#27AE8B"></i>Movement</span>
+      <span class="lg"><i style="background:#5B7FC4"></i>Sleep</span>
+    </div>
+  </header>
+
+  <!-- ============ 0 · NOTIFICATIONS (the core) ============ -->
+  <section class="sec">
+    <div class="sec-h"><span class="num">00</span><h2>The nag — notifications <span style="font-size:12px;color:var(--coral);font-weight:700">★ the actual product</span></h2><p>The persona reaches you on the lock screen, in her voice. You log without ever opening the app.</p></div>
+    <div class="grid">
+
+      <div class="mock"><div class="phone"><div class="scr lock">
+        <div class="clock"><div class="t">2:14</div><div class="d">Tuesday, August 12</div></div>
+        <div class="notifs">
+          <div class="notif">
+            <div class="ntop"><span class="dot"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 3s6 6.5 6 11a6 6 0 1 1-12 0c0-4.5 6-11 6-11Z"/></svg></span>Nagly · now</div>
+            <div class="nbody"><div class="txt"><div class="who">Mom</div><div class="line">Afternoon check — bottle empty? You're behind today, beta.</div></div><div class="ava" style="--moodc:#FFE082">👩</div></div>
+            <div class="acts"><b>+250 ml</b><b>+500 ml</b><b class="jab">Later, Amma</b></div>
+          </div>
+          <div class="notif stack">
+            <div class="ntop"><span class="dot"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 3s6 6.5 6 11a6 6 0 1 1-12 0c0-4.5 6-11 6-11Z"/></svg></span>Nagly · 11:02</div>
+            <div class="nbody"><div class="txt"><div class="who">Mom</div><div class="line">Water first, then chai.</div></div><div class="ava" style="--moodc:#A5D6A7">👩</div></div>
+          </div>
+        </div>
+      </div></div>
+        <div class="cap"><span class="step-no">LOCAL · the core loop</span><h3>The lock-screen nag</h3><p>Persona voice + 3 quick actions (+250, +500, a skip-jab). Log without opening the app.</p></div></div>
+
+      <div class="mock"><div class="phone"><div class="scr lock">
+        <div class="clock"><div class="t">2:00</div><div class="d">🌿 Health mode</div></div>
+        <div class="notifs">
+          <div class="notif">
+            <div class="ntop"><span class="dot"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 3s6 6.5 6 11a6 6 0 1 1-12 0c0-4.5 6-11 6-11Z"/></svg></span>Nagly · now</div>
+            <div class="nbody"><div class="txt"><div class="who">Mom</div><div class="line">It's 2 o'clock — did you take your BP tablet, beta?</div></div><div class="ava" style="--moodc:#7E6BE0">👩</div></div>
+            <div class="acts"><b>Took it 💊</b><b>Snooze 30m</b><b class="jab">Not today</b></div>
+          </div>
+          <div class="notif stack">
+            <div class="ntop"><span class="dot"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 3s6 6.5 6 11a6 6 0 1 1-12 0c0-4.5 6-11 6-11Z"/></svg></span>Nagly · 1:10</div>
+            <div class="nbody"><div class="txt"><div class="who">Mom</div><div class="line">Good, you ate lunch. That's my child. 💛</div></div><div class="ava" style="--moodc:#A5D6A7">👩</div></div>
+          </div>
+        </div>
+      </div></div>
+        <div class="cap"><span class="step-no">LOCAL · Health mode</span><h3>Nagging beyond water</h3><p>Same persona, medication &amp; meals. One-tap "Took it" logs the dose.</p></div></div>
+
+      <div class="mock"><div class="phone"><div class="scr lock">
+        <div class="clock"><div class="t">9:30</div><div class="d">Friday, August 15</div></div>
+        <div class="notifs">
+          <div class="notif">
+            <div class="ntop"><span class="dot"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 3s6 6.5 6 11a6 6 0 1 1-12 0c0-4.5 6-11 6-11Z"/></svg></span>Nagly · now<span class="cloud">☁ reminder</span></div>
+            <div class="nbody"><div class="txt"><div class="who">Mom</div><div class="line">3 days without a sip, beta. I'm not angry… just disappointed. Come back? 🥺</div></div><div class="ava" style="--moodc:#B0BEC5">👩</div></div>
+          </div>
+        </div>
+      </div></div>
+        <div class="cap"><span class="step-no">CLOUD · OneSignal</span><h3>The comeback push</h3><p>Cloud re-engagement when you've gone quiet → the "Keep Them Coming Back" award.</p></div></div>
+
+    </div>
+  </section>
+
+  <!-- ============ 1 · ONBOARDING ============ -->
+  <section class="sec">
+    <div class="sec-h"><span class="num">01</span><h2>Onboarding — the activation funnel</h2><p>Personalize → reveal goal → choose mode &amp; nagger → first sip → permission.</p></div>
+    <div class="grid">
+
+      <div class="mock"><div class="phone"><div class="scr" data-status>
+        <div class="app"><div class="oprog"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+          <div class="h-lg">How much do you weigh?</div><div class="sub">So Mom can set the right goal for you.</div>
+          <div class="bignum"><div class="val">70<span> kg</span></div>
+            <div class="track"><b>–</b><b>+</b></div></div>
+          <div class="cta">Continue</div>
+        </div></div></div>
+        <div class="cap"><span class="step-no">STEP 1 · Weight</span><h3>Weight</h3><p>Drives the daily-goal math.</p></div></div>
+
+      <div class="mock"><div class="phone"><div class="scr" data-status>
+        <div class="app"><div class="oprog"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>
+          <div class="h-lg">How active are you?</div>
+          <div class="choices">
+            <div class="choice"><span class="e">🛋️</span><div><div class="n">Sedentary</div><div class="d">Mostly sitting</div></div></div>
+            <div class="choice sel"><span class="e">🚶</span><div><div class="n">Lightly active</div><div class="d">Some walking</div></div><span class="r"></span></div>
+            <div class="choice"><span class="e">🏃</span><div><div class="n">Active</div><div class="d">Daily exercise</div></div></div>
+            <div class="choice"><span class="e">🔥</span><div><div class="n">Very active</div><div class="d">Athlete / labour</div></div></div>
+          </div><div class="spacer"></div><div class="cta">Continue</div>
+        </div></div></div>
+        <div class="cap"><span class="step-no">STEP 2 · Activity</span><h3>Activity level</h3><p>Adjusts the target up or down.</p></div></div>
+
+      <div class="mock"><div class="phone"><div class="scr" data-status>
+        <div class="app"><div class="oprog"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
+          <div class="h-lg">When are you awake?</div><div class="sub">Nags only happen inside your day.</div>
+          <div class="hours"><div class="hour"><div class="k">☀️ Wake</div><div class="t">7:00</div></div><div class="hour"><div class="k">🌙 Sleep</div><div class="t">22:00</div></div></div>
+          <div class="dial"><b>15 waking<br>hours</b></div>
+          <div class="spacer"></div><div class="cta">Continue</div>
+        </div></div></div>
+        <div class="cap"><span class="step-no">STEP 3 · Hours</span><h3>Awake hours</h3><p>Defines the nagging window.</p></div></div>
+
+      <div class="mock"><div class="phone"><div class="scr" data-status>
+        <div class="app"><div class="loader"><div class="spin"></div><div class="t">Building your plan…</div><div class="s">Mom is doing the math 👩</div></div></div>
+      </div></div>
+        <div class="cap"><span class="step-no">STEP 4 · Building</span><h3>Building plan</h3><p>1.8s anticipation beat before the reveal.</p></div></div>
+
+      <div class="mock"><div class="phone"><div class="scr" data-status>
+        <div class="app"><div class="reveal">
+          <div class="ring"><div><div class="big">2400<span>ml</span></div></div></div>
+          <div class="h-sm" style="margin-top:14px">Your daily goal</div>
+          <div class="lab">Based on 70 kg · lightly active · 15h awake</div>
+        </div><div class="spacer"></div><div class="cta">Sounds good</div></div>
+      </div></div>
+        <div class="cap"><span class="step-no">STEP 5 · Goal</span><h3>Goal reveal</h3><p>The payoff of the quiz.</p></div></div>
+
+      <div class="mock"><div class="phone"><div class="scr" data-status>
+        <div class="app"><div class="oprog"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div>
+          <div class="h-lg">What should I care about?</div><div class="sub">Pick a mode. Add more anytime.</div>
+          <div class="choices">
+            <div class="choice sel"><span class="e">💧</span><div><div class="n">Hydration</div><div class="d">Water · the classic</div></div><span class="tag free">FREE</span></div>
+            <div class="choice"><span class="e">🌿</span><div><div class="n">Health</div><div class="mini"><span>💧</span><span>🍽️</span><span>🚶</span><span>😴</span></div></div><span class="tag pro">PRO</span></div>
+            <div class="choice"><span class="e">💊</span><div><div class="n">Medication</div><div class="mini"><span>💊</span><span>💧</span></div></div><span class="tag pro">PRO</span></div>
+          </div><div class="spacer"></div><div class="cta">Continue</div>
+        </div></div></div>
+        <div class="cap"><span class="step-no">STEP 6 · Mode ✨NEW</span><h3>Pick your care mode</h3><p>The new step — plants the Pro seed early.</p></div></div>
+
+      <div class="mock"><div class="phone"><div class="scr" data-status>
+        <div class="app"><div class="oprog"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+          <div class="h-lg">Who nags you best?</div>
+          <div class="choices">
+            <div class="choice sel"><span class="e">👩</span><div><div class="n">Mom</div><div class="d">Warm, relentless, loving</div></div><span class="tag free">FREE</span></div>
+            <div class="choice"><span class="e">👨</span><div><div class="n">Dad</div><div class="d">Puns &amp; tough love</div></div><span class="lock">🔒 Pro</span></div>
+            <div class="choice"><span class="e">🧓</span><div><div class="n">Grandparent</div><div class="d">Gentle guilt</div></div><span class="lock">🔒 Pro</span></div>
+            <div class="choice"><span class="e">🤗</span><div><div class="n">Bestie</div><div class="d">Side-eye &amp; slay</div></div><span class="lock">🔒 Pro</span></div>
+          </div><div class="spacer"></div><div class="cta">Continue</div>
+        </div></div></div>
+        <div class="cap"><span class="step-no">STEP 7 · Relationship</span><h3>Pick your nagger</h3><p>Mom free; others seed the paywall.</p></div></div>
+
+      <div class="mock"><div class="phone"><div class="scr" data-status>
+        <div class="app"><div class="oprog on5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></div>
+          <div class="h-lg">Pick your Mom</div>
+          <div class="choices">
+            <div class="choice sel"><span class="e">👩</span><div><div class="n">Indian Mom</div><div class="d">"I'm not nagging, I'm caring."</div></div><span class="r"></span></div>
+            <div class="choice"><span class="e">👩‍🦰</span><div><div class="n">Jewish Mom</div><div class="d">"Drink. For me."</div></div></div>
+            <div class="choice"><span class="e">👩🏼</span><div><div class="n">Southern Mom</div><div class="d">"Sugar, take a sip."</div></div></div>
+          </div><div class="spacer"></div><div class="cta">Continue</div>
+        </div></div></div>
+        <div class="cap"><span class="step-no">STEP 8 · Variant</span><h3>Pick the voice</h3><p>Twelve personalities across tiers.</p></div></div>
+
+      <div class="mock"><div class="phone"><div class="scr" data-status>
+        <div class="app"><div class="h-lg" style="text-align:center">Log your first glass</div>
+          <div class="bcenter"><div class="bottle"><span class="cap"></span><div class="fill" style="height:12%"></div><span class="pct">250</span></div>
+            <div class="tapnote">Tap the bottle 💧</div></div>
+          <div class="pbubble" style="margin-top:16px"><div class="ava" style="--moodc:#A5D6A7">👩</div><div class="txt"><div class="who">Indian Mom</div>That's my child! See? Listening works. 💛</div></div>
+          <div class="spacer"></div><div class="cta">Continue</div></div>
+      </div></div>
+        <div class="cap"><span class="step-no">STEP 9 · First glass</span><h3>First sip → praise</h3><p>The emotional hook. Belongs in the demo's first 15s.</p></div></div>
+
+      <div class="mock"><div class="phone"><div class="scr" data-status>
+        <div class="app"><div class="spacer"></div>
+          <div style="text-align:center;font-size:52px">🔔</div>
+          <div class="h-lg" style="text-align:center">Let Mom remind you?</div>
+          <div class="pbubble"><div class="ava" style="--moodc:#FFE082">👩</div><div class="txt"><div class="who">Indian Mom</div>Beta, sip some water. Let me nudge you when you forget.</div></div>
+          <div class="spacer"></div><div class="cta">Allow notifications</div><div class="ghostbtn">Maybe later</div></div>
+      </div></div>
+        <div class="cap"><span class="step-no">STEP 10 · Permission</span><h3>Permission — in her voice</h3><p>Primed emotionally, not a cold system prompt.</p></div></div>
+
+    </div>
+  </section>
+
+  <!-- ============ 2 · DAILY USE ============ -->
+  <section class="sec">
+    <div class="sec-h"><span class="num">02</span><h2>Daily use</h2><p>The living hero in both modes, the signature chat timeline, and insights.</p></div>
+    <div class="grid">
+
+      <div class="mock"><div class="phone"><div class="scr" data-status>
+        <div class="app">
+          <div class="hero-top"><div><div class="h-lg" style="margin:0">Good afternoon</div><div class="sub">💧 Hydration · 🔥 5-day streak</div></div>
+            <div style="text-align:right"><span class="level">💛 Close</span><div class="bond"><i></i></div></div></div>
+          <div class="hero-mid"><div class="avatar" style="--moodc:#FFE082">👩</div>
+            <div class="saybubble">Afternoon check — bottle empty? You're behind today, beta.</div></div>
+          <div class="bcenter" style="margin-top:12px"><div class="bottle"><span class="cap"></span><div class="fill" style="height:60%"></div><span class="pct">60%</span></div></div>
+          <div class="readrow"><div><div class="big">1200<span> / 2000ml</span></div><div class="behind">↓ 300 ml behind</div></div></div>
+          <div class="adds"><div class="add">+250</div><div class="add">+500</div><div class="add ghost">Custom</div></div>
+        </div><nav class="nav" data-nav="home"></nav>
+      </div></div>
+        <div class="cap"><h3>Home · Hydration mode</h3><p>The free flagship — persona, bottle, bond meter, streak.</p></div></div>
+
+      <div class="mock"><div class="phone"><div class="scr" data-status>
+        <div class="app"><div class="h-lg" style="margin-bottom:0">Today's care</div><div class="sub">🌿 Health mode · 🔥 5-day streak</div>
+          <div class="pbubble"><div class="ava" style="--moodc:#FFE082">👩</div><div class="txt"><div class="who">Indian Mom</div>It's 2 o'clock — did you take your BP tablet? And your bottle looks empty.</div></div>
+          <div class="bmini"><div class="b"><i></i></div><div><div class="big">1200 <span class="k">/2000ml</span></div><div class="k">300 ml behind</div></div><div class="add">+250</div></div>
+          <div class="carelist">
+            <div class="care"><div class="ic" style="background:var(--med)">💊</div><div><div class="n">Blood pressure tablet<span class="time">DUE 2:00 PM</span></div></div><div class="btn">Took it</div></div>
+            <div class="care done"><div class="ic" style="background:var(--meal)">🍽️</div><div><div class="n">Lunch<span class="time">Logged 1:10 PM</span></div></div><div class="btn">✓ Ate</div></div>
+            <div class="care"><div class="ic" style="background:var(--move)">🚶</div><div><div class="n">Move a little<span class="time">Sitting 2 hrs</span></div></div><div class="btn">Walked</div></div>
+          </div>
+        </div><nav class="nav" data-nav="home"></nav>
+      </div></div>
+        <div class="cap"><h3>Home · Health mode</h3><p>Same Mom, now a daily care list. Bottle is one card.</p></div></div>
+
+      <div class="mock"><div class="phone"><div class="scr" data-status>
+        <div style="padding:6px 18px 2px"><div class="h-lg">History</div><div class="sub">Your story with Indian Mom 👩</div></div>
+        <div class="chat">
+          <div class="divider">Tuesday, August 12</div>
+          <div class="msg them mw"><span class="ava">👩</span>Morning and already behind, beta.<span class="t">08:14</span></div>
+          <div class="msg me">+250 ml<span class="t">08:15</span></div>
+          <div class="msg them"><span class="ava">👩</span>Water first, then chai.<span class="t">10:02</span></div>
+          <div class="msg me">+500 ml<span class="t">10:03</span></div>
+          <div class="msg them mp"><span class="ava">👩</span>That's my child! Goal is close.<span class="t">13:40</span></div>
+          <div class="msg me">+250 ml<span class="t">13:41</span></div>
+          <div class="msg them md"><span class="ava">👩</span>Evening already and still behind.<span class="t">19:20</span></div>
+        </div><nav class="nav" data-nav="history"></nav>
+      </div></div>
+        <div class="cap"><h3>History · chat timeline</h3><p>The signature screen. Mood stripe per nag.</p></div></div>
+
+      <div class="mock"><div class="phone"><div class="scr" data-status>
+        <div class="ins"><div class="h-lg">Insights</div>
+          <div class="bars"><div class="goal"></div>
+            <div class="col"><i style="height:70%"></i><b>M</b></div><div class="col"><i style="height:88%"></i><b>T</b></div>
+            <div class="col miss"><i style="height:45%"></i><b>W</b></div><div class="col"><i style="height:100%"></i><b>T</b></div>
+            <div class="col"><i style="height:82%"></i><b>F</b></div><div class="col miss"><i style="height:38%"></i><b>S</b></div>
+            <div class="col"><i style="height:60%"></i><b>S</b></div></div>
+          <div class="statgrid">
+            <div class="stat"><div class="k">Current streak</div><div class="v">5 <small>days</small></div></div>
+            <div class="stat"><div class="k">Daily average</div><div class="v">1740 <small>ml</small></div></div>
+            <div class="stat"><div class="k">Goal met</div><div class="v">5 <small>/ 7</small></div></div>
+            <div class="stat"><div class="k">Best hour</div><div class="v">10 <small>AM</small></div></div>
+          </div>
+        </div><nav class="nav" data-nav="insights"></nav>
+      </div></div>
+        <div class="cap"><h3>Insights</h3><p>Weekly intake vs goal line + stat tiles.</p></div></div>
+
+    </div>
+  </section>
+
+  <!-- ============ 3 · PERSONAS & CARE MODES ============ -->
+  <section class="sec">
+    <div class="sec-h"><span class="num">03</span><h2>Personas &amp; care modes</h2><p>Choosing voices, building a care plan, and the rewarded-ad unlock.</p></div>
+    <div class="grid">
+
+      <div class="mock"><div class="phone"><div class="scr" data-status>
+        <div class="app"><div class="h-lg">Personas</div>
+          <div class="steps"><b>1 · Relationship</b><span>2 · Variant</span></div>
+          <div class="relrow"><div class="relmini sel">👩<b>Mom</b></div><div class="relmini">👨<span class="l">🔒</span><b>Dad</b></div><div class="relmini">🧓<span class="l">🔒</span><b>Nani</b></div><div class="relmini">🤗<span class="l">🔒</span><b>Bestie</b></div></div>
+          <div class="slabel" style="margin-bottom:8px">Pick your Mom</div>
+          <div class="var"><span class="e">👩</span><div><div class="n">Indian Mom</div><div class="p">"I'm not nagging, I'm caring."</div></div><span class="r"></span></div>
+          <div class="var"><span class="e">👩‍🦰</span><div><div class="n">Jewish Mom</div><div class="p">"Drink. For me."</div></div><span class="r"></span></div>
+          <div class="var sel"><span class="e">👩🏼</span><div><div class="n">Southern Mom</div><div class="p">"Sugar, take a sip."</div></div><span class="r"></span></div>
+        </div><nav class="nav" data-nav="personas"></nav>
+      </div></div>
+        <div class="cap"><h3>Persona picker</h3><p>Two-step: relationship → variant.</p></div></div>
+
+      <div class="mock"><div class="phone"><div class="scr" data-status>
+        <div class="app"><div class="h-lg">Your care plan</div>
+          <div class="pbubble"><div class="ava" style="--moodc:#A5D6A7">👩</div><div class="txt"><div class="who">Indian Mom</div>Tell me what to nag you about, beta. I'll handle the rest.</div></div>
+          <div class="cats">
+            <div class="cat"><div class="ic" style="background:#4FC3F7">💧</div><div><div class="n">Water</div><div class="d">"Sip some water, beta."</div></div><span class="toggle on"><i></i></span></div>
+            <div class="cat"><div class="ic" style="background:var(--med)">💊</div><div><div class="n">Medication</div><div class="d">"Did you take your pill?"</div></div><span class="toggle on"><i></i></span></div>
+            <div class="cat"><div class="ic" style="background:var(--meal)">🍽️</div><div><div class="n">Meals</div><div class="d">"Have you eaten?"</div></div><span class="toggle"><i></i></span></div>
+            <div class="cat"><div class="ic" style="background:var(--move)">🚶</div><div><div class="n">Movement</div><div class="d">"Get up and walk."</div></div><span class="toggle on"><i></i></span></div>
+            <div class="cat"><div class="ic" style="background:var(--sleep)">😴</div><div><div class="n">Sleep</div><div class="d">"It's late. Bed."</div></div><span class="toggle"><i></i></span></div>
+          </div><div class="cta">Save care plan</div>
+        </div></div></div>
+        <div class="cap"><h3>Custom care plan</h3><p>Each category = a nag type with its own lines.</p></div></div>
+
+      <div class="mock"><div class="phone"><div class="scr" data-status>
+        <div class="app" style="filter:saturate(.9)"><div class="h-lg" style="margin:0">Personas</div>
+          <div class="steps"><b>1 · Relationship</b><span>2 · Variant</span></div>
+          <div class="relrow"><div class="relmini">👩<b>Mom</b></div><div class="relmini sel">👨<span class="l">🔒</span><b>Dad</b></div><div class="relmini">🧓<span class="l">🔒</span><b>Nani</b></div><div class="relmini">🤗<span class="l">🔒</span><b>Bestie</b></div></div>
+          <div class="var"><span class="e">🧔</span><div><div class="n">Punjabi Dad</div><div class="p">"Paani pi le, beta."</div></div><span class="r"></span></div>
+        </div>
+        <div class="dim"><div class="sheet"><div class="grip"></div>
+          <div class="e">🎁</div><h4>Unlock Punjabi Dad free</h4>
+          <p>Watch a 30-second ad to unlock all of Dad's voices for 24 hours.</p>
+          <div class="watch">▶ Watch ad · unlock 24h</div>
+          <div class="alt">Or go Pro to keep them forever →</div>
+        </div></div>
+      </div></div>
+        <div class="cap"><h3>Rewarded-ad unlock</h3><p>Catvertising: watch → 24h unlock. The no-pay sampler.</p></div></div>
+
+    </div>
+  </section>
+
+  <!-- ============ 4 · MONEY ============ -->
+  <section class="sec">
+    <div class="sec-h"><span class="num">04</span><h2>Trial &amp; paywall</h2><p>The 7-day welcome trial ending, and the three-plan paywall.</p></div>
+    <div class="grid">
+
+      <div class="mock"><div class="phone"><div class="scr" data-status>
+        <div class="app"><div class="hero-top"><div><div class="h-lg" style="margin:0">Good evening</div><div class="sub">🔥 6-day streak</div></div></div>
+          <div class="hero-mid"><div class="avatar" style="--moodc:#B0BEC5">👩</div></div>
+        </div>
+        <div class="dim"><div class="sheet"><div class="grip"></div>
+          <div class="e">🥺</div><h4>My full care plan ends today</h4>
+          <p>"You've had all my care free for 7 days, beta. Keep me around? I'll still do water for free — but I'll miss the rest."</p>
+          <div class="watch" style="background:linear-gradient(120deg,#4FC3F7,#0E7C86);color:#fff">See plans</div>
+          <div class="alt" style="color:var(--ts)">Keep free (water only)</div>
+        </div></div>
+      </div></div>
+        <div class="cap"><h3>Trial ending — in her voice</h3><p>The re-engagement moment (Keep Them Coming Back).</p></div></div>
+
+      <div class="mock"><div class="phone"><div class="scr" data-status>
+        <div class="pw"><div class="back">←</div>
+          <div class="h-lg">Unlock every nagger</div>
+          <p class="sub">Free forever: Mom + water. Go Pro for every persona and care mode.</p>
+          <div class="h-sm" style="margin-top:12px">You'll get</div>
+          <div class="gets">
+            <div class="g"><span class="e">💊</span>Medication &amp; Health modes</div>
+            <div class="g"><span class="e">🧔</span>Dad, Grandparent &amp; Bestie voices</div>
+            <div class="g"><span class="e">🎛️</span>Custom care plans</div>
+          </div>
+          <div class="plan sel"><div><div class="pt">Lifetime</div><div class="ps">$29.99 · pay once, yours forever</div></div><span class="badge">BEST VALUE</span></div>
+          <div class="plan"><div><div class="pt">Annual</div><div class="ps">$19.99/yr · 7-day free trial</div></div><span class="badge" style="color:var(--ok)">FREE TRIAL</span></div>
+          <div class="plan"><div><div class="pt">Monthly</div><div class="ps">$1.99/mo</div></div></div>
+          <div class="gopro">Go Pro</div><div class="restore">Restore purchases</div>
+        </div>
+      </div></div>
+        <div class="cap"><h3>Paywall · 3 plans</h3><p>Lifetime-first. Feeds HAMM + Funnel Vision.</p></div></div>
+
+      <div class="mock"><div class="phone"><div class="scr" data-status>
+        <div class="set"><div class="h-lg">Settings</div>
+          <div class="slabel">Your goal</div>
+          <div class="srow"><span class="e">💧</span><span class="k">Daily goal</span><span class="val">2000 ml</span></div>
+          <div class="srow"><span class="e">🌿</span><span class="k">Care mode</span><span class="val">Hydration</span></div>
+          <div class="srow"><span class="e">🌅</span><span class="k">Awake hours</span><span class="val">7 – 22</span></div>
+          <div class="slabel">Nagging</div>
+          <div class="srow"><span class="e">👩</span><span class="k">Persona</span><span class="val">Indian Mom</span></div>
+          <div class="srow"><span class="e">🔔</span><span class="k">Reminders</span><span class="toggle on"><i></i></span></div>
+          <div class="slabel">About</div>
+          <div class="srow"><span class="e">📄</span><span class="k">Privacy &amp; Terms</span><span class="val">›</span></div>
+        </div><nav class="nav" data-nav="settings"></nav>
+      </div></div>
+        <div class="cap"><h3>Settings &amp; profile</h3><p>Goal, mode, persona, reminders, legal.</p></div></div>
+
+    </div>
+  </section>
+
+  <!-- ============ 5 · ONESIGNAL ============ -->
+  <section class="sec">
+    <div class="sec-h"><span class="num">05</span><h2>OneSignal — cloud re-engagement <span style="font-size:12px;color:var(--coral);font-weight:700">★ Keep Them Coming Back</span></h2><p>Local notifications do the nags. OneSignal owns everything cloud: segments, journeys, in-app messages — all in the persona's voice.</p></div>
+
+    <div class="journey">
+      <div class="jcol">
+        <h5>1 · Tags you already sync</h5>
+        <p class="hint">PushTagSync streams these on every change.</p>
+        <div class="jnode"><code>persona_id</code> · <code>current_streak</code></div>
+        <div class="jnode"><code>last_log_days_ago</code></div>
+        <div class="jnode"><code>daily_goal_ml</code> · <code>is_pro</code></div>
+      </div>
+      <div class="jcol">
+        <h5>2 · Segments &amp; triggers</h5>
+        <p class="hint">Built in the OneSignal dashboard.</p>
+        <div class="jnode"><b>Gone quiet</b><code>last_log_days_ago ≥ 2</code></div>
+        <div class="jnode"><b>Streak milestone</b><code>current_streak ∈ 3,7,14</code></div>
+        <div class="jnode"><b>Trial ending</b><code>scheduled @ trial_end</code></div>
+        <div class="jnode"><b>Engaged free user</b><code>is_pro=false · streak≥3</code></div>
+      </div>
+      <div class="jcol">
+        <h5>3 · Messages (persona voice)</h5>
+        <p class="hint">Liquid templates keyed on <code>persona_id</code>.</p>
+        <div class="jnode msg win"><b>Win-back push</b><div class="m">"3 days without a sip, beta… come back? 🥺"</div></div>
+        <div class="jnode msg streak"><b>Streak celebration</b><div class="m">"Shabash! 7 days strong. Amma is proud. 💛"</div></div>
+        <div class="jnode msg trial"><b>Trial reminder</b><div class="m">"My full care plan ends today. Keep me?"</div></div>
+        <div class="jnode msg"><b>Pro upsell (in-app)</b><div class="m">"Unlock every mode — 7 days free."</div></div>
+      </div>
+    </div>
+
+    <div class="grid">
+
+      <div class="mock"><div class="phone"><div class="scr" data-status>
+        <div class="app" style="filter:saturate(.92)">
+          <div class="hero-top"><div><div class="h-lg" style="margin:0">Good evening</div><div class="sub">🔥 6-day streak</div></div><div style="text-align:right"><span class="level">💛 Close</span><div class="bond"><i></i></div></div></div>
+          <div class="hero-mid"><div class="avatar" style="--moodc:#A5D6A7">👩</div></div>
+        </div>
+        <div class="dim" style="align-items:center;padding:18px">
+          <div class="iamcard"><div class="e">💛</div><h4>Mom misses nagging you fully</h4>
+            <p>6-day streak! Unlock every persona &amp; care mode — <b>7 days free</b>, then $19.99/yr.</p>
+            <div class="watch" style="background:linear-gradient(120deg,#4FC3F7,#0E7C86);color:#fff">Start 7-day free trial</div>
+            <div class="alt" style="color:var(--ts)">Maybe later</div></div>
+        </div>
+      </div></div>
+        <div class="cap"><span class="step-no">OneSignal · In-App Message</span><h3>In-app upsell</h3><p>Shown to engaged free users. Segmented on <code>is_pro=false</code>.</p></div></div>
+
+      <div class="mock"><div class="phone"><div class="scr lock">
+        <div class="clock"><div class="t">8:00</div><div class="d">Sunday · day 7 🔥</div></div>
+        <div class="notifs">
+          <div class="notif">
+            <div class="ntop"><span class="dot"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 3s6 6.5 6 11a6 6 0 1 1-12 0c0-4.5 6-11 6-11Z"/></svg></span>Nagly · now<span class="cloud">☁ OneSignal</span></div>
+            <div class="nbody"><div class="txt"><div class="who">Mom</div><div class="line">Shabash! 7 days strong, beta. Amma is so proud. 💛</div></div><div class="ava" style="--moodc:#81D4FA">👩</div></div>
+          </div>
+          <div class="notif stack">
+            <div class="ntop"><span class="dot"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 3s6 6.5 6 11a6 6 0 1 1-12 0c0-4.5 6-11 6-11Z"/></svg></span>Nagly · yesterday<span class="cloud">☁ OneSignal</span></div>
+            <div class="nbody"><div class="txt"><div class="who">Mom</div><div class="line">My full care plan ends tomorrow — keep me around?</div></div><div class="ava" style="--moodc:#FFE082">👩</div></div>
+          </div>
+        </div>
+      </div></div>
+        <div class="cap"><span class="step-no">OneSignal · Journeys</span><h3>Milestone &amp; trial pushes</h3><p>Cloud-sent, segmented on <code>current_streak</code> &amp; trial timing.</p></div></div>
+
+    </div>
+  </section>
+
+  <footer class="foot">
+    <b>Nagly — Full App Mockups</b>
+    <span><code>com.manojbuilds.nagly</code> · KMP · Compose · light theme only</span>
+    <span>Built from real tokens &amp; personas · onboarding, care modes &amp; 3-plan pricing included</span>
+  </footer>
+</div>
+
+<script>
+(function(){
+  var STATUS='<span>9:41</span><svg viewBox="0 0 24 16" fill="currentColor"><rect x="1" y="9" width="3" height="5" rx="1"/><rect x="6" y="6" width="3" height="8" rx="1"/><rect x="11" y="3" width="3" height="11" rx="1"/><rect x="17" y="2" width="5" height="12" rx="2" opacity=".4"/></svg>';
+  var I={
+    home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',
+    history:'<path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z"/>',
+    personas:'<circle cx="9" cy="8" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><circle cx="17" cy="9" r="2.4"/>',
+    insights:'<path d="M4 20V4"/><path d="M4 20h16"/><rect x="8" y="11" width="3" height="6"/><rect x="14" y="7" width="3" height="10"/>',
+    settings:'<circle cx="12" cy="12" r="3.2"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>'
+  };
+  var LABEL={home:'Home',history:'History',personas:'Personas',insights:'Insights',settings:'Settings'};
+  var ORDER=['home','history','personas','insights','settings'];
+  function ico(k,on){return '<a class="'+(on?'on':'')+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+I[k]+'</svg>'+LABEL[k]+'</a>';}
+  document.querySelectorAll('.scr[data-status]').forEach(function(scr){
+    var s=document.createElement('div');s.className='status';s.innerHTML=STATUS;scr.insertBefore(s,scr.firstChild);
+  });
+  document.querySelectorAll('nav[data-nav]').forEach(function(n){
+    var active=n.getAttribute('data-nav');
+    n.innerHTML=ORDER.map(function(k){return ico(k,k===active);}).join('');
+  });
+})();
+</script>
+
+</body></html>

@@ -1,0 +1,277 @@
+<title>Nagly — Team Overview</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{
+  --ground:#F4F7F8; --panel:#FFFFFF; --panel-2:#EEF3F5; --ink:#12262E; --ink-2:#3A5560; --muted:#63808C;
+  --line:#DDE7EA; --brand:#0E7C86; --brand-2:#0a5a63; --sky:#2AA5C4; --coral:#E8663F; --coral-soft:#e8663f16;
+  --brand-soft:#0e7c8612; --ok:#2E9E5B;
+  --shadow:0 18px 44px -26px rgba(16,40,50,.5), 0 2px 8px -4px rgba(16,40,50,.18);
+  --fd:"SF Pro Rounded",ui-rounded,"Segoe UI",system-ui,-apple-system,sans-serif;
+  --fb:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --fm:ui-monospace,"SF Mono","Cascadia Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#091419; --panel:#0F212A; --panel-2:#152a34; --ink:#E9F0F2; --ink-2:#B4C6CD; --muted:#8AA4AE;
+  --line:#213139; --brand:#3FC0CA; --brand-2:#6fd3da; --sky:#7FD1EF; --coral:#FF9E7F; --coral-soft:#ff9e7f18;
+  --brand-soft:#3fc0ca18; --ok:#5DBE83;
+  --shadow:0 22px 54px -24px rgba(0,0,0,.72), 0 2px 10px -4px rgba(0,0,0,.5);
+}}
+:root[data-theme="dark"]{
+  --ground:#091419; --panel:#0F212A; --panel-2:#152a34; --ink:#E9F0F2; --ink-2:#B4C6CD; --muted:#8AA4AE;
+  --line:#213139; --brand:#3FC0CA; --brand-2:#6fd3da; --sky:#7FD1EF; --coral:#FF9E7F; --coral-soft:#ff9e7f18;
+  --brand-soft:#3fc0ca18; --ok:#5DBE83;
+  --shadow:0 22px 54px -24px rgba(0,0,0,.72), 0 2px 10px -4px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--fb);line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:900px;margin:0 auto;padding:clamp(26px,5vw,64px) clamp(18px,4vw,36px) 100px}
+a{color:var(--brand);font-weight:600}
+
+/* hero */
+.hero{background:
+  radial-gradient(700px 300px at 12% -20%, var(--brand-soft), transparent 65%),
+  linear-gradient(180deg,var(--panel),var(--panel));
+  border:1px solid var(--line);border-radius:26px;padding:clamp(26px,4vw,44px);box-shadow:var(--shadow)}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.logo{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(160deg,#4FC3F7,#0E7C86);box-shadow:var(--shadow)}
+.logo svg{width:25px;height:25px}
+.brand .nm{font-family:var(--fd);font-weight:800;font-size:20px;letter-spacing:-.01em}
+.brand .tg{font-family:var(--fm);font-size:11.5px;color:var(--brand);letter-spacing:.06em}
+.eyebrow{font-family:var(--fm);font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--coral);margin:0 0 10px}
+h1{font-family:var(--fd);font-weight:800;font-size:clamp(28px,4.6vw,44px);line-height:1.06;letter-spacing:-.02em;margin:0;text-wrap:balance;max-width:20ch}
+.hero .lead{font-size:clamp(15px,2vw,18px);color:var(--ink-2);margin:16px 0 0;max-width:62ch}
+.hero .lead b{color:var(--ink);font-weight:600}
+.pillrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.pill{font-family:var(--fm);font-size:11.5px;font-weight:600;padding:6px 12px;border-radius:999px;background:var(--panel-2);border:1px solid var(--line);color:var(--ink-2)}
+
+/* sections */
+section{margin-top:52px}
+.kicker{font-family:var(--fm);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--brand);margin:0 0 6px;font-weight:700}
+h2{font-family:var(--fd);font-weight:800;font-size:clamp(22px,3.2vw,30px);letter-spacing:-.015em;margin:0;text-wrap:balance}
+.intro{color:var(--ink-2);font-size:16px;margin:10px 0 0;max-width:64ch}
+p{color:var(--ink-2)}
+
+/* the loop */
+.loop{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:26px}
+.step{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px 14px;position:relative}
+.step .n{font-family:var(--fm);font-size:11px;color:var(--brand);font-weight:700}
+.step .e{font-size:26px;margin:6px 0 8px}
+.step h4{font-family:var(--fd);font-size:14.5px;font-weight:700;margin:0 0 3px}
+.step p{font-size:12.5px;margin:0;line-height:1.4}
+.step::after{content:"→";position:absolute;right:-11px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px;z-index:1}
+.step:last-child::after{content:"↻";right:-6px;color:var(--brand)}
+@media (max-width:720px){.loop{grid-template-columns:1fr 1fr}.step::after{display:none}}
+
+/* callout */
+.callout{background:var(--coral-soft);border:1px solid var(--line);border-left:4px solid var(--coral);border-radius:14px;padding:18px 20px;margin-top:24px}
+.callout b{color:var(--ink)}
+.callout p{margin:0;color:var(--ink-2)}
+
+/* cards grid */
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}
+.card .e{font-size:24px}
+.card h4{font-family:var(--fd);font-size:16px;font-weight:700;margin:8px 0 4px}
+.card p{font-size:13.5px;margin:0}
+.card .free{color:var(--ok);font-weight:700;font-size:12px}
+.card .pro{color:var(--coral);font-weight:700;font-size:12px}
+@media (max-width:640px){.cards{grid-template-columns:1fr}}
+
+/* persona chips */
+.personas{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+.pc{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 13px 8px 10px;font-size:13px;font-weight:600}
+.pc .e{font-size:19px}
+.pc small{color:var(--muted);font-weight:500}
+.pc.free{border-color:var(--ok)}
+
+/* table */
+.tbl{width:100%;border-collapse:collapse;margin-top:22px;font-size:14px;background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.tbl th,.tbl td{text-align:left;padding:12px 15px;border-bottom:1px solid var(--line)}
+.tbl th{font-family:var(--fm);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:700;background:var(--panel-2)}
+.tbl tr:last-child td{border-bottom:0}
+.tbl td b{color:var(--ink)}
+.tbl .price{font-family:var(--fd);font-weight:800;font-variant-numeric:tabular-nums;color:var(--ink)}
+.tag{display:inline-block;font-family:var(--fm);font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;background:var(--brand-soft);color:var(--brand)}
+
+/* award clusters */
+.clusters{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:24px}
+.cl{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;border-top:3px solid var(--brand)}
+.cl.msg{border-top-color:var(--coral)}.cl.dist{border-top-color:var(--sky)}
+.cl h4{font-family:var(--fd);font-size:15px;font-weight:800;margin:0 0 10px}
+.cl ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px}
+.cl li{font-size:13px;color:var(--ink-2);display:flex;gap:7px;align-items:baseline}
+.cl li b{color:var(--ink);font-weight:600}
+.cl li::before{content:"◆";color:var(--brand);font-size:9px}
+.cl.msg li::before{color:var(--coral)}.cl.dist li::before{color:var(--sky)}
+@media (max-width:720px){.clusters{grid-template-columns:1fr}}
+
+/* two-col status */
+.status{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px}
+.sbox{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}
+.sbox h4{font-family:var(--fd);font-size:15px;margin:0 0 10px;display:flex;align-items:center;gap:8px}
+.sbox ul{margin:0;padding-left:18px}.sbox li{font-size:13.5px;color:var(--ink-2);margin-bottom:5px}
+.sbox.done{border-left:4px solid var(--ok)}.sbox.next{border-left:4px solid var(--coral)}
+@media (max-width:640px){.status{grid-template-columns:1fr}}
+
+/* arch list */
+.arch{display:grid;grid-template-columns:1fr 1fr;gap:10px 22px;margin-top:20px}
+.arch div{font-size:13.5px;color:var(--ink-2);padding:9px 0;border-bottom:1px solid var(--line)}
+.arch div b{color:var(--ink);font-family:var(--fd)}
+.arch code{font-family:var(--fm);font-size:12px;color:var(--brand)}
+@media (max-width:640px){.arch{grid-template-columns:1fr}}
+
+.ctaband{margin-top:52px;background:linear-gradient(135deg,var(--brand),var(--brand-2));border-radius:20px;padding:26px 28px;color:#fff;display:flex;flex-wrap:wrap;align-items:center;gap:14px;justify-content:space-between}
+.ctaband h3{font-family:var(--fd);font-size:19px;margin:0;font-weight:800}
+.ctaband p{margin:4px 0 0;color:#ffffffcc;font-size:14px}
+.ctaband a{background:#fff;color:var(--brand-2);padding:12px 20px;border-radius:12px;font-weight:800;font-size:14px;white-space:nowrap}
+.foot{margin-top:40px;color:var(--muted);font-size:13px;font-family:var(--fm)}
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="brand">
+      <span class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3s6 6.5 6 11a6 6 0 1 1-12 0c0-4.5 6-11 6-11Z" fill="#fff" opacity=".95"/><circle cx="9.5" cy="13" r="1.3" fill="#0E7C86"/><circle cx="14.5" cy="13" r="1.3" fill="#0E7C86"/><path d="M9.5 16.2c1.6 1.1 3.4 1.1 5 0" stroke="#0E7C86" stroke-width="1.3" stroke-linecap="round"/></svg></span>
+      <div><div class="nm">Nagly</div><div class="tg">Someone who cares.</div></div>
+    </div>
+    <p class="eyebrow">Team overview</p>
+    <h1>Someone who loves you, nagging you to drink water.</h1>
+    <p class="lead">Nagly is a care app where a persona — <b>Mom, Dad, Dadi, or the Bestie</b> — nags you to drink water and look after yourself, in her own voice, right on your lock screen. <b>The emotional relationship is the product, not the tracking.</b> Built for RevenueCat's Shipaton 2026.</p>
+    <div class="pillrow">
+      <span class="pill">Kotlin Multiplatform</span>
+      <span class="pill">Android-first · iOS later</span>
+      <span class="pill">Offline · no accounts</span>
+      <span class="pill">Light theme</span>
+      <span class="pill">com.manojbuilds.nagly</span>
+    </div>
+  </header>
+
+  <section>
+    <p class="kicker">The insight</p>
+    <h2>Every other app tracks. Nagly makes you feel cared for.</h2>
+    <p class="intro">A boring notification says "Time to hydrate." Nagly's Indian Mom says <i>"Afternoon check — bottle empty? You're behind today, beta."</i> Same reminder, completely different feeling. That relationship — worry, pride, disappointment, love — is the moat competitors can't copy. When we pitch it, we <b>lead with the joke, not "water tracker."</b></p>
+  </section>
+
+  <section>
+    <p class="kicker">How it works</p>
+    <h2>The core loop</h2>
+    <div class="loop">
+      <div class="step"><div class="n">01</div><div class="e">🎯</div><h4>Set your goal</h4><p>Quick quiz: weight, activity, awake hours → daily target.</p></div>
+      <div class="step"><div class="n">02</div><div class="e">👩</div><h4>Pick your nagger</h4><p>Choose the persona who reminds you — and their voice.</p></div>
+      <div class="step"><div class="n">03</div><div class="e">🔔</div><h4>She nags you</h4><p>A lock-screen notification in her voice, timed to how far behind you are.</p></div>
+      <div class="step"><div class="n">04</div><div class="e">💧</div><h4>Log in one tap</h4><p>+250 / +500 straight from the notification. No app needed.</p></div>
+      <div class="step"><div class="n">05</div><div class="e">💛</div><h4>She reacts</h4><p>Worried, proud, disappointed — and your bond grows. Repeat.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="kicker">The actual product</p>
+    <h2>The nag is a notification</h2>
+    <p class="intro">Most of Nagly happens <b>without opening the app</b>. The persona reaches you on the lock screen with three action buttons — <b>+250 ml, +500 ml, and a skip-jab</b> ("Later, Amma") — so you log with one tap. These fire <b>locally and offline</b> for precise, reliable timing.</p>
+    <div class="callout"><p><b>Two notification layers.</b> <b>Local</b> notifications do the hourly nags (offline, quick-log). <b>OneSignal</b> owns everything cloud — win-back messages, streak milestones, trial reminders — all in the persona's voice. That cloud layer is our "Keep Them Coming Back" award play.</p></div>
+  </section>
+
+  <section>
+    <p class="kicker">The cast</p>
+    <h2>Twelve voices, two levels</h2>
+    <p class="intro">Personas are a two-level model: a <b>Relationship</b> (Mom, Dad, Grandparent, Bestie) → a <b>Variant</b> (the specific personality). Tier gating lives at the relationship level.</p>
+    <div class="personas">
+      <span class="pc free"><span class="e">👩</span>Mom <small>· free</small></span>
+      <span class="pc"><span class="e">👨</span>Dad</span>
+      <span class="pc"><span class="e">🧓</span>Grandparent</span>
+      <span class="pc"><span class="e">🤗</span>Bestie</span>
+    </div>
+    <p style="font-size:13.5px;margin-top:14px">Variants include <b>Indian / Jewish / Southern Mom</b>, <b>Punjabi / Corny / Silent Dad</b>, <b>Dadi-Nani / Italian Nonna / Sweet Granny</b>, and <b>The Bestie / Gym Coach / Corporate HR</b> — each with lines keyed by <b>mood × time-of-day</b>.</p>
+  </section>
+
+  <section>
+    <p class="kicker">The expansion</p>
+    <h2>Care Modes — more than water</h2>
+    <p class="intro">Same persona, but you choose <b>what</b> they care about. This broadens the market and gives the paywall real value. For the demo we ship <b>Water + Medication</b> only.</p>
+    <div class="cards">
+      <div class="card"><div class="e">💧</div><h4>Water <span class="free">· always free</span></h4><p>The flagship. "Sip some water, beta."</p></div>
+      <div class="card"><div class="e">💊</div><h4>Medication <span class="pro">· Pro</span></h4><p>"Did you take your pill?" — high stakes, deeply emotional.</p></div>
+      <div class="card"><div class="e">🍽️</div><h4>Meals <span class="pro">· Pro</span></h4><p>"Have you eaten? Don't skip lunch."</p></div>
+      <div class="card"><div class="e">🚶</div><h4>Movement + Sleep <span class="pro">· Pro</span></h4><p>"You've been sitting 2 hours." / "It's late. Bed."</p></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="kicker">The money</p>
+    <h2>Free where it counts, Pro for the rest</h2>
+    <p class="intro"><b>Mom + Water is free forever.</b> Everything else opens with a 7-day trial, then one of three plans. Free users can also watch a rewarded ad for a 24-hour unlock.</p>
+    <table class="tbl">
+      <tr><th>Plan</th><th>What</th><th>Price</th></tr>
+      <tr><td><b>Free forever</b></td><td>Mom persona + Water mode</td><td class="price">$0</td></tr>
+      <tr><td><b>7-day trial</b></td><td>Everything unlocked, no card</td><td class="price">$0</td></tr>
+      <tr><td><b>Lifetime</b> <span class="tag">primary</span></td><td>Pay once, yours forever</td><td class="price">$29.99</td></tr>
+      <tr><td><b>Annual</b></td><td>With native 7-day free trial</td><td class="price">$19.99/yr</td></tr>
+      <tr><td><b>Monthly</b></td><td>Cancel anytime</td><td class="price">$1.99/mo</td></tr>
+      <tr><td><b>Rewarded ad</b></td><td>Watch 1 ad → 24h unlock (Catvertising)</td><td class="price">$0</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <p class="kicker">Under the hood</p>
+    <h2>How it's built</h2>
+    <div class="arch">
+      <div><b>Kotlin Multiplatform</b> — ~88% shared code, Android + iOS</div>
+      <div><b>Compose Multiplatform</b> — one shared UI</div>
+      <div><b>Local-only</b> — <code>SQLDelight</code>, offline, no login</div>
+      <div><b>Navigation</b> — sealed screens, no nav library</div>
+      <div><b>Notifications</b> — local (AlarmManager / UNUserNotificationCenter)</div>
+      <div><b>RevenueCat</b> — store IAP for plans (<code>pro</code> entitlement)</div>
+      <div><b>OneSignal</b> — cloud re-engagement only</div>
+      <div><b>AdMob</b> — rewarded ads for unlocks</div>
+      <div><b>Koin + Flow</b> — DI, fakes swap to real via one binding</div>
+      <div><b>Light theme only</b> — one committed white look</div>
+    </div>
+    <p style="font-size:13px;margin-top:12px;color:var(--muted)">Every third-party service sits behind an interface with a fake implementation, toggled by <code>Integrations.SANDBOX_MODE</code> — so the whole app runs today, and we swap in real keys one binding at a time.</p>
+  </section>
+
+  <section>
+    <p class="kicker">Why we're building it now</p>
+    <h2>Shipaton 2026 — award strategy</h2>
+    <p class="intro">Seven targets in three effort clusters. Doing RevenueCat well covers three of them at once.</p>
+    <div class="clusters">
+      <div class="cl"><h4>💰 RevenueCat</h4><ul>
+        <li><b>HAMM</b> — smartest use to drive revenue</li>
+        <li><b>Funnel Vision</b> — the RC implementation</li>
+        <li><b>Design</b> — visual craft (mostly banked)</li>
+      </ul></div>
+      <div class="cl msg"><h4>📣 Messaging</h4><ul>
+        <li><b>Keep Them Coming Back</b> — OneSignal re-engagement</li>
+        <li><b>Catvertising</b> — rewarded-ad unlocks</li>
+      </ul></div>
+      <div class="cl dist"><h4>📦 Distribution</h4><ul>
+        <li><b>Best App for Galaxy</b> — Samsung Store</li>
+        <li><b>Most Viral</b> — <i>deferred</i></li>
+      </ul></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="kicker">Where we are</p>
+    <h2>Status &amp; what's next</h2>
+    <div class="status">
+      <div class="sbox done"><h4>✅ Done</h4><ul>
+        <li>Full app runs in sandbox (onboarding → home → history → paywall)</li>
+        <li>Design system + signature chat timeline · 70 tests pass</li>
+        <li>All screens mocked (white theme) incl. notifications &amp; OneSignal</li>
+        <li>Monetization &amp; Care Modes designed and locked</li>
+      </ul></div>
+      <div class="sbox next"><h4>🚧 Next</h4><ul>
+        <li>Wire real RevenueCat + AdMob + OneSignal (fakes → real)</li>
+        <li>Write the persona lines (the actual product content)</li>
+        <li>Store paperwork: Play Console, Galaxy Store, IAP products</li>
+        <li>App icon, privacy/terms, 2-min demo video</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <div class="ctaband">
+    <div><h3>See every screen</h3><p>The full app mockup — notifications, onboarding, care modes, paywall, OneSignal.</p></div>
+    <a href="https://claude.ai/code/artifact/aaa2a2a6-9a6f-4cad-a99f-663c859f762c">Open the mockups →</a>
+  </div>
+
+  <p class="foot">Nagly · Kotlin Multiplatform · Shipaton 2026 · internal team overview</p>
+</div>
