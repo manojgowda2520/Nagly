@@ -11,13 +11,38 @@ Core loop: set daily goal → pick your "nagger" persona → log water (bottle f
 reacts to behavior (worried / disappointed / proud) → reminders in her voice, timed to how far
 behind you are. Free = Mom personas. Pro / watch-ad = Dad, Grandparent, Bestie.
 
+## Product direction — Care Modes + monetization (added 2026-08-12, in DESIGN not code yet)
+Expanding beyond water → persona-driven CARE MODES. The persona (mom/dad/dadi/bestie) stays the
+constant identity; the user chooses WHAT it nags about.
+- Categories, each its own nag type with its own persona lines: Water (free), Medication, Meals,
+  Movement, Sleep, Custom.
+- Modes bundle categories: Hydration (free) / Health (water+meals+movement+sleep) / Medication
+  (meds+water) / Custom. For the DEMO ship Water + Medication ONLY (limits line-writing).
+- Onboarding gains a "pick your care mode" step → now 10 steps: Weight → Activity → Hours →
+  Building-plan loader → Goal reveal → **Mode** → Relationship → Variant → First glass → Permission.
+- Home adapts per mode: Hydration = bottle hero; Health = daily care checklist with the bottle as
+  one card. Settings gains a "Care mode" row.
+- MONETIZATION (locked): FREE = Mom + Water forever. Everything else = 7-day app-managed welcome
+  trial (no card; reuse UnlockRepository/UnlockExpiryWatcher + a `trial_ends_at` AppFlag; treat
+  `isPro || inTrial` as full access) → paywall. Plans: Monthly $1.99 · Annual $19.99/yr (native
+  7-day store trial) · Lifetime $29.99 one-time (non-consumable, PRIMARY). Rewarded AdMob ad = 24h
+  unlock of one locked item. NOTE: lifetime≈annual gap is narrow → will cannibalize MRR (weakens
+  HAMM). Full mockups (light theme): claude.ai/code/artifact/aaa2a2a6-9a6f-4cad-a99f-663c859f762c
+
 ## Competition
-Shipaton 2026 (RevenueCat), ends Sep 30 2026. Builder is targeting an early personal deadline.
-Targeting 4 awards:
-- OneSignal "Keep Them Coming Back" — $25k — re-engagement messaging (messaging IS the product)
-- #BuildInPublic — $30k — posting daily on X as @ManojBuilds06, tags #Shipaton #nagly
-- Ship Kotlin Everywhere (JetBrains) — $15k — the KMP architecture (needs BOTH stores live)
-- Catvertising — $15k — rewarded-ad persona unlocks
+Shipaton 2026 (RevenueCat), Aug 1 – Sep 30 2026. Builder targeting an early personal deadline.
+Award targets (REPIVOTED 2026-08-12 — app is now Android-first + light-theme-only):
+- HAMM — smartest use of RevenueCat to drive REAL revenue. Same build as Funnel Vision.
+- Funnel Vision — RevenueCat implementation: real RC SDK + paywall + funnel/purchase events.
+- RevenueCat Design — visual craft. Mockups approved (white theme). Paywall polish counts double.
+- Catvertising — rewarded-ad persona unlocks.
+- OneSignal "Keep Them Coming Back" — cloud re-engagement in the persona's voice.
+- Best App for Galaxy — Samsung Galaxy Store presence (NEW distribution target — adds a store).
+- Most Viral — DEFERRED; no-backend share loops when revisited.
+Effort clusters: RevenueCat (HAMM + Funnel Vision + paywall Design) · Messaging (OneSignal +
+Catvertising) · Distribution (Galaxy). Design largely banked; Most Viral parked.
+DROPPED: #BuildInPublic; Ship Kotlin Everywhere (was the only iOS-forcing award); Conflict of
+Interest (employee-only — builder is NOT a RevenueCat/sponsor employee, so ineligible).
 Judging: video-first. Screeners watch the first 2 min of the demo video + description. Do NOT
 jam into every category. Lead the pitch with the joke, not "water tracker".
 
@@ -49,7 +74,10 @@ is MANDATORY for digital goods; Stripe/Razorpay are forbidden. Only job = design
   Personas (2-step picker), Insights, Settings/Profile, bottom nav, paywall, ad-unlock flow.
 - v1.0 build + v1.1 "living UI" + v1.2 polish pass all committed & pushed. 70 tests pass.
 - Design system: teal #0E7C86 / primary #4FC3F7 / accent #FF8A65, mood colors, 8pt spacing,
-  rounded, light+dark. Chat timeline is the signature screen (keep it).
+  rounded. Chat timeline is the signature screen (keep it).
+- THEME: LIGHT ONLY — locked 2026-08-12. Force the light `NaglyColors`; do NOT wire
+  `isSystemInDarkTheme()`. Dark tokens stay in NaglyColors.kt but are unused (white look chosen
+  deliberately; app renders light even on a dark-mode device). Screen mockups approved in white.
 - Git identity set to Manoj Kumar K <mgmanoj1481@gmail.com>. History was rewritten to remove
   a co-author (Cursor commits as prakash@mobil80.com — RESET git identity after Cursor commits).
 
