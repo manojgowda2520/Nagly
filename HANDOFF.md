@@ -116,3 +116,10 @@ manojgowda2520, re-add Cursor RevenueCat MCP (.cursor/mcp.json) and re-auth.
 - Builder builds via Cursor (loop-engineering prompts: run steps in order, verify+commit each).
   Claude writes the prompts + verifies builds independently + advises strategy. Communicate concise.
 - Builder speaks via voice-to-text (transcripts can be garbled — confirm intent when unclear).
+
+## 2026-09-19 — Flutter rewrite (branch `flutter`)
+Builder decided to ship in Flutter. New app lives in `app/` (see README). Decisions made in the rewrite:
+- Monetization changed for the Peace Prize: **one medication reminder is free forever**; Medication mode is available to all, Pro = all voices + unlimited meds. 7-day no-card trial starts when onboarding ends; Pro personas can be picked during onboarding.
+- Ignored-nudge count is derived from persisted nudge history (survives process death — fixes open issue #1's likely cause).
+- Upload keystore: `~/development/nagly-keys/` on the builder's Mac (BACK IT UP). Toolchain: JDK 17 at `~/development/jdk17`, Flutter at `~/development/flutter`, Android SDK at `~/Library/Android/sdk`.
+- Strategy/submission copy: SHIPATON.md. Play listing + data safety: app/store/PLAY_LISTING.md.
