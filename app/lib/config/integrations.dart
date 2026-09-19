@@ -5,7 +5,7 @@
 /// these are *public* client keys (RevenueCat public SDK key, OneSignal app id,
 /// AdMob ids) — never put secret/server keys here.
 abstract final class Integrations {
-  static const bool sandboxMode = true;
+  static const bool sandboxMode = false;
 
   /// Plan A (true): paywall with Lifetime / Annual / Monthly via RevenueCat.
   /// Plan B (false): no purchases anywhere — every Pro feature is unlocked for 24h by a
