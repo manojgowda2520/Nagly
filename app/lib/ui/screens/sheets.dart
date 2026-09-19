@@ -1,0 +1,359 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+
+import '../../domain/models.dart';
+import '../../domain/mood_engine.dart';
+import '../../domain/persona_catalog.dart';
+import '../../services/ads.dart';
+import '../../state/app_controller.dart';
+import '../app.dart';
+import '../theme.dart';
+import '../widgets/common.dart';
+import '../widgets/persona_widgets.dart';
+
+// ── Custom amount ─────────────────────────────────────────────
+Future<int?> showCustomAmountSheet(BuildContext context) {
+  final c = context.read<AppController>();
+  final unit = c.profile.volumeUnit;
+  var ml = c.recentCustomMl ?? 350;
+  return showModalBottomSheet<int>(
+    context: context,
+    builder: (ctx) => StatefulBuilder(
+      builder: (ctx, set) => Padding(
+        padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('How much?', style: Theme.of(ctx).textTheme.titleLarge),
+            const SizedBox(height: 12),
+            Text(formatVolume(ml, unit), style: Theme.of(ctx).textTheme.displaySmall?.copyWith(color: NaglyColors.primaryDeep)),
+            Slider(
+              value: ml.toDouble(),
+              min: 50,
+              max: 1500,
+              divisions: 29,
+              label: formatVolume(ml, unit),
+              onChanged: (v) {
+                HapticFeedback.selectionClick();
+                set(() => ml = v.round());
+              },
+            ),
+            Wrap(
+              spacing: 8,
+              children: [
+                for (final preset in const [100, 330, 750, 1000])
+                  ChoiceChip(
+                    label: Text(formatVolume(preset, unit)),
+                    selected: ml == preset,
+                    onSelected: (_) => set(() => ml = preset),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            FilledButton(onPressed: () => Navigator.pop(ctx, ml), child: Text('Log ${formatVolume(ml, unit)}')),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+// ── Medication editor ─────────────────────────────────────────
+Future<void> showMedicationEditor(BuildContext context, {Medication? existing}) {
+  final c = context.read<AppController>();
+  final name = TextEditingController(text: existing?.name ?? '');
+  final dose = TextEditingController(text: existing?.dose ?? '');
+  var time = TimeOfDay(hour: existing?.hour ?? 9, minute: existing?.minute ?? 0);
+  return showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    builder: (ctx) => StatefulBuilder(
+      builder: (ctx, set) => Padding(
+        padding: EdgeInsets.fromLTRB(24, 0, 24, 24 + MediaQuery.of(ctx).viewInsets.bottom),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(existing == null ? 'Add medication' : 'Edit medication', style: Theme.of(ctx).textTheme.titleLarge),
+            const SizedBox(height: 16),
+            TextField(
+              controller: name,
+              autofocus: existing == null,
+              textCapitalization: TextCapitalization.sentences,
+              decoration: const InputDecoration(labelText: 'Name', hintText: 'e.g. Vitamin D', border: OutlineInputBorder()),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: dose,
+              decoration: const InputDecoration(labelText: 'Dose (optional)', hintText: 'e.g. 1 tablet', border: OutlineInputBorder()),
+            ),
+            const SizedBox(height: 12),
+            NCard(
+              onTap: () async {
+                final t = await showTimePicker(context: ctx, initialTime: time);
+                if (t != null) set(() => time = t);
+              },
+              child: Row(
+                children: [
+                  const Text('⏰', style: TextStyle(fontSize: 20)),
+                  const SizedBox(width: 12),
+                  const Expanded(child: Text('Daily reminder', style: TextStyle(fontWeight: FontWeight.w800))),
+                  Text(time.format(ctx), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: NaglyColors.med)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            ListenableBuilder(
+              listenable: name,
+              builder: (_, _) => FilledButton(
+                style: FilledButton.styleFrom(backgroundColor: NaglyColors.med),
+                onPressed: name.text.trim().isEmpty
+                    ? null
+                    : () async {
+                        Navigator.pop(ctx);
+                        if (existing == null) {
+                          await c.addMedication(name.text.trim(), time.hour, time.minute, dose: dose.text.trim());
+                        } else {
+                          await c.updateMedication(existing.copyWith(
+                              name: name.text.trim(), dose: dose.text.trim(), hour: time.hour, minute: time.minute));
+                        }
+                      },
+                child: const Text('Save'),
+              ),
+            ),
+            if (existing != null)
+              TextButton(
+                style: TextButton.styleFrom(foregroundColor: NaglyColors.danger),
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  c.removeMedication(existing.id);
+                },
+                child: const Text('Remove medication'),
+              ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+// ── Locked persona: watch an ad (24h) or go Pro ────────────────
+Future<void> showUnlockSheet(BuildContext context, Persona persona) {
+  final rel = PersonaCatalog.relationshipOf(persona);
+  return showModalBottomSheet<void>(
+    context: context,
+    builder: (ctx) => Padding(
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          PersonaAvatar(emoji: persona.emoji, mood: Mood.proud, size: 84),
+          const SizedBox(height: 14),
+          SpeechBubble(text: persona.signature, name: persona.displayName),
+          const SizedBox(height: 18),
+          Text('🎁 Try ${rel.displayName} free', style: Theme.of(ctx).textTheme.titleLarge),
+          const SizedBox(height: 6),
+          Text('Watch one short ad to unlock all of ${rel.displayName}\'s voices for 24 hours.',
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontWeight: FontWeight.w700, color: NaglyColors.textSecondary)),
+          const SizedBox(height: 18),
+          FilledButton.icon(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              await watchAdToUnlock(context, persona);
+            },
+            icon: const Icon(Icons.play_circle_fill_rounded),
+            label: const Text('Watch ad · unlock 24h'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              openPaywall(context, placement: 'persona_locked', relationshipId: rel.id);
+            },
+            child: const Text('Or go Pro to keep them forever →'),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+Future<void> watchAdToUnlock(BuildContext context, Persona persona) async {
+  final c = context.read<AppController>();
+  final messenger = ScaffoldMessenger.of(context);
+  final placement = 'unlock_${persona.relationshipId}';
+  final Future<AdResult> result;
+  if (c.ads case final FakeAdService fake) {
+    result = fake.showRewarded(placement: placement);
+    unawaited(Navigator.of(context).push(PageRouteBuilder<void>(
+      opaque: true,
+      pageBuilder: (_, _, _) => _FakeAdScreen(ads: fake, personaName: persona.displayName),
+    )));
+  } else {
+    result = c.ads.showRewarded(placement: placement);
+  }
+  switch (await result) {
+    case AdResult.rewarded:
+      await c.grantAdUnlock(persona.relationshipId);
+      await c.selectPersona(persona.id);
+      HapticFeedback.heavyImpact();
+      messenger.showSnackBar(SnackBar(content: Text('${persona.displayName} is yours for 24 hours 💛')));
+    case AdResult.cancelled:
+      messenger.showSnackBar(const SnackBar(content: Text('Ad closed early — no unlock this time')));
+    case AdResult.unavailable:
+      messenger.showSnackBar(const SnackBar(content: Text('No ad available right now. Try again in a bit.')));
+  }
+}
+
+/// Sandbox stand-in for a rewarded video: 5s countdown, closable (forfeits reward).
+class _FakeAdScreen extends StatefulWidget {
+  const _FakeAdScreen({required this.ads, required this.personaName});
+  final FakeAdService ads;
+  final String personaName;
+
+  @override
+  State<_FakeAdScreen> createState() => _FakeAdScreenState();
+}
+
+class _FakeAdScreenState extends State<_FakeAdScreen> with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(seconds: 5))
+    ..forward().whenComplete(() {
+      if (!mounted) return;
+      widget.ads.complete();
+      Navigator.pop(context);
+    });
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => PopScope(
+        onPopInvokedWithResult: (didPop, _) {
+          if (_c.isAnimating) widget.ads.cancel();
+        },
+        child: Scaffold(
+          backgroundColor: NaglyColors.ink,
+          body: SafeArea(
+            child: Stack(
+              children: [
+                Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text('📺', style: TextStyle(fontSize: 64)),
+                      const SizedBox(height: 12),
+                      const Text('Sandbox ad', style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900)),
+                      const SizedBox(height: 6),
+                      Text('Unlocking ${widget.personaName}…', style: const TextStyle(color: Colors.white70, fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 24),
+                      SizedBox(
+                        width: 200,
+                        child: AnimatedBuilder(
+                          animation: _c,
+                          builder: (_, _) => LinearProgressIndicator(value: _c.value, color: NaglyColors.primary, backgroundColor: Colors.white24),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Positioned(
+                  right: 8,
+                  top: 8,
+                  child: IconButton(
+                    tooltip: 'Close ad',
+                    color: Colors.white,
+                    icon: const Icon(Icons.close),
+                    onPressed: () {
+                      _c.stop();
+                      widget.ads.cancel();
+                      Navigator.pop(context);
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+}
+
+// ── Trial ending / ended, in her voice ──────────────────────────
+Future<void> showTrialEndingSheet(BuildContext context, {required bool ended, String? departedPersona}) {
+  final c = context.read<AppController>();
+  final p = c.persona;
+  return showModalBottomSheet<void>(
+    context: context,
+    builder: (ctx) => Padding(
+      padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              PersonaAvatar(emoji: p.emoji, mood: Mood.disappointed, size: 84),
+              const Positioned(right: -6, bottom: -4, child: Text('🥺', style: TextStyle(fontSize: 30))),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text(ended ? 'My full care plan has ended' : 'My full care plan ends today',
+              textAlign: TextAlign.center, style: Theme.of(ctx).textTheme.titleLarge),
+          const SizedBox(height: 10),
+          Text(
+            ended
+                ? '${departedPersona != null ? '$departedPersona had to go for now. ' : ''}"I\'m still here for your water — and your most important pill. Always free. But I\'ll miss the rest of the family."'
+                : '"You\'ve had all of me free for 7 days. Keep me around? Water and one medication stay free — but I\'ll miss the rest."',
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: NaglyColors.textSecondary, height: 1.4),
+          ),
+          const SizedBox(height: 20),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              openPaywall(context, placement: 'trial_end');
+            },
+            child: const Text('See plans'),
+          ),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Keep free (water + 1 pill)')),
+        ],
+      ),
+    ),
+  );
+}
+
+Future<void> showUpsellDialog(BuildContext context, int streak) {
+  final p = context.read<AppController>().persona;
+  return showDialog<void>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      icon: const Text('💛', style: TextStyle(fontSize: 44)),
+      title: Text('${PersonaCatalog.relationshipOf(p).displayName} misses nagging you fully', textAlign: TextAlign.center),
+      content: Text(
+        '$streak-day streak! Unlock every persona and unlimited medication reminders — try the Annual plan free for 7 days.',
+        textAlign: TextAlign.center,
+      ),
+      actionsAlignment: MainAxisAlignment.center,
+      actions: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            FilledButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                openPaywall(context, placement: 'streak_upsell');
+              },
+              child: const Text('See Pro'),
+            ),
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Maybe later')),
+          ],
+        ),
+      ],
+    ),
+  );
+}

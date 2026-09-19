@@ -37,7 +37,10 @@ class TrialEndingEvent extends AppEvent {
 }
 
 class TrialEndedEvent extends AppEvent {
-  const TrialEndedEvent();
+  const TrialEndedEvent({this.departedPersona});
+
+  /// Name of the Pro persona that had to leave, if any.
+  final String? departedPersona;
 }
 
 class UpsellEvent extends AppEvent {
@@ -346,26 +349,32 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
 
   // ── Access events ─────────────────────────────────────────
   bool _checkingAccess = false;
+  String? _departedPersona;
 
   Future<void> _checkAccessEvents() async {
-    if (!loaded || !profile.onboarded || _checkingAccess) return;
+    if (!loaded || !profile.onboarded || trialEndsAtMs == null || _checkingAccess) return;
     _checkingAccess = true;
     try {
       final a = access;
+      final trialJustEnded = a.trialEnded && !await db.getBool(Keys.trialEndedShown);
       final fallback = resolvePersonaFallback(profile, a);
       if (fallback != null) {
+        final departed = persona.displayName;
         profile = fallback.profile;
         await db.saveProfile(profile);
-        _events.add(PersonaFallbackEvent(fallback.message));
+        // When the trial ends, one sheet explains everything; otherwise (an ad unlock
+        // lapsing) a small dialog does.
+        if (!trialJustEnded) _events.add(PersonaFallbackEvent(fallback.message));
+        _departedPersona = departed;
         _scheduleSync();
       }
       if (a.trialEndsWithin24h && await db.getString(Keys.trialSheetShownOn) != todayKey) {
         await db.setString(Keys.trialSheetShownOn, todayKey);
         _events.add(const TrialEndingEvent());
       }
-      if (a.trialEnded && !await db.getBool(Keys.trialEndedShown)) {
+      if (trialJustEnded) {
         await db.setBool(Keys.trialEndedShown, true);
-        _events.add(const TrialEndedEvent());
+        _events.add(TrialEndedEvent(departedPersona: _departedPersona));
         _scheduleSync();
       }
       // An engaged free user gets one gentle offer a week.
@@ -411,11 +420,13 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> setCareMode(CareMode mode) => updateProfile((p) => p.copyWith(careMode: mode));
 
   Future<void> finishOnboarding(Profile draft) async {
-    profile = draft.copyWith(onboarded: true);
-    await db.saveProfile(profile);
+    // Start the trial *before* marking onboarded, so an access check can never see an
+    // onboarded user with a Pro persona and no trial (which would bounce them to Mom).
     if (await db.getInt(Keys.trialEndsAt) == null) {
       await db.setInt(Keys.trialEndsAt, DateTime.now().millisecondsSinceEpoch + trialMs);
     }
+    profile = draft.copyWith(onboarded: true);
+    await db.saveProfile(profile);
     await _changed();
   }
 

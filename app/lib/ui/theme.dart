@@ -99,6 +99,8 @@ ThemeData buildNaglyTheme() {
       style: FilledButton.styleFrom(
         backgroundColor: NaglyColors.primaryDeep,
         foregroundColor: Colors.white,
+        disabledBackgroundColor: NaglyColors.outline,
+        disabledForegroundColor: NaglyColors.textSecondary,
         minimumSize: const Size.fromHeight(56),
         shape: const StadiumBorder(),
         textStyle: const TextStyle(fontFamily: font, fontSize: 17, fontWeight: FontWeight.w800),

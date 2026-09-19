@@ -239,3 +239,15 @@ class Tag extends StatelessWidget {
                 fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 0.6, color: filled ? Colors.white : color)),
       );
 }
+
+String formatHourLabel(int h) {
+  final hr = h % 12 == 0 ? 12 : h % 12;
+  return '$hr ${h < 12 ? 'AM' : 'PM'}';
+}
+
+String greetingFor(int hour) {
+  if (hour >= 5 && hour < 12) return 'Good morning';
+  if (hour >= 12 && hour < 17) return 'Good afternoon';
+  if (hour >= 17 && hour < 22) return 'Good evening';
+  return 'Up late?';
+}

@@ -75,14 +75,15 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> {
   final _tabs = TabSwitcher();
-  StreamSubscription<AppEvent>? _sub;
+  StreamSubscription<void>? _sub;
   bool _confetti = false;
 
   @override
   void initState() {
     super.initState();
     _tabs.addListener(() => setState(() {}));
-    _sub = context.read<AppController>().events.listen(_onEvent);
+    // One modal at a time: each event waits for the previous one to be dismissed.
+    _sub = context.read<AppController>().events.asyncMap(_onEvent).listen((_) {});
   }
 
   @override
@@ -119,8 +120,8 @@ class _MainShellState extends State<MainShell> {
         );
       case TrialEndingEvent():
         await showTrialEndingSheet(ctx, ended: false);
-      case TrialEndedEvent():
-        await showTrialEndingSheet(ctx, ended: true);
+      case TrialEndedEvent(:final departedPersona):
+        await showTrialEndingSheet(ctx, ended: true, departedPersona: departedPersona);
       case UpsellEvent(:final streak):
         await showUpsellDialog(ctx, streak);
       case RouteEvent(:final route):
