@@ -41,23 +41,26 @@ Skip: Grand Prize (needs revenue traction), Kotlin Everywhere (we're Flutter now
 > Free forever: Mom + water + one medication. Every new user gets a 7-day no-card welcome trial of everything, so they bond with Dad or Nonna before the paywall appears. Pro is sold as Lifetime ($29.99, the anchor), Annual ($19.99 with a store free trial) and Monthly ($1.99), fetched from RevenueCat per **placement** — the locked-persona, medication-limit, trial-end, streak-upsell and settings moments can each run their own offering or experiment. Rewarded ads (tracked through RevenueCat Ads) let free users borrow a persona for 24h, a sampler that converts. Customer attributes (persona, care mode, streak, bond level) let us see which voices and moments drive revenue. [Add real numbers after launch.]
 
 **OneSignal — Keep Them Coming Back:**
-> Local notifications handle the hourly nags; OneSignal handles everything cloud, in the same persona voice. The app syncs 6 tags (persona_id, care_mode, current_streak, last_log_days_ago, trial_days_left, is_pro — never health data) and in-app triggers (streak, trial_days_left). Cloud pushes carry "+250 ml" action buttons that log water without opening the app, and every sip, goal and dose taken is reported as a OneSignal Outcome, so the dashboard shows which message actually made someone drink — not just who opened it. Journeys: a win-back ("3 days without a sip, beta… come back?"), streak celebrations at 3/7/14 days, a trial-ending reminder, and an in-app upsell for engaged free users. Messages deep-link into the right screen via a `route` field.
+> Local notifications handle the hourly nags; OneSignal handles everything cloud, in the same persona voice. The app syncs exactly 6 tags (persona_id, care_mode, current_streak, last_log_at, trial_started_at, is_pro — never health data); timestamps feed "time elapsed" segments, so they never go stale. Cloud pushes carry "+250 ml / +500 ml" action buttons that log water without opening the app, and every sip, goal and dose taken is reported as a OneSignal Outcome, so the dashboard shows which message actually made someone drink — not just who opened it. Three Journeys, every message written per persona with Liquid: a two-step win-back that ends in an in-app "Log a glass" button, streak celebrations at 3 and 7 days, and a trial-ending ask that opens the paywall. Messages deep-link into the right screen via a `route` field.
 
-## OneSignal campaigns to create (dashboard)
+## OneSignal dashboard (built, Nagly App 2858113c…)
 
-Segments (by tag):
-- **Gone quiet** — `last_log_days_ago` ≥ 2
-- **Streak milestone** — `current_streak` = 3 / 7 / 14
-- **Trial ending** — `in_trial` = true AND `trial_ends_at` within 24h (use Journey with time-based wait from `trial_ends_at`)
-- **Engaged free user** — `is_pro` = false AND `in_trial` = false AND `current_streak` ≥ 3
+Segments (tags → time-elapsed filters):
+- **Gone quiet (no water logged 2+ days)** — `last_log_at` elapsed > 2 days
+- **Streak 3+ days** — `current_streak` > 2
+- **Trial ends tomorrow (not Pro)** — `trial_started_at` elapsed > 6 and < 7 days AND `is_pro` = false
 
-Message templates (Liquid on `persona_id`, fallback to Mom):
-```liquid
-{% if tag.persona_id contains "dad" %}Beta, where have you gone? Paani pi le.{% elsif tag.persona_id == "the_bestie" %}You ghosted me for {{ tag.last_log_days_ago }} days?? Drink something.{% elsif tag.persona_id == "corporate_hr" %}We noticed you've been out of office. Please hydrate.{% else %}{{ tag.last_log_days_ago }} days without a sip, beta. I'm not angry… just disappointed. Come back? 🥺{% endif %}
-```
-- Streak: `Shabash! {{ tag.current_streak }} days strong. So proud. 💛` — additional data `route=insights`
-- Trial ending: `My full care plan ends today — keep me around?` — additional data `route=paywall`
-- In-app message (trigger `streak` ≥ 3, `is_pro` = false): "Mom misses nagging you fully — try every voice free for 7 days" — button action id `paywall`
+Push templates (Liquid `{% case tag.persona_id %}` title + body, Mom fallback, 1-day TTL):
+- Win-back 1 · gentle / Win-back 2 · guilt trip — collapse `nagly_winback`, `route=home`, buttons `add_250` / `add_500`
+- Streak 3 days / Streak 7 days · celebration — collapse `nagly_streak`, `route=insights`
+- Trial ends tomorrow — collapse `nagly_trial`, `route=paywall`
+
+Journeys (all **Draft** until the builder approves Set live):
+1. **Win-back: Mom misses you** — Gone quiet → 8am–6pm window → Win-back 1 → wait 24h → Win-back 2 → IAM "Welcome back 💛" (button `add_250`). Exits when they log again; re-entry after 7 days.
+2. **Streak celebrations: proud family** — Streak 3+ → window → Streak 3 push → wait 4 days → window → Streak 7 push. Exits if the streak breaks; re-entry after 14 days.
+3. **Trial ending: keep me around?** — Trial ends tomorrow → window → trial push → IAM "Keep me around? 🥺" (button `paywall`; opens the ad hub in Plan B). Exits on going Pro; once per user.
+
+Push goals are Clicks (>10% CTR) for now. After launch, switch them to the `water_logged` Outcome if the goal picker offers it.
 
 ## Demo video (≤2:00) — first 15 seconds sell it
 
