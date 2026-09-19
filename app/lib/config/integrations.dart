@@ -13,7 +13,7 @@ abstract final class Integrations {
   static bool purchasesEnabled = true;
 
   // RevenueCat public SDK keys (Project settings → API keys).
-  static const String revenueCatAndroidKey = '';
+  static const String revenueCatAndroidKey = 'goog_fhjwCDIAKDpUQTIWJKNmIsozRWP';
   static const String revenueCatIosKey = '';
 
   /// Entitlement that unlocks everything.
