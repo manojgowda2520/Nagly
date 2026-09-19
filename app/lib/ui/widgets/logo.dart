@@ -21,7 +21,7 @@ class NaglyLogo extends StatelessWidget {
 }
 
 class NaglyLogoPainter extends CustomPainter {
-  NaglyLogoPainter({this.withBackground = true, this.browRaise = 1, this.foregroundScale = 1});
+  NaglyLogoPainter({this.withBackground = true, this.browRaise = 1, this.foregroundScale = 1, this.cornerRadius = 0.23});
 
   final bool withBackground;
   final double browRaise;
@@ -29,11 +29,14 @@ class NaglyLogoPainter extends CustomPainter {
   /// Shrinks the drop for Android adaptive-icon safe zones.
   final double foregroundScale;
 
+  /// Background corner radius as a fraction of size; 0 = full-bleed square (store icons).
+  final double cornerRadius;
+
   @override
   void paint(Canvas canvas, Size size) {
     final s = size.width;
     if (withBackground) {
-      final r = RRect.fromRectAndRadius(Offset.zero & size, Radius.circular(s * 0.23));
+      final r = RRect.fromRectAndRadius(Offset.zero & size, Radius.circular(s * cornerRadius));
       canvas.drawRRect(
         r,
         Paint()
@@ -70,7 +73,7 @@ class NaglyLogoPainter extends CustomPainter {
     );
     // Shine
     canvas.drawOval(
-      Rect.fromCenter(center: Offset(cx - s * 0.16, s * 0.55), width: s * 0.06, height: s * 0.13),
+      Rect.fromCenter(center: Offset(cx - s * 0.2, s * 0.73), width: s * 0.045, height: s * 0.1),
       Paint()..color = const Color(0xFFBFEAF8),
     );
 

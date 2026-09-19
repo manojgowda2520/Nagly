@@ -146,7 +146,7 @@ class SettingsScreen extends StatelessWidget {
               _Row(emoji: '📄', title: 'Terms of use', onTap: () => launchUrl(Uri.parse(Integrations.termsUrl))),
             ]),
             const SizedBox(height: 16),
-            const Text('Your data stays on this phone. No account, no tracking.',
+            const Text('Your water & medication log stays on this phone. No account needed.',
                 textAlign: TextAlign.center, style: TextStyle(fontWeight: FontWeight.w700, color: NaglyColors.textSecondary)),
             FutureBuilder(
               future: PackageInfo.fromPlatform(),
@@ -156,6 +156,10 @@ class SettingsScreen extends StatelessWidget {
             if (Integrations.sandboxMode) ...[
               const SectionLabel('Sandbox (demo tools)'),
               _Group(children: [
+                _Row(emoji: '🔔', title: 'Send a test nudge in 5s', onTap: () {
+                  c.notifications.sendTestNudge(c.db);
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Lock your phone — she\'s coming 👀')));
+                }),
                 _Row(emoji: '👑', title: a.isPro ? 'Remove Pro' : 'Grant Pro', onTap: () => c.sandboxSetPro(!a.isPro)),
                 _Row(emoji: '⏳', title: 'Trial ends in 1 hour', onTap: c.sandboxEndTrialSoon),
                 _Row(emoji: '⌛', title: 'Expire trial now', onTap: c.sandboxExpireTrial),

@@ -53,7 +53,7 @@ abstract class BillingService {
 
 const _fallbackPlans = [
   Plan(kind: PlanKind.lifetime, title: 'Lifetime', price: r'$29.99', detail: 'Pay once, yours forever', badge: 'BEST VALUE'),
-  Plan(kind: PlanKind.annual, title: 'Annual', price: r'$19.99/yr', detail: '7-day free trial, then \$19.99/yr', badge: 'FREE TRIAL'),
+  Plan(kind: PlanKind.annual, title: 'Annual', price: r'$19.99/yr', detail: 'Try free for 7 days', badge: 'FREE TRIAL'),
   Plan(kind: PlanKind.monthly, title: 'Monthly', price: r'$1.99/mo', detail: 'Cancel any time'),
 ];
 
@@ -140,7 +140,7 @@ class RevenueCatBillingService implements BillingService {
               detail: 'Pay once, yours forever', badge: 'BEST VALUE', rcPackage: p),
         if (current.annual case final p?)
           Plan(kind: PlanKind.annual, title: 'Annual', price: '${p.storeProduct.priceString}/yr',
-              detail: '7-day free trial, then ${p.storeProduct.priceString}/yr', badge: 'FREE TRIAL', rcPackage: p),
+              detail: 'Try free for 7 days', badge: 'FREE TRIAL', rcPackage: p),
         if (current.monthly case final p?)
           Plan(kind: PlanKind.monthly, title: 'Monthly', price: '${p.storeProduct.priceString}/mo',
               detail: 'Cancel any time', rcPackage: p),

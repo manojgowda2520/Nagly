@@ -42,7 +42,7 @@ class InsightsScreen extends StatelessWidget {
               physics: const NeverScrollableScrollPhysics(),
               mainAxisSpacing: 12,
               crossAxisSpacing: 12,
-              childAspectRatio: 1.45,
+              childAspectRatio: 1.75,
               children: [
                 _Stat(label: 'Current streak', value: '${w.currentStreak}', unit: w.currentStreak == 1 ? 'day' : 'days', emoji: '🔥'),
                 _Stat(label: 'Daily average', value: '${mlToDisplay(w.dailyAverageMl, unit)}', unit: unitLabel(unit), emoji: '💧'),
@@ -53,9 +53,10 @@ class InsightsScreen extends StatelessWidget {
                   unit: w.bestHour == null ? '' : formatHour(w.bestHour!).split(' ').last,
                   emoji: '⏰',
                 ),
-                if (c.profile.careMode == CareMode.medication && adherence.due > 0)
+                if (c.profile.careMode == CareMode.medication && adherence.due > 0) ...[
                   _Stat(label: 'Doses taken', value: '${adherence.taken}', unit: '/ ${adherence.due}', emoji: '💊', color: NaglyColors.med),
-                _Stat(label: 'Best streak', value: '${w.bestStreak}', unit: w.bestStreak == 1 ? 'day' : 'days', emoji: '🏆'),
+                  _Stat(label: 'Best streak', value: '${w.bestStreak}', unit: w.bestStreak == 1 ? 'day' : 'days', emoji: '🏆'),
+                ],
               ],
             ),
             const SizedBox(height: 20),
@@ -128,22 +129,19 @@ class _WeekChart extends StatelessWidget {
       excludeSemantics: true,
       child: Column(
         children: [
+          Row(
+            children: [
+              CustomPaint(painter: _DashPainter(), size: const Size(18, 1)),
+              const SizedBox(width: 6),
+              Text('Daily goal · ${formatVolume(goal, unit)}',
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: NaglyColors.coral)),
+            ],
+          ),
+          const SizedBox(height: 14),
           SizedBox(
             height: chartH,
             child: Stack(
               children: [
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  bottom: chartH * goal / maxV,
-                  child: CustomPaint(painter: _DashPainter(), size: const Size(double.infinity, 1)),
-                ),
-                Positioned(
-                  right: 0,
-                  bottom: chartH * goal / maxV + 4,
-                  child: Text('goal ${formatVolume(goal, unit)}',
-                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: NaglyColors.coral)),
-                ),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -171,6 +169,12 @@ class _WeekChart extends StatelessWidget {
                         ),
                       ),
                   ],
+                ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: chartH * goal / maxV,
+                  child: CustomPaint(painter: _DashPainter(), size: const Size(double.infinity, 1)),
                 ),
               ],
             ),

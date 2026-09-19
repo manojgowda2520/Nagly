@@ -250,6 +250,33 @@ class NotificationService {
     }
   }
 
+  /// Demo/QA: fire a real water nudge (with its action buttons) a few seconds from now.
+  Future<void> sendTestNudge(NaglyDatabase db, {Duration after = const Duration(seconds: 5)}) async {
+    final profile = await db.profile();
+    final at = DateTime.now().add(after);
+    final plan = planWaterNudges(
+      nowMs: at.millisecondsSinceEpoch - minNudgeIntervalMs,
+      profile: profile.copyWith(wakeHour: 0, sleepHour: 23),
+      consumedMl: 0,
+      ignoredSoFar: 1,
+    );
+    if (plan.isEmpty) return;
+    final n = plan.first;
+    await _schedule(
+      id: 99,
+      at: at,
+      title: n.title,
+      body: n.body,
+      channel: _waterChannel,
+      payload: 'water',
+      actions: [
+        const AndroidNotificationAction(NudgeAction.add250, '+250 ml'),
+        const AndroidNotificationAction(NudgeAction.add500, '+500 ml'),
+        AndroidNotificationAction(NudgeAction.skip, n.skipLabel),
+      ],
+    );
+  }
+
   Future<void> _scheduleMed(Medication med, Persona persona, DateTime at, int id, int seed) {
     final name = med.dose.isEmpty ? med.name : '${med.name} (${med.dose})';
     return _schedule(
