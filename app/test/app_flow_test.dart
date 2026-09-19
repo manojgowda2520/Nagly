@@ -150,8 +150,8 @@ void main() {
         'persona_id',
         'care_mode',
         'current_streak',
-        'last_log_days_ago',
-        'trial_days_left',
+        'last_log_at',
+        'trial_started_at',
         'is_pro',
       });
 

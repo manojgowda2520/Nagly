@@ -349,31 +349,40 @@ void main() {
     expect(w.dailyAverageMl, (6000 + 500) ~/ 4);
   });
 
-  test('push tags describe the user for cloud journeys', () {
-    final now = DateTime(2026, 9, 19, 12);
-    final tags = computePushTags(
-      profile: const Profile(
-        personaId: 'the_bestie',
-        careMode: CareMode.medication,
-      ),
-      recentLogs: [
-        DrinkLog(
-          id: 1,
-          timestampMs: DateTime(2026, 9, 16, 9).millisecondsSinceEpoch,
-          amountMl: 250,
+  test(
+    'push tags: 6 tags, timestamps for server-side "time elapsed" filters',
+    () {
+      final now = DateTime(2026, 9, 19, 12);
+      final lastLog = DateTime(2026, 9, 16, 9);
+      final trialEnd = now.add(const Duration(days: 2));
+      final tags = computePushTags(
+        profile: const Profile(
+          personaId: 'the_bestie',
+          careMode: CareMode.medication,
         ),
-      ],
-      access: Access(
-        isPro: false,
-        trialEndsAtMs: now.millisecondsSinceEpoch + 1000,
-        unlocks: const {},
-        nowMs: now.millisecondsSinceEpoch,
-      ),
-      now: now,
-    );
-    expect(tags['persona_id'], 'the_bestie');
-    expect(tags['last_log_days_ago'], '3');
-    expect(tags['trial_days_left'], '0', reason: 'ends in 1s → last day');
-    expect(tags.length, 6, reason: 'OneSignal free plan allows 6 data tags');
-  });
+        recentLogs: [
+          DrinkLog(
+            id: 1,
+            timestampMs: lastLog.millisecondsSinceEpoch,
+            amountMl: 250,
+          ),
+        ],
+        access: Access(
+          isPro: false,
+          trialEndsAtMs: trialEnd.millisecondsSinceEpoch,
+          unlocks: const {},
+          nowMs: now.millisecondsSinceEpoch,
+        ),
+        now: now,
+      );
+      expect(tags.length, 6, reason: 'OneSignal free plan allows 6 data tags');
+      expect(tags['persona_id'], 'the_bestie');
+      expect(tags['last_log_at'], '${lastLog.millisecondsSinceEpoch ~/ 1000}');
+      expect(
+        tags['trial_started_at'],
+        '${(trialEnd.millisecondsSinceEpoch - trialMs) ~/ 1000}',
+      );
+      expect(tags['is_pro'], 'false');
+    },
+  );
 }
