@@ -20,7 +20,7 @@ abstract final class Integrations {
   static const String proEntitlement = 'pro';
 
   // OneSignal App ID (Settings → Keys & IDs).
-  static const String oneSignalAppId = '';
+  static const String oneSignalAppId = '2858113c-c323-453d-bbc9-976b8d4c999e';
 
   // AdMob. The app id also lives in android/app/src/main/AndroidManifest.xml.
   // Defaults are Google's official *test* ids — safe to ship in sandbox builds.
