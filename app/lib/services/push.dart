@@ -10,7 +10,10 @@ enum PushRoute { home, paywall, personas, history, insights }
 /// Cloud re-engagement only (win-back, streak milestones, trial ending, upsell).
 /// The hourly nags are local notifications — they never go through push.
 abstract class PushService {
-  Future<void> init(String externalId, {required void Function(PushRoute) onRoute});
+  Future<void> init(
+    String externalId, {
+    required void Function(PushRoute) onRoute,
+  });
   Future<void> setTags(Map<String, String> tags);
 
   /// In-app message triggers, e.g. `streak_milestone=7` or `trial_days_left=1`.
@@ -26,8 +29,10 @@ class FakePushService implements PushService {
   String? externalId;
 
   @override
-  Future<void> init(String externalId, {required void Function(PushRoute) onRoute}) async =>
-      this.externalId = externalId;
+  Future<void> init(
+    String externalId, {
+    required void Function(PushRoute) onRoute,
+  }) async => this.externalId = externalId;
 
   @override
   Future<void> setTags(Map<String, String> tags) async {
@@ -36,12 +41,16 @@ class FakePushService implements PushService {
   }
 
   @override
-  Future<void> setTriggers(Map<String, String> triggers) async => this.triggers.addAll(triggers);
+  Future<void> setTriggers(Map<String, String> triggers) async =>
+      this.triggers.addAll(triggers);
 }
 
 class OneSignalPushService implements PushService {
   @override
-  Future<void> init(String externalId, {required void Function(PushRoute) onRoute}) async {
+  Future<void> init(
+    String externalId, {
+    required void Function(PushRoute) onRoute,
+  }) async {
     OneSignal.initialize(Integrations.oneSignalAppId);
     // Anonymous install id — no personal data, no login screen.
     await OneSignal.login(externalId);
@@ -56,8 +65,10 @@ class OneSignalPushService implements PushService {
   }
 
   @override
-  Future<void> setTags(Map<String, String> tags) => OneSignal.User.addTags(tags);
+  Future<void> setTags(Map<String, String> tags) =>
+      OneSignal.User.addTags(tags);
 
   @override
-  Future<void> setTriggers(Map<String, String> triggers) => OneSignal.InAppMessages.addTriggers(triggers);
+  Future<void> setTriggers(Map<String, String> triggers) =>
+      OneSignal.InAppMessages.addTriggers(triggers);
 }

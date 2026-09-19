@@ -29,11 +29,21 @@ class InsightsScreen extends StatelessWidget {
           children: [
             Text('Insights', style: Theme.of(context).textTheme.headlineMedium),
             const SizedBox(height: 4),
-            const Text('Your last 7 days', style: TextStyle(fontWeight: FontWeight.w800, color: NaglyColors.textSecondary)),
+            const Text(
+              'Your last 7 days',
+              style: TextStyle(
+                fontWeight: FontWeight.w800,
+                color: NaglyColors.textSecondary,
+              ),
+            ),
             const SizedBox(height: 16),
             NCard(
               padding: const EdgeInsets.fromLTRB(12, 18, 12, 12),
-              child: _WeekChart(days: w.days, goal: c.profile.dailyMl, unit: unit),
+              child: _WeekChart(
+                days: w.days,
+                goal: c.profile.dailyMl,
+                unit: unit,
+              ),
             ),
             const SizedBox(height: 12),
             GridView.count(
@@ -44,18 +54,49 @@ class InsightsScreen extends StatelessWidget {
               crossAxisSpacing: 12,
               childAspectRatio: 1.75,
               children: [
-                _Stat(label: 'Current streak', value: '${w.currentStreak}', unit: w.currentStreak == 1 ? 'day' : 'days', emoji: '🔥'),
-                _Stat(label: 'Daily average', value: '${mlToDisplay(w.dailyAverageMl, unit)}', unit: unitLabel(unit), emoji: '💧'),
-                _Stat(label: 'Goal met', value: '${w.goalMetDays}', unit: '/ 7', emoji: '🎯'),
+                _Stat(
+                  label: 'Current streak',
+                  value: '${w.currentStreak}',
+                  unit: w.currentStreak == 1 ? 'day' : 'days',
+                  emoji: '🔥',
+                ),
+                _Stat(
+                  label: 'Daily average',
+                  value: '${mlToDisplay(w.dailyAverageMl, unit)}',
+                  unit: unitLabel(unit),
+                  emoji: '💧',
+                ),
+                _Stat(
+                  label: 'Goal met',
+                  value: '${w.goalMetDays}',
+                  unit: '/ 7',
+                  emoji: '🎯',
+                ),
                 _Stat(
                   label: 'Best hour',
-                  value: w.bestHour == null ? '—' : formatHour(w.bestHour!).split(' ').first,
-                  unit: w.bestHour == null ? '' : formatHour(w.bestHour!).split(' ').last,
+                  value: w.bestHour == null
+                      ? '—'
+                      : formatHour(w.bestHour!).split(' ').first,
+                  unit: w.bestHour == null
+                      ? ''
+                      : formatHour(w.bestHour!).split(' ').last,
                   emoji: '⏰',
                 ),
-                if (c.profile.careMode == CareMode.medication && adherence.due > 0) ...[
-                  _Stat(label: 'Doses taken', value: '${adherence.taken}', unit: '/ ${adherence.due}', emoji: '💊', color: NaglyColors.med),
-                  _Stat(label: 'Best streak', value: '${w.bestStreak}', unit: w.bestStreak == 1 ? 'day' : 'days', emoji: '🏆'),
+                if (c.profile.careMode == CareMode.medication &&
+                    adherence.due > 0) ...[
+                  _Stat(
+                    label: 'Doses taken',
+                    value: '${adherence.taken}',
+                    unit: '/ ${adherence.due}',
+                    emoji: '💊',
+                    color: NaglyColors.med,
+                  ),
+                  _Stat(
+                    label: 'Best streak',
+                    value: '${w.bestStreak}',
+                    unit: w.bestStreak == 1 ? 'day' : 'days',
+                    emoji: '🏆',
+                  ),
                 ],
               ],
             ),
@@ -65,16 +106,27 @@ class InsightsScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('👨‍👩‍👧 Keep your family in the loop',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: NaglyColors.ink)),
+                  const Text(
+                    '👨‍👩‍👧 Keep your family in the loop',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w900,
+                      color: NaglyColors.ink,
+                    ),
+                  ),
                   const SizedBox(height: 6),
                   const Text(
                     'Share a simple weekly summary with someone who worries about you. Nothing is uploaded — you choose who sees it.',
-                    style: TextStyle(fontWeight: FontWeight.w700, color: NaglyColors.textSecondary),
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      color: NaglyColors.textSecondary,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   OutlinedButton.icon(
-                    onPressed: () => SharePlus.instance.share(ShareParams(text: c.weeklyReport)),
+                    onPressed: () => SharePlus.instance.share(
+                      ShareParams(text: c.weeklyReport),
+                    ),
                     icon: const Icon(Icons.ios_share_rounded),
                     label: const Text('Share my week'),
                   ),
@@ -89,43 +141,81 @@ class InsightsScreen extends StatelessWidget {
 }
 
 class _Stat extends StatelessWidget {
-  const _Stat({required this.label, required this.value, required this.unit, required this.emoji, this.color});
+  const _Stat({
+    required this.label,
+    required this.value,
+    required this.unit,
+    required this.emoji,
+    this.color,
+  });
   final String label, value, unit, emoji;
   final Color? color;
 
   @override
   Widget build(BuildContext context) => NCard(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('$emoji  $label', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: NaglyColors.textSecondary)),
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: Alignment.centerLeft,
-              child: Text.rich(TextSpan(children: [
-                TextSpan(text: value, style: TextStyle(fontSize: 30, fontWeight: FontWeight.w900, color: color ?? NaglyColors.ink)),
-                TextSpan(text: ' $unit', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: NaglyColors.textSecondary)),
-              ])),
-            ),
-          ],
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          '$emoji  $label',
+          style: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w800,
+            color: NaglyColors.textSecondary,
+          ),
         ),
-      );
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Text.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: value,
+                  style: TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.w900,
+                    color: color ?? NaglyColors.ink,
+                  ),
+                ),
+                TextSpan(
+                  text: ' $unit',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                    color: NaglyColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 /// Seven bars vs a dashed goal line; bars grow in on first paint.
 class _WeekChart extends StatelessWidget {
-  const _WeekChart({required this.days, required this.goal, required this.unit});
+  const _WeekChart({
+    required this.days,
+    required this.goal,
+    required this.unit,
+  });
   final List<DayTotal> days;
   final int goal;
   final VolumeUnit unit;
 
   @override
   Widget build(BuildContext context) {
-    final maxV = [goal, ...days.map((d) => d.totalMl)].reduce((a, b) => a > b ? a : b) * 1.1;
+    final maxV =
+        [goal, ...days.map((d) => d.totalMl)].reduce((a, b) => a > b ? a : b) *
+        1.1;
     const chartH = 150.0;
     return Semantics(
-      label: 'Weekly water chart. ${days.map((d) => '${DateFormat.E().format(d.date)} ${formatVolume(d.totalMl, unit)}').join(', ')}',
+      label:
+          'Weekly water chart. ${days.map((d) => '${DateFormat.E().format(d.date)} ${formatVolume(d.totalMl, unit)}').join(', ')}',
       excludeSemantics: true,
       child: Column(
         children: [
@@ -133,8 +223,14 @@ class _WeekChart extends StatelessWidget {
             children: [
               CustomPaint(painter: _DashPainter(), size: const Size(18, 1)),
               const SizedBox(width: 6),
-              Text('Daily goal · ${formatVolume(goal, unit)}',
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: NaglyColors.coral)),
+              Text(
+                'Daily goal · ${formatVolume(goal, unit)}',
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  color: NaglyColors.coral,
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 14),
@@ -159,10 +255,24 @@ class _WeekChart extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(8),
                                 gradient: d.totalMl >= goal
                                     ? const LinearGradient(
-                                        begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Color(0xFF6FD3FA), NaglyColors.primaryDeep])
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          Color(0xFF6FD3FA),
+                                          NaglyColors.primaryDeep,
+                                        ],
+                                      )
                                     : null,
-                                color: d.totalMl >= goal ? null : NaglyColors.surfaceVariant.withValues(alpha: 1),
-                                border: d.totalMl >= goal ? null : Border.all(color: const Color(0xFFCFDDE5)),
+                                color: d.totalMl >= goal
+                                    ? null
+                                    : NaglyColors.surfaceVariant.withValues(
+                                        alpha: 1,
+                                      ),
+                                border: d.totalMl >= goal
+                                    ? null
+                                    : Border.all(
+                                        color: const Color(0xFFCFDDE5),
+                                      ),
                               ),
                             ),
                           ),
@@ -174,7 +284,10 @@ class _WeekChart extends StatelessWidget {
                   left: 0,
                   right: 0,
                   bottom: chartH * goal / maxV,
-                  child: CustomPaint(painter: _DashPainter(), size: const Size(double.infinity, 1)),
+                  child: CustomPaint(
+                    painter: _DashPainter(),
+                    size: const Size(double.infinity, 1),
+                  ),
                 ),
               ],
             ),
@@ -184,9 +297,14 @@ class _WeekChart extends StatelessWidget {
             children: [
               for (final d in days)
                 Expanded(
-                  child: Text(DateFormat.E().format(d.date).substring(0, 1),
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(fontWeight: FontWeight.w800, color: NaglyColors.textSecondary)),
+                  child: Text(
+                    DateFormat.E().format(d.date).substring(0, 1),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w800,
+                      color: NaglyColors.textSecondary,
+                    ),
+                  ),
                 ),
             ],
           ),

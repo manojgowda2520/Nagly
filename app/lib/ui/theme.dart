@@ -23,11 +23,11 @@ abstract final class NaglyColors {
   static const gold = Color(0xFFF2B53B);
 
   static Color mood(Mood m) => switch (m) {
-        Mood.neutral => const Color(0xFFA5D6A7),
-        Mood.worried => const Color(0xFFFFD166),
-        Mood.disappointed => const Color(0xFFB0BEC5),
-        Mood.proud => const Color(0xFF81D4FA),
-      };
+    Mood.neutral => const Color(0xFFA5D6A7),
+    Mood.worried => const Color(0xFFFFD166),
+    Mood.disappointed => const Color(0xFFB0BEC5),
+    Mood.proud => const Color(0xFF81D4FA),
+  };
 
   /// Soft day-part tint at the top of screens: peach morning, sky afternoon,
   /// amber evening, deep navy night.
@@ -65,18 +65,57 @@ ThemeData buildNaglyTheme() {
   final t = base.textTheme;
   return base.copyWith(
     textTheme: t.copyWith(
-      displayLarge: t.displayLarge?.copyWith(fontWeight: FontWeight.w900, color: NaglyColors.ink, letterSpacing: -1),
-      displaySmall: t.displaySmall?.copyWith(fontWeight: FontWeight.w900, color: NaglyColors.ink, letterSpacing: -0.5),
-      headlineMedium: t.headlineMedium?.copyWith(fontWeight: FontWeight.w900, color: NaglyColors.ink, letterSpacing: -0.5),
-      headlineSmall: t.headlineSmall?.copyWith(fontWeight: FontWeight.w800, color: NaglyColors.ink),
-      titleLarge: t.titleLarge?.copyWith(fontWeight: FontWeight.w800, color: NaglyColors.ink),
-      titleMedium: t.titleMedium?.copyWith(fontWeight: FontWeight.w800, color: NaglyColors.ink),
-      titleSmall: t.titleSmall?.copyWith(fontWeight: FontWeight.w700, color: NaglyColors.ink),
-      bodyLarge: t.bodyLarge?.copyWith(fontWeight: FontWeight.w600, color: NaglyColors.textPrimary, height: 1.4),
-      bodyMedium: t.bodyMedium?.copyWith(fontWeight: FontWeight.w600, color: NaglyColors.textPrimary, height: 1.4),
-      bodySmall: t.bodySmall?.copyWith(fontWeight: FontWeight.w600, color: NaglyColors.textSecondary),
+      displayLarge: t.displayLarge?.copyWith(
+        fontWeight: FontWeight.w900,
+        color: NaglyColors.ink,
+        letterSpacing: -1,
+      ),
+      displaySmall: t.displaySmall?.copyWith(
+        fontWeight: FontWeight.w900,
+        color: NaglyColors.ink,
+        letterSpacing: -0.5,
+      ),
+      headlineMedium: t.headlineMedium?.copyWith(
+        fontWeight: FontWeight.w900,
+        color: NaglyColors.ink,
+        letterSpacing: -0.5,
+      ),
+      headlineSmall: t.headlineSmall?.copyWith(
+        fontWeight: FontWeight.w800,
+        color: NaglyColors.ink,
+      ),
+      titleLarge: t.titleLarge?.copyWith(
+        fontWeight: FontWeight.w800,
+        color: NaglyColors.ink,
+      ),
+      titleMedium: t.titleMedium?.copyWith(
+        fontWeight: FontWeight.w800,
+        color: NaglyColors.ink,
+      ),
+      titleSmall: t.titleSmall?.copyWith(
+        fontWeight: FontWeight.w700,
+        color: NaglyColors.ink,
+      ),
+      bodyLarge: t.bodyLarge?.copyWith(
+        fontWeight: FontWeight.w600,
+        color: NaglyColors.textPrimary,
+        height: 1.4,
+      ),
+      bodyMedium: t.bodyMedium?.copyWith(
+        fontWeight: FontWeight.w600,
+        color: NaglyColors.textPrimary,
+        height: 1.4,
+      ),
+      bodySmall: t.bodySmall?.copyWith(
+        fontWeight: FontWeight.w600,
+        color: NaglyColors.textSecondary,
+      ),
       labelLarge: t.labelLarge?.copyWith(fontWeight: FontWeight.w800),
-      labelSmall: t.labelSmall?.copyWith(fontWeight: FontWeight.w800, letterSpacing: 1.1, color: NaglyColors.textSecondary),
+      labelSmall: t.labelSmall?.copyWith(
+        fontWeight: FontWeight.w800,
+        letterSpacing: 1.1,
+        color: NaglyColors.textSecondary,
+      ),
     ),
     appBarTheme: const AppBarTheme(
       backgroundColor: Colors.transparent,
@@ -84,7 +123,12 @@ ThemeData buildNaglyTheme() {
       elevation: 0,
       foregroundColor: NaglyColors.ink,
       centerTitle: false,
-      titleTextStyle: TextStyle(fontFamily: font, fontSize: 22, fontWeight: FontWeight.w900, color: NaglyColors.ink),
+      titleTextStyle: TextStyle(
+        fontFamily: font,
+        fontSize: 22,
+        fontWeight: FontWeight.w900,
+        color: NaglyColors.ink,
+      ),
     ),
     cardTheme: const CardThemeData(
       color: NaglyColors.card,
@@ -103,7 +147,11 @@ ThemeData buildNaglyTheme() {
         disabledForegroundColor: NaglyColors.textSecondary,
         minimumSize: const Size.fromHeight(56),
         shape: const StadiumBorder(),
-        textStyle: const TextStyle(fontFamily: font, fontSize: 17, fontWeight: FontWeight.w800),
+        textStyle: const TextStyle(
+          fontFamily: font,
+          fontSize: 17,
+          fontWeight: FontWeight.w800,
+        ),
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
@@ -112,14 +160,22 @@ ThemeData buildNaglyTheme() {
         minimumSize: const Size(48, 48),
         shape: const StadiumBorder(),
         side: const BorderSide(color: NaglyColors.outline, width: 1.5),
-        textStyle: const TextStyle(fontFamily: font, fontSize: 15, fontWeight: FontWeight.w800),
+        textStyle: const TextStyle(
+          fontFamily: font,
+          fontSize: 15,
+          fontWeight: FontWeight.w800,
+        ),
       ),
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
         foregroundColor: NaglyColors.textSecondary,
         minimumSize: const Size(48, 48),
-        textStyle: const TextStyle(fontFamily: font, fontSize: 15, fontWeight: FontWeight.w700),
+        textStyle: const TextStyle(
+          fontFamily: font,
+          fontSize: 15,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     ),
     navigationBarTheme: NavigationBarThemeData(
@@ -128,38 +184,57 @@ ThemeData buildNaglyTheme() {
       indicatorColor: NaglyColors.primary.withValues(alpha: 0.18),
       elevation: 0,
       height: 68,
-      labelTextStyle: WidgetStateProperty.resolveWith((s) => TextStyle(
-            fontFamily: font,
-            fontSize: 12,
-            fontWeight: FontWeight.w800,
-            color: s.contains(WidgetState.selected) ? NaglyColors.primaryDeep : NaglyColors.textSecondary,
-          )),
-      iconTheme: WidgetStateProperty.resolveWith((s) => IconThemeData(
-            color: s.contains(WidgetState.selected) ? NaglyColors.primaryDeep : NaglyColors.textSecondary,
-          )),
+      labelTextStyle: WidgetStateProperty.resolveWith(
+        (s) => TextStyle(
+          fontFamily: font,
+          fontSize: 12,
+          fontWeight: FontWeight.w800,
+          color: s.contains(WidgetState.selected)
+              ? NaglyColors.primaryDeep
+              : NaglyColors.textSecondary,
+        ),
+      ),
+      iconTheme: WidgetStateProperty.resolveWith(
+        (s) => IconThemeData(
+          color: s.contains(WidgetState.selected)
+              ? NaglyColors.primaryDeep
+              : NaglyColors.textSecondary,
+        ),
+      ),
     ),
     switchTheme: SwitchThemeData(
       trackColor: WidgetStateProperty.resolveWith(
-          (s) => s.contains(WidgetState.selected) ? NaglyColors.primary : NaglyColors.outline),
+        (s) => s.contains(WidgetState.selected)
+            ? NaglyColors.primary
+            : NaglyColors.outline,
+      ),
       thumbColor: const WidgetStatePropertyAll(Colors.white),
       trackOutlineColor: const WidgetStatePropertyAll(Colors.transparent),
     ),
     snackBarTheme: const SnackBarThemeData(
       behavior: SnackBarBehavior.floating,
       backgroundColor: NaglyColors.ink,
-      contentTextStyle: TextStyle(fontFamily: font, fontWeight: FontWeight.w700, color: Colors.white),
+      contentTextStyle: TextStyle(
+        fontFamily: font,
+        fontWeight: FontWeight.w700,
+        color: Colors.white,
+      ),
       shape: StadiumBorder(),
     ),
     bottomSheetTheme: const BottomSheetThemeData(
       backgroundColor: NaglyColors.card,
       surfaceTintColor: Colors.transparent,
       showDragHandle: true,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
     ),
     dialogTheme: const DialogThemeData(
       backgroundColor: NaglyColors.card,
       surfaceTintColor: Colors.transparent,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(28))),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(28)),
+      ),
     ),
     dividerTheme: const DividerThemeData(color: NaglyColors.outline, space: 1),
   );

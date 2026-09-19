@@ -5,7 +5,12 @@ import '../theme.dart';
 /// The Nagly mark: a water drop with one raised eyebrow — the look every
 /// mother gives you when you say you "drank enough today".
 class NaglyLogo extends StatelessWidget {
-  const NaglyLogo({super.key, this.size = 96, this.withBackground = true, this.browRaise = 1});
+  const NaglyLogo({
+    super.key,
+    this.size = 96,
+    this.withBackground = true,
+    this.browRaise = 1,
+  });
 
   final double size;
   final bool withBackground;
@@ -15,13 +20,21 @@ class NaglyLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => CustomPaint(
-        size: Size.square(size),
-        painter: NaglyLogoPainter(withBackground: withBackground, browRaise: browRaise),
-      );
+    size: Size.square(size),
+    painter: NaglyLogoPainter(
+      withBackground: withBackground,
+      browRaise: browRaise,
+    ),
+  );
 }
 
 class NaglyLogoPainter extends CustomPainter {
-  NaglyLogoPainter({this.withBackground = true, this.browRaise = 1, this.foregroundScale = 1, this.cornerRadius = 0.23});
+  NaglyLogoPainter({
+    this.withBackground = true,
+    this.browRaise = 1,
+    this.foregroundScale = 1,
+    this.cornerRadius = 0.23,
+  });
 
   final bool withBackground;
   final double browRaise;
@@ -36,7 +49,10 @@ class NaglyLogoPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final s = size.width;
     if (withBackground) {
-      final r = RRect.fromRectAndRadius(Offset.zero & size, Radius.circular(s * cornerRadius));
+      final r = RRect.fromRectAndRadius(
+        Offset.zero & size,
+        Radius.circular(s * cornerRadius),
+      );
       canvas.drawRRect(
         r,
         Paint()
@@ -56,9 +72,23 @@ class NaglyLogoPainter extends CustomPainter {
     final cx = s / 2;
     final drop = Path()
       ..moveTo(cx, s * 0.14)
-      ..cubicTo(cx + s * 0.06, s * 0.28, cx + s * 0.3, s * 0.44, cx + s * 0.3, s * 0.6)
+      ..cubicTo(
+        cx + s * 0.06,
+        s * 0.28,
+        cx + s * 0.3,
+        s * 0.44,
+        cx + s * 0.3,
+        s * 0.6,
+      )
       ..cubicTo(cx + s * 0.3, s * 0.77, cx + s * 0.165, s * 0.88, cx, s * 0.88)
-      ..cubicTo(cx - s * 0.165, s * 0.88, cx - s * 0.3, s * 0.77, cx - s * 0.3, s * 0.6)
+      ..cubicTo(
+        cx - s * 0.165,
+        s * 0.88,
+        cx - s * 0.3,
+        s * 0.77,
+        cx - s * 0.3,
+        s * 0.6,
+      )
       ..cubicTo(cx - s * 0.3, s * 0.44, cx - s * 0.06, s * 0.28, cx, s * 0.14)
       ..close();
     canvas.drawShadow(drop, const Color(0x66000000), s * 0.03, false);
@@ -73,7 +103,11 @@ class NaglyLogoPainter extends CustomPainter {
     );
     // Shine
     canvas.drawOval(
-      Rect.fromCenter(center: Offset(cx - s * 0.2, s * 0.73), width: s * 0.045, height: s * 0.1),
+      Rect.fromCenter(
+        center: Offset(cx - s * 0.2, s * 0.73),
+        width: s * 0.045,
+        height: s * 0.1,
+      ),
       Paint()..color = const Color(0xFFBFEAF8),
     );
 
@@ -87,11 +121,23 @@ class NaglyLogoPainter extends CustomPainter {
     final brow = ink
       ..style = PaintingStyle.stroke
       ..strokeWidth = s * 0.028;
-    canvas.drawLine(Offset(cx - s * 0.15, s * 0.545), Offset(cx - s * 0.05, s * 0.55), brow);
+    canvas.drawLine(
+      Offset(cx - s * 0.15, s * 0.545),
+      Offset(cx - s * 0.05, s * 0.55),
+      brow,
+    );
     final lift = s * 0.045 * browRaise;
-    canvas.drawLine(Offset(cx + s * 0.05, s * 0.54 - lift * 0.4), Offset(cx + s * 0.15, s * 0.52 - lift), brow);
+    canvas.drawLine(
+      Offset(cx + s * 0.05, s * 0.54 - lift * 0.4),
+      Offset(cx + s * 0.15, s * 0.52 - lift),
+      brow,
+    );
     // Mouth: a knowing flat line
-    canvas.drawLine(Offset(cx - s * 0.04, s * 0.74), Offset(cx + s * 0.045, s * 0.735), brow);
+    canvas.drawLine(
+      Offset(cx - s * 0.04, s * 0.74),
+      Offset(cx + s * 0.045, s * 0.735),
+      brow,
+    );
     canvas.restore();
   }
 

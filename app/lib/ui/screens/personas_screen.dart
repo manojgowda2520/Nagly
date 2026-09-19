@@ -45,9 +45,12 @@ class _PersonasScreenState extends State<PersonasScreen> {
               access.isPro
                   ? 'Pro — every voice is yours 💛'
                   : access.inTrial
-                      ? 'Everyone is free for ${access.trialDaysLeft} more day${access.trialDaysLeft == 1 ? '' : 's'}'
-                      : 'Mom is free forever. Others: watch an ad for 24h, or go Pro.',
-              style: const TextStyle(fontWeight: FontWeight.w800, color: NaglyColors.textSecondary),
+                  ? 'Everyone is free for ${access.trialDaysLeft} more day${access.trialDaysLeft == 1 ? '' : 's'}'
+                  : 'Mom is free forever. Others: watch an ad for 24h, or go Pro.',
+              style: const TextStyle(
+                fontWeight: FontWeight.w800,
+                color: NaglyColors.textSecondary,
+              ),
             ),
             const SizedBox(height: 16),
             NCard(
@@ -59,19 +62,37 @@ class _PersonasScreenState extends State<PersonasScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(c.persona.displayName, style: Theme.of(context).textTheme.titleMedium),
-                        Text('Bond: ${c.bondLevel.emoji} ${c.bondLevel.label}',
-                            style: const TextStyle(fontWeight: FontWeight.w800, color: NaglyColors.textSecondary)),
+                        Text(
+                          c.persona.displayName,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        Text(
+                          'Bond: ${c.bondLevel.emoji} ${c.bondLevel.label}',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w800,
+                            color: NaglyColors.textSecondary,
+                          ),
+                        ),
                         const SizedBox(height: 6),
                         ClipRRect(
                           borderRadius: BorderRadius.circular(4),
                           child: LinearProgressIndicator(
-                              value: c.bondProgress, minHeight: 6, color: NaglyColors.gold, backgroundColor: NaglyColors.surfaceVariant),
+                            value: c.bondProgress,
+                            minHeight: 6,
+                            color: NaglyColors.gold,
+                            backgroundColor: NaglyColors.surfaceVariant,
+                          ),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          c.bondLevel.next == null ? 'Soul Reminder. It doesn\'t get closer.' : 'Next: ${c.bondLevel.next!.label} — keep the streak going',
-                          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: NaglyColors.textSecondary),
+                          c.bondLevel.next == null
+                              ? 'Soul Reminder. It doesn\'t get closer.'
+                              : 'Next: ${c.bondLevel.next!.label} — keep the streak going',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: NaglyColors.textSecondary,
+                          ),
                         ),
                       ],
                     ),
@@ -103,7 +124,10 @@ class _PersonasScreenState extends State<PersonasScreen> {
             if (adExpiry != null)
               Padding(
                 padding: const EdgeInsets.only(bottom: 10),
-                child: Tag('⏳ Unlocked by ad · ${countdownLabel(adExpiry, c.now.millisecondsSinceEpoch)}', color: NaglyColors.primaryDeep),
+                child: Tag(
+                  '⏳ Unlocked by ad · ${countdownLabel(adExpiry, c.now.millisecondsSinceEpoch)}',
+                  color: NaglyColors.primaryDeep,
+                ),
               ),
             for (final p in PersonaCatalog.variantsOf(relId)) ...[
               _VariantCard(
@@ -129,88 +153,140 @@ class _PersonasScreenState extends State<PersonasScreen> {
 }
 
 class _RelTile extends StatelessWidget {
-  const _RelTile({required this.rel, required this.selected, required this.locked, required this.onTap});
+  const _RelTile({
+    required this.rel,
+    required this.selected,
+    required this.locked,
+    required this.onTap,
+  });
   final Relationship rel;
   final bool selected, locked;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) => Semantics(
-        selected: selected,
-        button: true,
-        label: '${rel.displayName}${locked ? ', locked' : ''}',
-        excludeSemantics: true,
-        child: GestureDetector(
-          onTap: onTap,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            decoration: BoxDecoration(
-              color: selected ? NaglyColors.primary.withValues(alpha: 0.14) : Colors.white,
-              borderRadius: BorderRadius.circular(18),
-              border: Border.all(color: selected ? NaglyColors.primaryDeep : NaglyColors.outline, width: selected ? 2 : 1),
-            ),
-            child: Column(
-              children: [
-                Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Text(rel.emoji, style: const TextStyle(fontSize: 30)),
-                    if (locked) const Positioned(right: -12, top: -6, child: Text('🔒', style: TextStyle(fontSize: 13))),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Text(rel.id == 'grandparent' ? 'Grandma' : rel.displayName,
-                    style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w900, color: NaglyColors.ink)),
-              ],
-            ),
+    selected: selected,
+    button: true,
+    label: '${rel.displayName}${locked ? ', locked' : ''}',
+    excludeSemantics: true,
+    child: GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: selected
+              ? NaglyColors.primary.withValues(alpha: 0.14)
+              : Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: selected ? NaglyColors.primaryDeep : NaglyColors.outline,
+            width: selected ? 2 : 1,
           ),
         ),
-      );
+        child: Column(
+          children: [
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Text(rel.emoji, style: const TextStyle(fontSize: 30)),
+                if (locked)
+                  const Positioned(
+                    right: -12,
+                    top: -6,
+                    child: Text('🔒', style: TextStyle(fontSize: 13)),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              rel.id == 'grandparent' ? 'Grandma' : rel.displayName,
+              style: const TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w900,
+                color: NaglyColors.ink,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
 }
 
 class _VariantCard extends StatelessWidget {
-  const _VariantCard({required this.persona, required this.selected, required this.locked, required this.onTap});
+  const _VariantCard({
+    required this.persona,
+    required this.selected,
+    required this.locked,
+    required this.onTap,
+  });
   final Persona persona;
   final bool selected, locked;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) => AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        decoration: BoxDecoration(
-          color: selected ? NaglyColors.primary.withValues(alpha: 0.1) : Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: selected ? NaglyColors.primaryDeep : NaglyColors.outline, width: selected ? 2 : 1),
-        ),
-        child: Material(
-          type: MaterialType.transparency,
-          child: InkWell(
-            borderRadius: BorderRadius.circular(20),
-            onTap: onTap,
-            child: Padding(
-              padding: const EdgeInsets.all(14),
-              child: Row(
-                children: [
-                  PersonaAvatar(emoji: persona.emoji, mood: selected ? Mood.proud : Mood.neutral, size: 52, animate: selected),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(persona.displayName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: NaglyColors.ink)),
-                        Text('"${persona.signature}"', style: const TextStyle(fontWeight: FontWeight.w700, color: NaglyColors.textSecondary)),
-                      ],
-                    ),
-                  ),
-                  if (locked)
-                    const Tag('🔒 Unlock', color: NaglyColors.accent)
-                  else if (selected)
-                    const Icon(Icons.check_circle_rounded, color: NaglyColors.primaryDeep),
-                ],
+    duration: const Duration(milliseconds: 200),
+    decoration: BoxDecoration(
+      color: selected
+          ? NaglyColors.primary.withValues(alpha: 0.1)
+          : Colors.white,
+      borderRadius: BorderRadius.circular(20),
+      border: Border.all(
+        color: selected ? NaglyColors.primaryDeep : NaglyColors.outline,
+        width: selected ? 2 : 1,
+      ),
+    ),
+    child: Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            children: [
+              PersonaAvatar(
+                emoji: persona.emoji,
+                mood: selected ? Mood.proud : Mood.neutral,
+                size: 52,
+                animate: selected,
               ),
-            ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      persona.displayName,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w900,
+                        color: NaglyColors.ink,
+                      ),
+                    ),
+                    Text(
+                      '"${persona.signature}"',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        color: NaglyColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (locked)
+                const Tag('🔒 Unlock', color: NaglyColors.accent)
+              else if (selected)
+                const Icon(
+                  Icons.check_circle_rounded,
+                  color: NaglyColors.primaryDeep,
+                ),
+            ],
           ),
         ),
-      );
+      ),
+    ),
+  );
 }

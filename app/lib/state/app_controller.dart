@@ -7,6 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+import '../config/integrations.dart';
 import '../data/database.dart';
 import '../domain/access.dart';
 import '../domain/history_chat.dart';
@@ -73,7 +74,21 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   final NotificationService notifications;
 
   final _events = StreamController<AppEvent>.broadcast();
+  final _pendingEvents = <AppEvent>[];
+
+  /// UI events. Anything emitted while nobody is listening (e.g. right as onboarding
+  /// finishes, before the shell mounts) is held until [flushPendingEvents].
   Stream<AppEvent> get events => _events.stream;
+
+  /// Call right after subscribing to [events] to receive anything that was held.
+  void flushPendingEvents() {
+    final pending = List<AppEvent>.of(_pendingEvents);
+    _pendingEvents.clear();
+    pending.forEach(_events.add);
+  }
+
+  void _emit(AppEvent e) =>
+      _events.hasListener ? _events.add(e) : _pendingEvents.add(e);
 
   // ── Raw state ─────────────────────────────────────────────
   Profile profile = const Profile();
@@ -108,14 +123,21 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     // Background notification actions ping us so the UI reflects them immediately.
     _refreshPort = ReceivePort();
     IsolateNameServer.removePortNameMapping(uiRefreshPortName);
-    IsolateNameServer.registerPortWithName(_refreshPort!.sendPort, uiRefreshPortName);
+    IsolateNameServer.registerPortWithName(
+      _refreshPort!.sendPort,
+      uiRefreshPortName,
+    );
     _refreshPort!.listen((_) => reload());
 
     final installId = await _installId();
-    unawaited(push
-        .init(installId, onRoute: (r) => _events.add(RouteEvent(r)))
-        .catchError((Object e) => debugPrint('Push init failed: $e')));
-    unawaited(ads.init().catchError((Object e) => debugPrint('Ads init failed: $e')));
+    unawaited(
+      push
+          .init(installId, onRoute: (r) => _emit(RouteEvent(r)))
+          .catchError((Object e) => debugPrint('Push init failed: $e')),
+    );
+    unawaited(
+      ads.init().catchError((Object e) => debugPrint('Ads init failed: $e')),
+    );
     permissionGranted = await notifications.permissionGranted();
     _scheduleSync();
   }
@@ -124,7 +146,10 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     final existing = await db.getString(Keys.installId);
     if (existing != null) return existing;
     final r = Random.secure();
-    final id = List.generate(16, (_) => r.nextInt(256).toRadixString(16).padLeft(2, '0')).join();
+    final id = List.generate(
+      16,
+      (_) => r.nextInt(256).toRadixString(16).padLeft(2, '0'),
+    ).join();
     await db.setString(Keys.installId, id);
     return id;
   }
@@ -175,14 +200,23 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     final tomorrow = today.add(const Duration(days: 1));
     profile = await db.profile();
     recentLogs = await db.drinksBetween(
-        today.subtract(const Duration(days: 59)).millisecondsSinceEpoch, tomorrow.millisecondsSinceEpoch);
-    todayLogs = recentLogs.where((l) => l.timestampMs >= today.millisecondsSinceEpoch).toList();
+      today.subtract(const Duration(days: 59)).millisecondsSinceEpoch,
+      tomorrow.millisecondsSinceEpoch,
+    );
+    todayLogs = recentLogs
+        .where((l) => l.timestampMs >= today.millisecondsSinceEpoch)
+        .toList();
     meds = await db.medications();
     allMedsById = await db.allMedicationsById();
-    recentMedLogs = await db.medLogsSince(dateKey(today.subtract(const Duration(days: 13))));
+    recentMedLogs = await db.medLogsSince(
+      dateKey(today.subtract(const Duration(days: 13))),
+    );
     unlocks = await db.activeUnlocks(now.millisecondsSinceEpoch);
     trialEndsAtMs = await db.getInt(Keys.trialEndsAt);
-    notificationsEnabled = await db.getBool(Keys.notificationsEnabled, fallback: true);
+    notificationsEnabled = await db.getBool(
+      Keys.notificationsEnabled,
+      fallback: true,
+    );
     nudgeHistory = await db.nudgeHistory();
     loaded = true;
     _checkAccessEvents();
@@ -204,18 +238,28 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         medCount: meds.length,
         bondLevel: bondLevel.name,
       );
-      unawaited(push.setTags(tags).catchError((Object e) => debugPrint('Push tags failed: $e')));
-      unawaited(push.setTriggers({
-        'streak': '$streak',
-        'trial_days_left': '${access.trialDaysLeft}',
-        'is_pro': '${access.isPro}',
-      }).catchError((Object e) => debugPrint('Push triggers failed: $e')));
-      unawaited(billing.setAttributes({
-        'persona_id': profile.personaId,
-        'care_mode': profile.careMode.name,
-        'current_streak': '$streak',
-        'bond_level': bondLevel.name,
-      }));
+      unawaited(
+        push
+            .setTags(tags)
+            .catchError((Object e) => debugPrint('Push tags failed: $e')),
+      );
+      unawaited(
+        push
+            .setTriggers({
+              'streak': '$streak',
+              'trial_days_left': '${access.trialDaysLeft}',
+              'is_pro': '${access.isPro}',
+            })
+            .catchError((Object e) => debugPrint('Push triggers failed: $e')),
+      );
+      unawaited(
+        billing.setAttributes({
+          'persona_id': profile.personaId,
+          'care_mode': profile.careMode.name,
+          'current_streak': '$streak',
+          'bond_level': bondLevel.name,
+        }),
+      );
     });
   }
 
@@ -228,32 +272,41 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   Persona get persona => PersonaCatalog.get(profile.personaId);
 
   Access get access => Access(
-        isPro: billing.isPro.value,
-        trialEndsAtMs: trialEndsAtMs,
-        unlocks: unlocks,
-        nowMs: now.millisecondsSinceEpoch,
-      );
+    isPro: billing.isPro.value,
+    trialEndsAtMs: trialEndsAtMs,
+    unlocks: unlocks,
+    nowMs: now.millisecondsSinceEpoch,
+  );
 
   int get consumedMl => todayLogs.fold(0, (s, l) => s + l.amountMl);
 
-  double get progress => profile.dailyMl <= 0 ? 0 : consumedMl / profile.dailyMl;
+  double get progress =>
+      profile.dailyMl <= 0 ? 0 : consumedMl / profile.dailyMl;
 
-  double get expected => expectedRatio(now.hour, profile.wakeHour, profile.sleepHour);
+  double get expected =>
+      expectedRatio(now.hour, profile.wakeHour, profile.sleepHour);
 
   int get ignoredCount => ignoredNudgeCount(
-        nudgeHistory: nudgeHistory,
-        nowMs: now.millisecondsSinceEpoch,
-        lastLogMs: todayLogs.isEmpty ? null : todayLogs.last.timestampMs,
-      );
+    nudgeHistory: nudgeHistory,
+    nowMs: now.millisecondsSinceEpoch,
+    lastLogMs: todayLogs.isEmpty ? null : todayLogs.last.timestampMs,
+  );
 
-  Mood get mood => computeMood(progressRatio: progress, expectedRatio: expected, ignoredNudgeCount: ignoredCount);
+  Mood get mood => computeMood(
+    progressRatio: progress,
+    expectedRatio: expected,
+    ignoredNudgeCount: ignoredCount,
+  );
 
-  DayPart get dayPart => dayPartFor(now.hour, profile.wakeHour, profile.sleepHour);
+  DayPart get dayPart =>
+      dayPartFor(now.hour, profile.wakeHour, profile.sleepHour);
 
   /// The persona's current line. Stable until the mood changes or the user taps for another.
   String get line {
     final m = mood;
-    if (_line == null || _lineMood != m || !PersonaCatalog.linesFor(persona, m, dayPart).contains(_line)) {
+    if (_line == null ||
+        _lineMood != m ||
+        !PersonaCatalog.linesFor(persona, m, dayPart).contains(_line)) {
       _line = pickLine(persona, m, dayPart: dayPart, previousLine: _line);
       _lineMood = m;
     }
@@ -273,17 +326,25 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
 
   int get daysMetIn14 => countDaysMetGoalInWindow(_byDay, profile.dailyMl, now);
 
-  RelationshipLevel get bondLevel => computeRelationshipLevel(streak, daysMetIn14);
+  RelationshipLevel get bondLevel =>
+      computeRelationshipLevel(streak, daysMetIn14);
 
-  double get bondProgress => relationshipProgressToNext(bondLevel, streak, daysMetIn14);
+  double get bondProgress =>
+      relationshipProgressToNext(bondLevel, streak, daysMetIn14);
 
   String get nextNudgeLabel {
     if (!notificationsEnabled) return 'Reminders are off';
     if (consumedMl >= profile.dailyMl) return 'Goal met — no more nudges today';
-    final next = nextNudgeTimes(nowMs: now.millisecondsSinceEpoch, profile: profile, consumedMl: consumedMl);
+    final next = nextNudgeTimes(
+      nowMs: now.millisecondsSinceEpoch,
+      profile: profile,
+      consumedMl: consumedMl,
+    );
     if (next.isEmpty) return 'Next nudge tomorrow morning';
     final mins = ((next.first - now.millisecondsSinceEpoch) / 60000).round();
-    return mins >= 60 ? 'Next nudge in ${mins ~/ 60}h ${mins % 60}m' : 'Next nudge in ${mins}m';
+    return mins >= 60
+        ? 'Next nudge in ${mins ~/ 60}h ${mins % 60}m'
+        : 'Next nudge in ${mins}m';
   }
 
   int? get recentCustomMl => recentLogs.reversed
@@ -293,18 +354,27 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
 
   String get todayKey => dateKey(now);
 
-  MedLog? medStatusToday(Medication med) =>
-      recentMedLogs.where((l) => l.medId == med.id && l.dateKey == todayKey).firstOrNull;
+  MedLog? medStatusToday(Medication med) => recentMedLogs
+      .where((l) => l.medId == med.id && l.dateKey == todayKey)
+      .firstOrNull;
 
   List<Medication> get activeMeds => access.activeMedications(meds);
 
   bool isMedPaused(Medication med) => !activeMeds.any((m) => m.id == med.id);
 
   WeeklyInsights get insights => computeWeeklyInsights(
-        logs: recentLogs.where((l) => l.timestampMs >= dateOnly(now).subtract(const Duration(days: 13)).millisecondsSinceEpoch).toList(),
-        dailyMl: profile.dailyMl,
-        now: now,
-      );
+    logs: recentLogs
+        .where(
+          (l) =>
+              l.timestampMs >=
+              dateOnly(now)
+                  .subtract(const Duration(days: 13))
+                  .millisecondsSinceEpoch,
+        )
+        .toList(),
+    dailyMl: profile.dailyMl,
+    now: now,
+  );
 
   /// Doses taken vs due over the last 7 days (only counting days since each med was added).
   ({int taken, int due}) get weeklyMedAdherence {
@@ -314,10 +384,17 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       final d = today.subtract(Duration(days: offset));
       final key = dateKey(d);
       for (final med in activeMeds) {
-        final isFuture = offset == 0 && DateTime(d.year, d.month, d.day, med.hour, med.minute).isAfter(now);
-        final log = recentMedLogs.where((l) => l.medId == med.id && l.dateKey == key).firstOrNull;
+        final isFuture =
+            offset == 0 &&
+            DateTime(d.year, d.month, d.day, med.hour, med.minute).isAfter(now);
+        final log = recentMedLogs
+            .where((l) => l.medId == med.id && l.dateKey == key)
+            .firstOrNull;
         if (isFuture && log == null) continue;
-        if (log == null && offset > 0 && !recentMedLogs.any((l) => l.medId == med.id)) continue;
+        if (log == null &&
+            offset > 0 &&
+            !recentMedLogs.any((l) => l.medId == med.id))
+          continue;
         due++;
         if (log?.status == MedStatus.taken) taken++;
       }
@@ -326,24 +403,40 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   List<ChatItem> get chatTimeline => buildChatTimeline(
-        logs: recentLogs.where((l) => l.timestampMs >= dateOnly(now).subtract(const Duration(days: 13)).millisecondsSinceEpoch).toList(),
-        medLogs: recentMedLogs,
-        medsById: allMedsById,
-        profile: profile,
-        persona: persona,
-      );
+    logs: recentLogs
+        .where(
+          (l) =>
+              l.timestampMs >=
+              dateOnly(now)
+                  .subtract(const Duration(days: 13))
+                  .millisecondsSinceEpoch,
+        )
+        .toList(),
+    medLogs: recentMedLogs,
+    medsById: allMedsById,
+    profile: profile,
+    persona: persona,
+  );
 
   /// A plain-text weekly summary for sharing with family (no data leaves the device otherwise).
   String get weeklyReport {
     final w = insights;
     final adherence = weeklyMedAdherence;
     final b = StringBuffer('My week with Nagly ${persona.emoji}\n')
-      ..writeln('💧 Water goal met ${w.goalMetDays}/7 days · avg ${formatVolume(w.dailyAverageMl, profile.volumeUnit)}/day')
-      ..writeln('🔥 Current streak: ${w.currentStreak} day${w.currentStreak == 1 ? '' : 's'}');
+      ..writeln(
+        '💧 Water goal met ${w.goalMetDays}/7 days · avg ${formatVolume(w.dailyAverageMl, profile.volumeUnit)}/day',
+      )
+      ..writeln(
+        '🔥 Current streak: ${w.currentStreak} day${w.currentStreak == 1 ? '' : 's'}',
+      );
     if (profile.careMode == CareMode.medication && adherence.due > 0) {
-      b.writeln('💊 Medication taken ${adherence.taken}/${adherence.due} doses');
+      b.writeln(
+        '💊 Medication taken ${adherence.taken}/${adherence.due} doses',
+      );
     }
-    b.writeln('${bondLevel.emoji} Bond with ${persona.displayName}: ${bondLevel.label}');
+    b.writeln(
+      '${bondLevel.emoji} Bond with ${persona.displayName}: ${bondLevel.label}',
+    );
     return b.toString();
   }
 
@@ -352,11 +445,16 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   String? _departedPersona;
 
   Future<void> _checkAccessEvents() async {
-    if (!loaded || !profile.onboarded || trialEndsAtMs == null || _checkingAccess) return;
+    if (!loaded ||
+        !profile.onboarded ||
+        trialEndsAtMs == null ||
+        _checkingAccess)
+      return;
     _checkingAccess = true;
     try {
       final a = access;
-      final trialJustEnded = a.trialEnded && !await db.getBool(Keys.trialEndedShown);
+      final trialJustEnded =
+          a.trialEnded && !await db.getBool(Keys.trialEndedShown);
       final fallback = resolvePersonaFallback(profile, a);
       if (fallback != null) {
         final departed = persona.displayName;
@@ -364,25 +462,26 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         await db.saveProfile(profile);
         // When the trial ends, one sheet explains everything; otherwise (an ad unlock
         // lapsing) a small dialog does.
-        if (!trialJustEnded) _events.add(PersonaFallbackEvent(fallback.message));
+        if (!trialJustEnded) _emit(PersonaFallbackEvent(fallback.message));
         _departedPersona = departed;
         _scheduleSync();
       }
-      if (a.trialEndsWithin24h && await db.getString(Keys.trialSheetShownOn) != todayKey) {
+      if (a.trialEndsWithin24h &&
+          await db.getString(Keys.trialSheetShownOn) != todayKey) {
         await db.setString(Keys.trialSheetShownOn, todayKey);
-        _events.add(const TrialEndingEvent());
+        _emit(const TrialEndingEvent());
       }
       if (trialJustEnded) {
         await db.setBool(Keys.trialEndedShown, true);
-        _events.add(TrialEndedEvent(departedPersona: _departedPersona));
+        _emit(TrialEndedEvent(departedPersona: _departedPersona));
         _scheduleSync();
       }
       // An engaged free user gets one gentle offer a week.
-      if (!a.fullAccess && streak >= 3) {
+      if (Integrations.purchasesEnabled && !a.fullAccess && streak >= 3) {
         final last = await db.getInt(Keys.upsellShownAt) ?? 0;
         if (now.millisecondsSinceEpoch - last > 7 * 24 * 60 * 60 * 1000) {
           await db.setInt(Keys.upsellShownAt, now.millisecondsSinceEpoch);
-          _events.add(UpsellEvent(streak));
+          _emit(UpsellEvent(streak));
         }
       }
     } finally {
@@ -395,7 +494,8 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     final before = consumedMl;
     await db.addDrink(ml);
     await _changed();
-    if (before < profile.dailyMl && consumedMl >= profile.dailyMl) _events.add(const GoalReachedEvent());
+    if (before < profile.dailyMl && consumedMl >= profile.dailyMl)
+      _emit(const GoalReachedEvent());
   }
 
   Future<void> undoLast() async {
@@ -415,15 +515,20 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     await _changed();
   }
 
-  Future<void> selectPersona(String id) => updateProfile((p) => p.copyWith(personaId: id));
+  Future<void> selectPersona(String id) =>
+      updateProfile((p) => p.copyWith(personaId: id));
 
-  Future<void> setCareMode(CareMode mode) => updateProfile((p) => p.copyWith(careMode: mode));
+  Future<void> setCareMode(CareMode mode) =>
+      updateProfile((p) => p.copyWith(careMode: mode));
 
   Future<void> finishOnboarding(Profile draft) async {
     // Start the trial *before* marking onboarded, so an access check can never see an
     // onboarded user with a Pro persona and no trial (which would bounce them to Mom).
     if (await db.getInt(Keys.trialEndsAt) == null) {
-      await db.setInt(Keys.trialEndsAt, DateTime.now().millisecondsSinceEpoch + trialMs);
+      await db.setInt(
+        Keys.trialEndsAt,
+        DateTime.now().millisecondsSinceEpoch + trialMs,
+      );
     }
     profile = draft.copyWith(onboarded: true);
     await db.saveProfile(profile);
@@ -442,7 +547,12 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     await _changed();
   }
 
-  Future<void> addMedication(String name, int hour, int minute, {String dose = ''}) async {
+  Future<void> addMedication(
+    String name,
+    int hour,
+    int minute, {
+    String dose = '',
+  }) async {
     await db.addMedication(name, hour, minute, dose: dose);
     await _changed();
   }
@@ -466,8 +576,11 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     await _changed();
   }
 
-  Future<void> grantAdUnlock(String relationshipId) async {
-    await db.grantUnlock(relationshipId, DateTime.now().millisecondsSinceEpoch + tempUnlockMs);
+  Future<void> grantAdUnlock(String key) async {
+    await db.grantUnlock(
+      key,
+      DateTime.now().millisecondsSinceEpoch + tempUnlockMs,
+    );
     await _changed();
   }
 
@@ -491,9 +604,9 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     }
     switch (response.payload) {
       case 'trial':
-        _events.add(const RouteEvent(PushRoute.paywall));
+        _emit(const RouteEvent(PushRoute.paywall));
       case 'comeback' || 'water':
-        _events.add(const RouteEvent(PushRoute.home));
+        _emit(const RouteEvent(PushRoute.home));
     }
   }
 
@@ -504,14 +617,20 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Future<void> sandboxEndTrialSoon() async {
-    await db.setInt(Keys.trialEndsAt, DateTime.now().millisecondsSinceEpoch + 60 * 60 * 1000);
+    await db.setInt(
+      Keys.trialEndsAt,
+      DateTime.now().millisecondsSinceEpoch + 60 * 60 * 1000,
+    );
     await db.remove(Keys.trialSheetShownOn);
     await db.setBool(Keys.trialEndedShown, false);
     await _changed();
   }
 
   Future<void> sandboxExpireTrial() async {
-    await db.setInt(Keys.trialEndsAt, DateTime.now().millisecondsSinceEpoch - 1000);
+    await db.setInt(
+      Keys.trialEndsAt,
+      DateTime.now().millisecondsSinceEpoch - 1000,
+    );
     await db.setBool(Keys.trialEndedShown, false);
     await _changed();
   }
@@ -521,17 +640,40 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     final today = dateOnly(DateTime.now());
     for (var d = 1; d <= 6; d++) {
       final day = today.subtract(Duration(days: d));
-      final target = d == 3 ? profile.dailyMl * 0.6 : profile.dailyMl * (1.0 + r.nextDouble() * 0.15);
+      final target = d == 3
+          ? profile.dailyMl * 0.6
+          : profile.dailyMl * (1.0 + r.nextDouble() * 0.15);
       var total = 0;
       var hour = profile.wakeHour + 1;
       while (total < target && hour < profile.sleepHour) {
         final ml = r.nextBool() ? 250 : 500;
-        await db.addDrink(ml, atMs: DateTime(day.year, day.month, day.day, hour, r.nextInt(50)).millisecondsSinceEpoch);
+        await db.addDrink(
+          ml,
+          atMs: DateTime(
+            day.year,
+            day.month,
+            day.day,
+            hour,
+            r.nextInt(50),
+          ).millisecondsSinceEpoch,
+        );
         total += ml;
         hour += 1 + r.nextInt(2);
       }
       for (final med in meds) {
-        if (d != 4) await db.logMed(med.id, dateKey(day), MedStatus.taken, atMs: DateTime(day.year, day.month, day.day, med.hour, med.minute + 5).millisecondsSinceEpoch);
+        if (d != 4)
+          await db.logMed(
+            med.id,
+            dateKey(day),
+            MedStatus.taken,
+            atMs: DateTime(
+              day.year,
+              day.month,
+              day.day,
+              med.hour,
+              med.minute + 5,
+            ).millisecondsSinceEpoch,
+          );
       }
     }
     await _changed();

@@ -47,7 +47,9 @@ WeeklyInsights computeWeeklyInsights({
 
   // Average over days that had any logging, so a fresh install isn't dragged to zero.
   final active = days.where((d) => d.totalMl > 0).toList();
-  final avg = active.isEmpty ? 0 : active.fold<int>(0, (s, d) => s + d.totalMl) ~/ active.length;
+  final avg = active.isEmpty
+      ? 0
+      : active.fold<int>(0, (s, d) => s + d.totalMl) ~/ active.length;
 
   final byHour = <int, int>{};
   for (final l in logs) {
@@ -56,7 +58,9 @@ WeeklyInsights computeWeeklyInsights({
   }
   final bestHour = byHour.isEmpty
       ? null
-      : (byHour.entries.toList()..sort((a, b) => b.value.compareTo(a.value))).first.key;
+      : (byHour.entries.toList()..sort((a, b) => b.value.compareTo(a.value)))
+            .first
+            .key;
 
   return WeeklyInsights(
     days: days,

@@ -9,7 +9,13 @@ import '../theme.dart';
 /// Emoji face in a mood-colored ring that *acts* its mood:
 /// proud bounces, worried wobbles, disappointed sighs and sinks.
 class PersonaAvatar extends StatefulWidget {
-  const PersonaAvatar({super.key, required this.emoji, this.mood = Mood.neutral, this.size = 88, this.animate = true});
+  const PersonaAvatar({
+    super.key,
+    required this.emoji,
+    this.mood = Mood.neutral,
+    this.size = 88,
+    this.animate = true,
+  });
 
   final String emoji;
   final Mood mood;
@@ -20,15 +26,19 @@ class PersonaAvatar extends StatefulWidget {
   State<PersonaAvatar> createState() => _PersonaAvatarState();
 }
 
-class _PersonaAvatarState extends State<PersonaAvatar> with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(vsync: this, duration: _durationFor(widget.mood));
+class _PersonaAvatarState extends State<PersonaAvatar>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: _durationFor(widget.mood),
+  );
 
   static Duration _durationFor(Mood m) => switch (m) {
-        Mood.proud => const Duration(milliseconds: 900),
-        Mood.worried => const Duration(milliseconds: 1400),
-        Mood.disappointed => const Duration(milliseconds: 3200),
-        Mood.neutral => const Duration(milliseconds: 3600),
-      };
+    Mood.proud => const Duration(milliseconds: 900),
+    Mood.worried => const Duration(milliseconds: 1400),
+    Mood.disappointed => const Duration(milliseconds: 3200),
+    Mood.neutral => const Duration(milliseconds: 3600),
+  };
 
   @override
   void initState() {
@@ -73,7 +83,10 @@ class _PersonaAvatarState extends State<PersonaAvatar> with SingleTickerProvider
         }
         return Transform.translate(
           offset: Offset(0, dy),
-          child: Transform.rotate(angle: angle, child: Transform.scale(scale: scale, child: child)),
+          child: Transform.rotate(
+            angle: angle,
+            child: Transform.scale(scale: scale, child: child),
+          ),
         );
       },
       child: AnimatedContainer(
@@ -88,10 +101,19 @@ class _PersonaAvatarState extends State<PersonaAvatar> with SingleTickerProvider
             colors: [Color(0xFFFFFBF2), Color(0xFFFFF0D9)],
           ),
           border: Border.all(color: ring, width: widget.size * 0.055),
-          boxShadow: [BoxShadow(color: ring.withValues(alpha: 0.55), blurRadius: widget.size * 0.3, spreadRadius: 1)],
+          boxShadow: [
+            BoxShadow(
+              color: ring.withValues(alpha: 0.55),
+              blurRadius: widget.size * 0.3,
+              spreadRadius: 1,
+            ),
+          ],
         ),
         alignment: Alignment.center,
-        child: Text(widget.emoji, style: TextStyle(fontSize: widget.size * 0.5)),
+        child: Text(
+          widget.emoji,
+          style: TextStyle(fontSize: widget.size * 0.5),
+        ),
       ),
     );
   }
@@ -100,7 +122,14 @@ class _PersonaAvatarState extends State<PersonaAvatar> with SingleTickerProvider
 /// Persona speech bubble with a little tail. Text changes cross-fade after a
 /// brief "typing…" beat so it feels like she's actually replying.
 class SpeechBubble extends StatefulWidget {
-  const SpeechBubble({super.key, required this.text, this.name, this.onTap, this.tail = true, this.accent});
+  const SpeechBubble({
+    super.key,
+    required this.text,
+    this.name,
+    this.onTap,
+    this.tail = true,
+    this.accent,
+  });
 
   final String text;
   final String? name;
@@ -152,7 +181,13 @@ class _SpeechBubbleState extends State<SpeechBubble> {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(22),
                 border: Border.all(color: NaglyColors.outline),
-                boxShadow: const [BoxShadow(color: Color(0x14122730), blurRadius: 18, offset: Offset(0, 8))],
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x14122730),
+                    blurRadius: 18,
+                    offset: Offset(0, 8),
+                  ),
+                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -160,9 +195,14 @@ class _SpeechBubbleState extends State<SpeechBubble> {
                   if (widget.name != null)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 4),
-                      child: Text(widget.name!,
-                          style: TextStyle(
-                              fontSize: 12.5, fontWeight: FontWeight.w900, color: widget.accent ?? NaglyColors.brand)),
+                      child: Text(
+                        widget.name!,
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w900,
+                          color: widget.accent ?? NaglyColors.brand,
+                        ),
+                      ),
                     ),
                   AnimatedSwitcher(
                     duration: const Duration(milliseconds: 250),
@@ -172,7 +212,11 @@ class _SpeechBubbleState extends State<SpeechBubble> {
                             _shown,
                             key: ValueKey(_shown),
                             style: const TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.w800, color: NaglyColors.ink, height: 1.3),
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              color: NaglyColors.ink,
+                              height: 1.3,
+                            ),
                           ),
                   ),
                 ],
@@ -195,13 +239,14 @@ class _TailPainter extends CustomPainter {
       ..close();
     canvas.drawPath(p, Paint()..color = Colors.white);
     canvas.drawPath(
-        Path()
-          ..moveTo(size.width / 2 - 12, 0.5)
-          ..lineTo(size.width / 2, -12)
-          ..lineTo(size.width / 2 + 12, 0.5),
-        Paint()
-          ..style = PaintingStyle.stroke
-          ..color = NaglyColors.outline);
+      Path()
+        ..moveTo(size.width / 2 - 12, 0.5)
+        ..lineTo(size.width / 2, -12)
+        ..lineTo(size.width / 2 + 12, 0.5),
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..color = NaglyColors.outline,
+    );
   }
 
   @override
@@ -215,9 +260,12 @@ class _TypingDots extends StatefulWidget {
   State<_TypingDots> createState() => _TypingDotsState();
 }
 
-class _TypingDotsState extends State<_TypingDots> with SingleTickerProviderStateMixin {
-  late final AnimationController _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 900))
-    ..repeat();
+class _TypingDotsState extends State<_TypingDots>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 900),
+  )..repeat();
 
   @override
   void dispose() {
@@ -227,32 +275,37 @@ class _TypingDotsState extends State<_TypingDots> with SingleTickerProviderState
 
   @override
   Widget build(BuildContext context) => SizedBox(
-        height: 23,
-        child: AnimatedBuilder(
-          animation: _c,
-          builder: (context, _) => Row(
-            mainAxisSize: MainAxisSize.min,
-            children: List.generate(3, (i) {
-              final v = sin((_c.value * 2 * pi) - i * 0.8).clamp(0.0, 1.0);
-              return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 3),
-                width: 8,
-                height: 8,
-                transform: Matrix4.translationValues(0, -4 * v, 0),
-                decoration: BoxDecoration(
-                  color: NaglyColors.textSecondary.withValues(alpha: 0.4 + 0.6 * v),
-                  shape: BoxShape.circle,
-                ),
-              );
-            }),
-          ),
-        ),
-      );
+    height: 23,
+    child: AnimatedBuilder(
+      animation: _c,
+      builder: (context, _) => Row(
+        mainAxisSize: MainAxisSize.min,
+        children: List.generate(3, (i) {
+          final v = sin((_c.value * 2 * pi) - i * 0.8).clamp(0.0, 1.0);
+          return Container(
+            margin: const EdgeInsets.symmetric(horizontal: 3),
+            width: 8,
+            height: 8,
+            transform: Matrix4.translationValues(0, -4 * v, 0),
+            decoration: BoxDecoration(
+              color: NaglyColors.textSecondary.withValues(alpha: 0.4 + 0.6 * v),
+              shape: BoxShape.circle,
+            ),
+          );
+        }),
+      ),
+    ),
+  );
 }
 
 /// "💛 Close" chip with a thin progress bar toward the next bond level.
 class BondChip extends StatelessWidget {
-  const BondChip({super.key, required this.level, required this.progress, this.onTap});
+  const BondChip({
+    super.key,
+    required this.level,
+    required this.progress,
+    this.onTap,
+  });
 
   final RelationshipLevel level;
   final double progress;
@@ -262,7 +315,9 @@ class BondChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final next = level.next;
     return Tooltip(
-      message: next == null ? 'Maximum bond' : 'Keep your streak going to reach ${next.label}',
+      message: next == null
+          ? 'Maximum bond'
+          : 'Keep your streak going to reach ${next.label}',
       child: Semantics(
         label: 'Bond level ${level.label}',
         child: Container(
@@ -276,8 +331,14 @@ class BondChip extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('${level.emoji} ${level.label}',
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w900, color: NaglyColors.ink)),
+              Text(
+                '${level.emoji} ${level.label}',
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w900,
+                  color: NaglyColors.ink,
+                ),
+              ),
               const SizedBox(height: 6),
               SizedBox(
                 width: 84,

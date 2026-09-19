@@ -52,9 +52,26 @@ abstract class BillingService {
 }
 
 const _fallbackPlans = [
-  Plan(kind: PlanKind.lifetime, title: 'Lifetime', price: r'$29.99', detail: 'Pay once, yours forever', badge: 'BEST VALUE'),
-  Plan(kind: PlanKind.annual, title: 'Annual', price: r'$19.99/yr', detail: 'Try free for 7 days', badge: 'FREE TRIAL'),
-  Plan(kind: PlanKind.monthly, title: 'Monthly', price: r'$1.99/mo', detail: 'Cancel any time'),
+  Plan(
+    kind: PlanKind.lifetime,
+    title: 'Lifetime',
+    price: r'$29.99',
+    detail: 'Pay once, yours forever',
+    badge: 'BEST VALUE',
+  ),
+  Plan(
+    kind: PlanKind.annual,
+    title: 'Annual',
+    price: r'$19.99/yr',
+    detail: 'Try free for 7 days',
+    badge: 'FREE TRIAL',
+  ),
+  Plan(
+    kind: PlanKind.monthly,
+    title: 'Monthly',
+    price: r'$1.99/mo',
+    detail: 'Cancel any time',
+  ),
 ];
 
 /// Sandbox billing: persists a local Pro flag so the whole funnel can be demoed.
@@ -71,7 +88,8 @@ class FakeBillingService implements BillingService {
   Future<void> init() async => _isPro.value = await _db.getBool(Keys.isPro);
 
   @override
-  Future<List<Plan>> plans({String placement = 'settings'}) async => _fallbackPlans;
+  Future<List<Plan>> plans({String placement = 'settings'}) async =>
+      _fallbackPlans;
 
   @override
   Future<void> setAttributes(Map<String, String> attributes) async {}
@@ -104,12 +122,14 @@ class RevenueCatBillingService implements BillingService {
   @override
   ValueListenable<bool> get isPro => _isPro;
 
-  void _apply(CustomerInfo info) =>
-      _isPro.value = info.entitlements.active.containsKey(Integrations.proEntitlement);
+  void _apply(CustomerInfo info) => _isPro.value = info.entitlements.active
+      .containsKey(Integrations.proEntitlement);
 
   @override
   Future<void> init() async {
-    final key = Platform.isIOS ? Integrations.revenueCatIosKey : Integrations.revenueCatAndroidKey;
+    final key = Platform.isIOS
+        ? Integrations.revenueCatIosKey
+        : Integrations.revenueCatAndroidKey;
     await Purchases.configure(PurchasesConfiguration(key));
     Purchases.addCustomerInfoUpdateListener(_apply);
     try {
@@ -131,19 +151,37 @@ class RevenueCatBillingService implements BillingService {
   @override
   Future<List<Plan>> plans({String placement = 'settings'}) async {
     try {
-      final current = await Purchases.getCurrentOfferingForPlacement(placement) ??
+      final current =
+          await Purchases.getCurrentOfferingForPlacement(placement) ??
           (await Purchases.getOfferings()).current;
       if (current == null) return _fallbackPlans;
       return [
         if (current.lifetime case final p?)
-          Plan(kind: PlanKind.lifetime, title: 'Lifetime', price: p.storeProduct.priceString,
-              detail: 'Pay once, yours forever', badge: 'BEST VALUE', rcPackage: p),
+          Plan(
+            kind: PlanKind.lifetime,
+            title: 'Lifetime',
+            price: p.storeProduct.priceString,
+            detail: 'Pay once, yours forever',
+            badge: 'BEST VALUE',
+            rcPackage: p,
+          ),
         if (current.annual case final p?)
-          Plan(kind: PlanKind.annual, title: 'Annual', price: '${p.storeProduct.priceString}/yr',
-              detail: 'Try free for 7 days', badge: 'FREE TRIAL', rcPackage: p),
+          Plan(
+            kind: PlanKind.annual,
+            title: 'Annual',
+            price: '${p.storeProduct.priceString}/yr',
+            detail: 'Try free for 7 days',
+            badge: 'FREE TRIAL',
+            rcPackage: p,
+          ),
         if (current.monthly case final p?)
-          Plan(kind: PlanKind.monthly, title: 'Monthly', price: '${p.storeProduct.priceString}/mo',
-              detail: 'Cancel any time', rcPackage: p),
+          Plan(
+            kind: PlanKind.monthly,
+            title: 'Monthly',
+            price: '${p.storeProduct.priceString}/mo',
+            detail: 'Cancel any time',
+            rcPackage: p,
+          ),
       ];
     } on PlatformException catch (e) {
       debugPrint('RevenueCat getOfferings failed: $e');
@@ -161,7 +199,9 @@ class RevenueCatBillingService implements BillingService {
       return _isPro.value ? PurchaseOutcome.success : PurchaseOutcome.failed;
     } on PlatformException catch (e) {
       final code = PurchasesErrorHelper.getErrorCode(e);
-      return code == PurchasesErrorCode.purchaseCancelledError ? PurchaseOutcome.cancelled : PurchaseOutcome.failed;
+      return code == PurchasesErrorCode.purchaseCancelledError
+          ? PurchaseOutcome.cancelled
+          : PurchaseOutcome.failed;
     }
   }
 

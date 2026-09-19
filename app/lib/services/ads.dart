@@ -53,8 +53,9 @@ class AdMobAdService implements AdService {
 
   final bool trackWithRevenueCat;
 
-  String get _unitId =>
-      Platform.isIOS ? Integrations.adMobRewardedUnitIos : Integrations.adMobRewardedUnitAndroid;
+  String get _unitId => Platform.isIOS
+      ? Integrations.adMobRewardedUnitIos
+      : Integrations.adMobRewardedUnitAndroid;
 
   @override
   Future<void> init() => MobileAds.instance.initialize();
@@ -78,13 +79,17 @@ class AdMobAdService implements AdService {
         onAdLoaded: loaded.complete,
         onAdFailedToLoad: (e) {
           debugPrint('Rewarded ad failed to load: $e');
-          _track(() => Purchases.adTracker.trackAdFailedToLoad(AdFailedToLoadData(
+          _track(
+            () => Purchases.adTracker.trackAdFailedToLoad(
+              AdFailedToLoadData(
                 mediatorName: AdMediatorName.adMob,
                 adFormat: AdFormat.rewarded,
                 placement: placement,
                 adUnitId: _unitId,
                 mediatorErrorCode: e.code,
-              )));
+              ),
+            ),
+          );
           loaded.complete(null);
         },
       ),
@@ -92,16 +97,22 @@ class AdMobAdService implements AdService {
     final ad = await loaded.future;
     if (ad == null) return AdResult.unavailable;
 
-    final impressionId = ad.responseInfo?.responseId ?? '${DateTime.now().millisecondsSinceEpoch}';
+    final impressionId =
+        ad.responseInfo?.responseId ??
+        '${DateTime.now().millisecondsSinceEpoch}';
     final network = ad.responseInfo?.mediationAdapterClassName;
-    await _track(() => Purchases.adTracker.trackAdLoaded(AdLoadedData(
+    await _track(
+      () => Purchases.adTracker.trackAdLoaded(
+        AdLoadedData(
           networkName: network,
           mediatorName: AdMediatorName.adMob,
           adFormat: AdFormat.rewarded,
           placement: placement,
           adUnitId: _unitId,
           impressionId: impressionId,
-        )));
+        ),
+      ),
+    );
 
     // Server-side reward verification through RevenueCat, when available.
     RewardVerificationToken? token;
@@ -109,7 +120,11 @@ class AdMobAdService implements AdService {
       try {
         token = await Purchases.generateRewardVerificationToken(impressionId);
         await ad.setServerSideOptions(
-            ServerSideVerificationOptions(userId: token.appUserID, customData: token.customData));
+          ServerSideVerificationOptions(
+            userId: token.appUserID,
+            customData: token.customData,
+          ),
+        );
       } catch (e) {
         debugPrint('Reward verification unavailable, using client reward: $e');
         token = null;
@@ -117,7 +132,9 @@ class AdMobAdService implements AdService {
     }
 
     ad.onPaidEvent = (ad, valueMicros, precision, currencyCode) {
-      _track(() => Purchases.adTracker.trackAdRevenue(AdRevenueData(
+      _track(
+        () => Purchases.adTracker.trackAdRevenue(
+          AdRevenueData(
             networkName: network,
             mediatorName: AdMediatorName.adMob,
             adFormat: AdFormat.rewarded,
@@ -129,34 +146,46 @@ class AdMobAdService implements AdService {
             precision: switch (precision) {
               PrecisionType.precise => AdRevenuePrecision.exact,
               PrecisionType.estimated => AdRevenuePrecision.estimated,
-              PrecisionType.publisherProvided => AdRevenuePrecision.publisherDefined,
+              PrecisionType.publisherProvided =>
+                AdRevenuePrecision.publisherDefined,
               _ => AdRevenuePrecision.unknown,
             },
-          )));
+          ),
+        ),
+      );
     };
 
     final done = Completer<AdResult>();
     var earned = false;
     ad.fullScreenContentCallback = FullScreenContentCallback(
-      onAdShowedFullScreenContent: (_) => _track(() => Purchases.adTracker.trackAdDisplayed(AdDisplayedData(
+      onAdShowedFullScreenContent: (_) => _track(
+        () => Purchases.adTracker.trackAdDisplayed(
+          AdDisplayedData(
             networkName: network,
             mediatorName: AdMediatorName.adMob,
             adFormat: AdFormat.rewarded,
             placement: placement,
             adUnitId: _unitId,
             impressionId: impressionId,
-          ))),
-      onAdClicked: (_) => _track(() => Purchases.adTracker.trackAdOpened(AdOpenedData(
+          ),
+        ),
+      ),
+      onAdClicked: (_) => _track(
+        () => Purchases.adTracker.trackAdOpened(
+          AdOpenedData(
             networkName: network,
             mediatorName: AdMediatorName.adMob,
             adFormat: AdFormat.rewarded,
             placement: placement,
             adUnitId: _unitId,
             impressionId: impressionId,
-          ))),
+          ),
+        ),
+      ),
       onAdDismissedFullScreenContent: (ad) {
         ad.dispose();
-        if (!done.isCompleted) done.complete(earned ? AdResult.rewarded : AdResult.cancelled);
+        if (!done.isCompleted)
+          done.complete(earned ? AdResult.rewarded : AdResult.cancelled);
       },
       onAdFailedToShowFullScreenContent: (ad, _) {
         ad.dispose();
@@ -181,7 +210,9 @@ class AdMobAdService implements AdService {
         );
         if (verification.failed) return AdResult.unavailable;
       } catch (e) {
-        debugPrint('Reward verification poll failed, trusting client reward: $e');
+        debugPrint(
+          'Reward verification poll failed, trusting client reward: $e',
+        );
       }
     }
     return result;

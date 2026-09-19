@@ -31,23 +31,28 @@ abstract final class _Ids {
   static const waterBase = 1; // 1..8
   static const trialEnding = 900;
   static const comeback = 901;
-  static int med(int medId, int dayOffset) => 10000 + medId * 10 + dayOffset; // offsets 0..2
+  static int med(int medId, int dayOffset) =>
+      10000 + medId * 10 + dayOffset; // offsets 0..2
   static int medSnooze(int medId) => 10000 + medId * 10 + 9;
 }
 
 const _waterChannel = AndroidNotificationChannel(
-  'nagly_nudges', 'Water nudges',
+  'nagly_nudges',
+  'Water nudges',
   description: 'Reminders to drink water, in your nagger\'s voice',
   importance: Importance.defaultImportance,
 );
 const _medChannel = AndroidNotificationChannel(
-  'nagly_meds', 'Medication reminders',
+  'nagly_meds',
+  'Medication reminders',
   description: 'Reminders to take your medication',
   importance: Importance.high,
 );
 const _careChannel = AndroidNotificationChannel(
-  'nagly_care', 'Check-ins',
-  description: 'Occasional check-ins when you\'ve gone quiet or your trial is ending',
+  'nagly_care',
+  'Check-ins',
+  description:
+      'Occasional check-ins when you\'ve gone quiet or your trial is ending',
   importance: Importance.defaultImportance,
 );
 
@@ -63,7 +68,8 @@ Future<void> notificationActionBackground(NotificationResponse response) async {
 }
 
 class NotificationService {
-  final FlutterLocalNotificationsPlugin _plugin = FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _plugin =
+      FlutterLocalNotificationsPlugin();
   static bool _tzReady = false;
 
   static Future<void> _initTimezones() async {
@@ -92,27 +98,48 @@ class NotificationService {
       onDidReceiveNotificationResponse: onResponse,
       onDidReceiveBackgroundNotificationResponse: notificationActionBackground,
     );
-    final android = _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    final android = _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
     for (final c in const [_waterChannel, _medChannel, _careChannel]) {
       await android?.createNotificationChannel(c);
     }
   }
 
   Future<bool> requestPermission() async {
-    final android = _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
-    if (android != null) return await android.requestNotificationsPermission() ?? false;
-    final ios = _plugin.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
-    return await ios?.requestPermissions(alert: true, sound: true, badge: false) ?? false;
+    final android = _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
+    if (android != null)
+      return await android.requestNotificationsPermission() ?? false;
+    final ios = _plugin
+        .resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin
+        >();
+    return await ios?.requestPermissions(
+          alert: true,
+          sound: true,
+          badge: false,
+        ) ??
+        false;
   }
 
   Future<bool> permissionGranted() async {
-    final android = _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    final android = _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
     return await android?.areNotificationsEnabled() ?? true;
   }
 
   /// Apply a notification action (from lock screen or foreground) to the database,
   /// then re-plan every reminder.
-  Future<void> handleResponse(NaglyDatabase db, NotificationResponse response) async {
+  Future<void> handleResponse(
+    NaglyDatabase db,
+    NotificationResponse response,
+  ) async {
     final action = response.actionId;
     final payload = response.payload ?? '';
     switch (action) {
@@ -129,10 +156,18 @@ class NotificationService {
         if (medId == null) break;
         if (action == NudgeAction.medSnooze) {
           final snoozes = await _snoozes(db);
-          snoozes['$medId'] = DateTime.now().add(const Duration(minutes: 30)).millisecondsSinceEpoch;
+          snoozes['$medId'] = DateTime.now()
+              .add(const Duration(minutes: 30))
+              .millisecondsSinceEpoch;
           await db.setString(_snoozeKey, jsonEncode(snoozes));
         } else {
-          await db.logMed(medId, parts[2], action == NudgeAction.medTaken ? MedStatus.taken : MedStatus.skipped);
+          await db.logMed(
+            medId,
+            parts[2],
+            action == NudgeAction.medTaken
+                ? MedStatus.taken
+                : MedStatus.skipped,
+          );
         }
     }
     if (response.id != null) await _plugin.cancel(id: response.id!);
@@ -144,7 +179,9 @@ class NotificationService {
   Future<Map<String, int>> _snoozes(NaglyDatabase db) async {
     final raw = await db.getString(_snoozeKey);
     if (raw == null) return {};
-    return (jsonDecode(raw) as Map).map((k, v) => MapEntry(k as String, v as int));
+    return (jsonDecode(raw) as Map).map(
+      (k, v) => MapEntry(k as String, v as int),
+    );
   }
 
   /// Rebuild every pending reminder from what's in the database.
@@ -168,7 +205,9 @@ class NotificationService {
     final persona = PersonaCatalog.get(profile.personaId);
     final dayStart = dateOnly(at);
     final today = await db.drinksBetween(
-        dayStart.millisecondsSinceEpoch, dayStart.add(const Duration(days: 1)).millisecondsSinceEpoch);
+      dayStart.millisecondsSinceEpoch,
+      dayStart.add(const Duration(days: 1)).millisecondsSinceEpoch,
+    );
     final consumed = today.fold<int>(0, (s, l) => s + l.amountMl);
 
     // ── Water ──
@@ -180,7 +219,12 @@ class NotificationService {
       nowMs: nowMs,
       lastLogMs: today.isEmpty ? null : today.last.timestampMs,
     );
-    final nudges = planWaterNudges(nowMs: nowMs, profile: profile, consumedMl: consumed, ignoredSoFar: ignored);
+    final nudges = planWaterNudges(
+      nowMs: nowMs,
+      profile: profile,
+      consumedMl: consumed,
+      ignoredSoFar: ignored,
+    );
     for (var i = 0; i < nudges.length; i++) {
       final n = nudges[i];
       await _schedule(
@@ -205,14 +249,29 @@ class NotificationService {
       final logs = await db.medLogsSince(dateKey(dayStart));
       final snoozes = await _snoozes(db);
       for (final med in meds) {
-        final logged = logs.where((l) => l.medId == med.id).map((l) => l.dateKey).toSet();
-        final times = nextMedOccurrences(med: med, now: at, loggedDateKeys: logged);
+        final logged = logs
+            .where((l) => l.medId == med.id)
+            .map((l) => l.dateKey)
+            .toSet();
+        final times = nextMedOccurrences(
+          med: med,
+          now: at,
+          loggedDateKeys: logged,
+        );
         for (var i = 0; i < times.length; i++) {
           await _scheduleMed(med, persona, times[i], _Ids.med(med.id, i), i);
         }
         final snoozeAt = snoozes['${med.id}'];
-        if (snoozeAt != null && snoozeAt > nowMs && !logged.contains(dateKey(at))) {
-          await _scheduleMed(med, persona, DateTime.fromMillisecondsSinceEpoch(snoozeAt), _Ids.medSnooze(med.id), 7);
+        if (snoozeAt != null &&
+            snoozeAt > nowMs &&
+            !logged.contains(dateKey(at))) {
+          await _scheduleMed(
+            med,
+            persona,
+            DateTime.fromMillisecondsSinceEpoch(snoozeAt),
+            _Ids.medSnooze(med.id),
+            7,
+          );
         }
       }
     }
@@ -237,7 +296,12 @@ class NotificationService {
     // ── Gone quiet: a local win-back two days after the last sip ──
     final lastLog = today.isNotEmpty ? today.last.timestampMs : null;
     final base = DateTime.fromMillisecondsSinceEpoch(lastLog ?? nowMs);
-    final comebackAt = DateTime(base.year, base.month, base.day + 2, (profile.wakeHour + 4).clamp(0, 23));
+    final comebackAt = DateTime(
+      base.year,
+      base.month,
+      base.day + 2,
+      (profile.wakeHour + 4).clamp(0, 23),
+    );
     if (comebackAt.isAfter(at)) {
       await _schedule(
         id: _Ids.comeback,
@@ -251,7 +315,10 @@ class NotificationService {
   }
 
   /// Demo/QA: fire a real water nudge (with its action buttons) a few seconds from now.
-  Future<void> sendTestNudge(NaglyDatabase db, {Duration after = const Duration(seconds: 5)}) async {
+  Future<void> sendTestNudge(
+    NaglyDatabase db, {
+    Duration after = const Duration(seconds: 5),
+  }) async {
     final profile = await db.profile();
     final at = DateTime.now().add(after);
     final plan = planWaterNudges(
@@ -277,13 +344,22 @@ class NotificationService {
     );
   }
 
-  Future<void> _scheduleMed(Medication med, Persona persona, DateTime at, int id, int seed) {
+  Future<void> _scheduleMed(
+    Medication med,
+    Persona persona,
+    DateTime at,
+    int id,
+    int seed,
+  ) {
     final name = med.dose.isEmpty ? med.name : '${med.name} (${med.dose})';
     return _schedule(
       id: id,
       at: at,
       title: '${persona.emoji} ${persona.displayName}',
-      body: PersonaCatalog.fillMed(persona.medDue[(med.id + seed) % persona.medDue.length], name),
+      body: PersonaCatalog.fillMed(
+        persona.medDue[(med.id + seed) % persona.medDue.length],
+        name,
+      ),
       channel: _medChannel,
       payload: 'med:${med.id}:${dateKey(at)}',
       actions: const [
@@ -318,7 +394,9 @@ class NotificationService {
             channel.name,
             channelDescription: channel.description,
             importance: channel.importance,
-            priority: channel.importance == Importance.high ? Priority.high : Priority.defaultPriority,
+            priority: channel.importance == Importance.high
+                ? Priority.high
+                : Priority.defaultPriority,
             color: const Color(0xFF0E7C86),
             styleInformation: BigTextStyleInformation(body),
             category: AndroidNotificationCategory.reminder,

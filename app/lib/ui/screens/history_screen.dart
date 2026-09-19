@@ -27,12 +27,20 @@ class HistoryScreen extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 4),
-              child: Text('History', style: Theme.of(context).textTheme.headlineMedium),
+              child: Text(
+                'History',
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-              child: Text('Your story with ${c.persona.displayName} ${c.persona.emoji}',
-                  style: const TextStyle(fontWeight: FontWeight.w800, color: NaglyColors.textSecondary)),
+              child: Text(
+                'Your story with ${c.persona.displayName} ${c.persona.emoji}',
+                style: const TextStyle(
+                  fontWeight: FontWeight.w800,
+                  color: NaglyColors.textSecondary,
+                ),
+              ),
             ),
             Expanded(
               child: items.isEmpty
@@ -42,9 +50,16 @@ class HistoryScreen extends StatelessWidget {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            PersonaAvatar(emoji: c.persona.emoji, mood: Mood.worried, size: 80),
+                            PersonaAvatar(
+                              emoji: c.persona.emoji,
+                              mood: Mood.worried,
+                              size: 80,
+                            ),
                             const SizedBox(height: 16),
-                            SpeechBubble(text: "No sips yet? I'm waiting, you know.", name: c.persona.displayName),
+                            SpeechBubble(
+                              text: "No sips yet? I'm waiting, you know.",
+                              name: c.persona.displayName,
+                            ),
                           ],
                         ),
                       ),
@@ -53,7 +68,10 @@ class HistoryScreen extends StatelessWidget {
                       reverse: true,
                       padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
                       itemCount: items.length,
-                      itemBuilder: (context, i) => _ChatRow(item: items[items.length - 1 - i], emoji: c.persona.emoji),
+                      itemBuilder: (context, i) => _ChatRow(
+                        item: items[items.length - 1 - i],
+                        emoji: c.persona.emoji,
+                      ),
                     ),
             ),
           ],
@@ -72,15 +90,25 @@ class _ChatRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return switch (item) {
       DayDivider(:final label) => Padding(
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          child: Center(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-              decoration: BoxDecoration(color: NaglyColors.surfaceVariant, borderRadius: BorderRadius.circular(12)),
-              child: Text(label, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: NaglyColors.textSecondary)),
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        child: Center(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+            decoration: BoxDecoration(
+              color: NaglyColors.surfaceVariant,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Text(
+              label,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
+                color: NaglyColors.textSecondary,
+              ),
             ),
           ),
         ),
+      ),
       ChatMessage m => _Bubble(m: m, emoji: emoji),
     };
   }
@@ -93,10 +121,14 @@ class _Bubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final time = DateFormat.Hm().format(DateTime.fromMillisecondsSinceEpoch(m.timestampMs));
+    final time = DateFormat.Hm().format(
+      DateTime.fromMillisecondsSinceEpoch(m.timestampMs),
+    );
     final userColor = m.isMed ? NaglyColors.med : NaglyColors.primaryDeep;
     final bubble = Container(
-      constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.68),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.sizeOf(context).width * 0.68,
+      ),
       padding: const EdgeInsets.fromLTRB(14, 10, 14, 8),
       decoration: BoxDecoration(
         color: m.isUser ? userColor : Colors.white,
@@ -106,28 +138,62 @@ class _Bubble extends StatelessWidget {
           bottomLeft: Radius.circular(m.isUser ? 18 : 4),
           bottomRight: Radius.circular(m.isUser ? 4 : 18),
         ),
-        border: m.isUser ? null : Border(left: BorderSide(color: NaglyColors.mood(m.mood ?? Mood.neutral), width: 4)),
-        boxShadow: const [BoxShadow(color: Color(0x10122730), blurRadius: 8, offset: Offset(0, 3))],
+        border: m.isUser
+            ? null
+            : Border(
+                left: BorderSide(
+                  color: NaglyColors.mood(m.mood ?? Mood.neutral),
+                  width: 4,
+                ),
+              ),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x10122730),
+            blurRadius: 8,
+            offset: Offset(0, 3),
+          ),
+        ],
       ),
       child: Column(
-        crossAxisAlignment: m.isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        crossAxisAlignment: m.isUser
+            ? CrossAxisAlignment.end
+            : CrossAxisAlignment.start,
         children: [
-          Text(m.text,
-              style: TextStyle(
-                  fontSize: 15, fontWeight: FontWeight.w800, color: m.isUser ? Colors.white : NaglyColors.ink, height: 1.3)),
+          Text(
+            m.text,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w800,
+              color: m.isUser ? Colors.white : NaglyColors.ink,
+              height: 1.3,
+            ),
+          ),
           const SizedBox(height: 2),
-          Text(time, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: m.isUser ? Colors.white70 : NaglyColors.textSecondary)),
+          Text(
+            time,
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              color: m.isUser ? Colors.white70 : NaglyColors.textSecondary,
+            ),
+          ),
         ],
       ),
     );
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
-        mainAxisAlignment: m.isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: m.isUser
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!m.isUser) ...[
-            CircleAvatar(radius: 16, backgroundColor: const Color(0xFFFFF3DD), child: Text(emoji, style: const TextStyle(fontSize: 16))),
+            CircleAvatar(
+              radius: 16,
+              backgroundColor: const Color(0xFFFFF3DD),
+              child: Text(emoji, style: const TextStyle(fontSize: 16)),
+            ),
             const SizedBox(width: 8),
           ],
           bubble,

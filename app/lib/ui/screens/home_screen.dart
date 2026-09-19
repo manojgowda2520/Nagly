@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../config/integrations.dart';
 import '../../domain/models.dart';
 import '../../domain/mood_engine.dart';
 import '../../domain/persona_catalog.dart';
@@ -47,7 +48,9 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.watch<AppController>();
-    final trial = c.access.inTrial ? ' · ⏳ ${c.access.trialDaysLeft}d free' : '';
+    final trial = c.access.inTrial
+        ? ' · ⏳ ${c.access.trialDaysLeft}d free'
+        : '';
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -55,10 +58,18 @@ class _Header extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(medMode ? "Today's care" : greetingFor(c.now.hour), style: Theme.of(context).textTheme.headlineMedium),
+              Text(
+                medMode ? "Today's care" : greetingFor(c.now.hour),
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
               const SizedBox(height: 4),
-              Text('${c.profile.careMode.emoji} ${c.profile.careMode.label} · 🔥 ${c.streak}-day streak$trial',
-                  style: const TextStyle(fontWeight: FontWeight.w800, color: NaglyColors.textSecondary)),
+              Text(
+                '${c.profile.careMode.emoji} ${c.profile.careMode.label} · 🔥 ${c.streak}-day streak$trial',
+                style: const TextStyle(
+                  fontWeight: FontWeight.w800,
+                  color: NaglyColors.textSecondary,
+                ),
+              ),
             ],
           ),
         ),
@@ -85,7 +96,11 @@ class _PersonaSays extends StatelessWidget {
           label: 'Change persona',
           child: GestureDetector(
             onTap: () => context.read<TabSwitcher>().value = MainTab.personas,
-            child: PersonaAvatar(emoji: c.persona.emoji, mood: c.mood, size: 92),
+            child: PersonaAvatar(
+              emoji: c.persona.emoji,
+              mood: c.mood,
+              size: 92,
+            ),
           ),
         ),
         const SizedBox(height: 18),
@@ -121,29 +136,49 @@ class _HydrationHero extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         Text.rich(
-          TextSpan(children: [
-            TextSpan(text: '${mlToDisplay(c.consumedMl, unit)}', style: Theme.of(context).textTheme.headlineMedium),
-            TextSpan(
+          TextSpan(
+            children: [
+              TextSpan(
+                text: '${mlToDisplay(c.consumedMl, unit)}',
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+              TextSpan(
                 text: ' / ${formatVolume(c.profile.dailyMl, unit)}',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: NaglyColors.textSecondary)),
-          ]),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: NaglyColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
         ),
         const SizedBox(height: 4),
         Text(
           done
               ? '🎉 Goal met — she\'s proud'
               : c.behindMl > 0
-                  ? '↓ ${formatVolume(c.behindMl, unit)} behind'
-                  : '✓ On track',
+              ? '↓ ${formatVolume(c.behindMl, unit)} behind'
+              : '✓ On track',
           style: TextStyle(
             fontWeight: FontWeight.w900,
-            color: done ? NaglyColors.success : c.behindMl > 0 ? NaglyColors.coral : NaglyColors.success,
+            color: done
+                ? NaglyColors.success
+                : c.behindMl > 0
+                ? NaglyColors.coral
+                : NaglyColors.success,
           ),
         ),
         const SizedBox(height: 18),
         const QuickAddRow(),
         const SizedBox(height: 12),
-        Text(c.nextNudgeLabel, style: const TextStyle(fontWeight: FontWeight.w700, color: NaglyColors.textSecondary)),
+        Text(
+          c.nextNudgeLabel,
+          style: const TextStyle(
+            fontWeight: FontWeight.w700,
+            color: NaglyColors.textSecondary,
+          ),
+        ),
         if (!c.permissionGranted && c.notificationsEnabled) ...[
           const SizedBox(height: 12),
           NCard(
@@ -154,8 +189,10 @@ class _HydrationHero extends StatelessWidget {
                 Text('🔕', style: TextStyle(fontSize: 22)),
                 SizedBox(width: 10),
                 Expanded(
-                  child: Text("Notifications are off, so she can't nag you. Tap to turn them on.",
-                      style: TextStyle(fontWeight: FontWeight.w800)),
+                  child: Text(
+                    "Notifications are off, so she can't nag you. Tap to turn them on.",
+                    style: TextStyle(fontWeight: FontWeight.w800),
+                  ),
                 ),
               ],
             ),
@@ -173,11 +210,17 @@ Future<void> logWithFeedback(BuildContext context, int ml) async {
   await c.logDrink(ml);
   messenger
     ..hideCurrentSnackBar()
-    ..showSnackBar(SnackBar(
-      content: Text('+${formatVolume(ml, c.profile.volumeUnit)} logged'),
-      duration: const Duration(seconds: 3),
-      action: SnackBarAction(label: 'Undo', textColor: NaglyColors.primary, onPressed: c.undoLast),
-    ));
+    ..showSnackBar(
+      SnackBar(
+        content: Text('+${formatVolume(ml, c.profile.volumeUnit)} logged'),
+        duration: const Duration(seconds: 3),
+        action: SnackBarAction(
+          label: 'Undo',
+          textColor: NaglyColors.primary,
+          onPressed: c.undoLast,
+        ),
+      ),
+    );
 }
 
 class QuickAddRow extends StatelessWidget {
@@ -186,13 +229,30 @@ class QuickAddRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final unit = context.select<AppController, VolumeUnit>((c) => c.profile.volumeUnit);
-    String label(int ml) => unit == VolumeUnit.ml ? '+$ml' : '+${mlToDisplay(ml, unit)} oz';
+    final unit = context.select<AppController, VolumeUnit>(
+      (c) => c.profile.volumeUnit,
+    );
+    String label(int ml) =>
+        unit == VolumeUnit.ml ? '+$ml' : '+${mlToDisplay(ml, unit)} oz';
     return Row(
       children: [
-        Expanded(child: PillButton(label: label(250), filled: true, semanticLabel: 'Log 250 millilitres', onPressed: () => logWithFeedback(context, 250))),
+        Expanded(
+          child: PillButton(
+            label: label(250),
+            filled: true,
+            semanticLabel: 'Log 250 millilitres',
+            onPressed: () => logWithFeedback(context, 250),
+          ),
+        ),
         const SizedBox(width: 10),
-        Expanded(child: PillButton(label: label(500), filled: true, semanticLabel: 'Log 500 millilitres', onPressed: () => logWithFeedback(context, 500))),
+        Expanded(
+          child: PillButton(
+            label: label(500),
+            filled: true,
+            semanticLabel: 'Log 500 millilitres',
+            onPressed: () => logWithFeedback(context, 500),
+          ),
+        ),
         if (!compact) ...[
           const SizedBox(width: 10),
           Expanded(
@@ -200,7 +260,8 @@ class QuickAddRow extends StatelessWidget {
               label: 'Custom',
               onPressed: () async {
                 final ml = await showCustomAmountSheet(context);
-                if (ml != null && context.mounted) await logWithFeedback(context, ml);
+                if (ml != null && context.mounted)
+                  await logWithFeedback(context, ml);
               },
             ),
           ),
@@ -218,10 +279,23 @@ class _MedicationHome extends StatelessWidget {
     final c = context.watch<AppController>();
     final unit = c.profile.volumeUnit;
     final due = c.activeMeds.where((m) => c.medStatusToday(m) == null).toList();
-    final nextDue = due.where((m) => DateTime(c.now.year, c.now.month, c.now.day, m.hour, m.minute).isBefore(c.now.add(const Duration(hours: 1)))).firstOrNull;
+    final nextDue = due
+        .where(
+          (m) => DateTime(
+            c.now.year,
+            c.now.month,
+            c.now.day,
+            m.hour,
+            m.minute,
+          ).isBefore(c.now.add(const Duration(hours: 1))),
+        )
+        .firstOrNull;
     final override = nextDue == null
         ? null
-        : PersonaCatalog.fillMed(c.persona.medDue[nextDue.id % c.persona.medDue.length], nextDue.name);
+        : PersonaCatalog.fillMed(
+            c.persona.medDue[nextDue.id % c.persona.medDue.length],
+            nextDue.name,
+          );
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -230,18 +304,45 @@ class _MedicationHome extends StatelessWidget {
         NCard(
           child: Row(
             children: [
-              WaterBottle(progress: c.progress, width: 60, height: 88, enableTilt: false),
+              WaterBottle(
+                progress: c.progress,
+                width: 60,
+                height: 88,
+                enableTilt: false,
+              ),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text.rich(TextSpan(children: [
-                      TextSpan(text: '${mlToDisplay(c.consumedMl, unit)}', style: Theme.of(context).textTheme.titleLarge),
-                      TextSpan(text: ' / ${formatVolume(c.profile.dailyMl, unit)}', style: const TextStyle(fontWeight: FontWeight.w800, color: NaglyColors.textSecondary)),
-                    ])),
-                    Text(c.behindMl > 0 ? '${formatVolume(c.behindMl, unit)} behind' : 'On track',
-                        style: TextStyle(fontWeight: FontWeight.w800, color: c.behindMl > 0 ? NaglyColors.coral : NaglyColors.success)),
+                    Text.rich(
+                      TextSpan(
+                        children: [
+                          TextSpan(
+                            text: '${mlToDisplay(c.consumedMl, unit)}',
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                          TextSpan(
+                            text: ' / ${formatVolume(c.profile.dailyMl, unit)}',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w800,
+                              color: NaglyColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Text(
+                      c.behindMl > 0
+                          ? '${formatVolume(c.behindMl, unit)} behind'
+                          : 'On track',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        color: c.behindMl > 0
+                            ? NaglyColors.coral
+                            : NaglyColors.success,
+                      ),
+                    ),
                     const SizedBox(height: 10),
                     const QuickAddRow(compact: true),
                   ],
@@ -258,7 +359,9 @@ class _MedicationHome extends StatelessWidget {
         OutlinedButton.icon(
           onPressed: () => addMedicationFlow(context),
           icon: const Icon(Icons.add_rounded),
-          label: Text(c.meds.isEmpty ? 'Add your first medication' : 'Add medication'),
+          label: Text(
+            c.meds.isEmpty ? 'Add your first medication' : 'Add medication',
+          ),
         ),
       ],
     );
@@ -283,7 +386,13 @@ class MedicationCard extends StatelessWidget {
     final c = context.watch<AppController>();
     final status = c.medStatusToday(med);
     final paused = c.isMedPaused(med);
-    final at = DateTime(c.now.year, c.now.month, c.now.day, med.hour, med.minute);
+    final at = DateTime(
+      c.now.year,
+      c.now.month,
+      c.now.day,
+      med.hour,
+      med.minute,
+    );
     final overdue = status == null && at.isBefore(c.now);
     final time = DateFormat.jm().format(at);
     return NCard(
@@ -293,7 +402,10 @@ class MedicationCard extends StatelessWidget {
           Container(
             width: 46,
             height: 46,
-            decoration: BoxDecoration(color: NaglyColors.med.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(14)),
+            decoration: BoxDecoration(
+              color: NaglyColors.med.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(14),
+            ),
             alignment: Alignment.center,
             child: const Text('💊', style: TextStyle(fontSize: 22)),
           ),
@@ -302,30 +414,49 @@ class MedicationCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(med.dose.isEmpty ? med.name : '${med.name} · ${med.dose}',
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900, color: NaglyColors.ink)),
+                Text(
+                  med.dose.isEmpty ? med.name : '${med.name} · ${med.dose}',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w900,
+                    color: NaglyColors.ink,
+                  ),
+                ),
                 Text(
                   paused
-                      ? 'Paused — Pro keeps every reminder'
+                      ? Integrations.purchasesEnabled
+                            ? 'Paused — Pro keeps every reminder'
+                            : 'Paused — unlock with a short ad'
                       : switch (status?.status) {
-                          MedStatus.taken => 'Taken at ${DateFormat.jm().format(DateTime.fromMillisecondsSinceEpoch(status!.atMs))}',
+                          MedStatus.taken =>
+                            'Taken at ${DateFormat.jm().format(DateTime.fromMillisecondsSinceEpoch(status!.atMs))}',
                           MedStatus.skipped => 'Skipped today',
-                          null => overdue ? 'Overdue · was due $time' : 'Due $time',
+                          null =>
+                            overdue ? 'Overdue · was due $time' : 'Due $time',
                         },
                   style: TextStyle(
                     fontWeight: FontWeight.w800,
                     fontSize: 13,
-                    color: overdue && !paused ? NaglyColors.coral : NaglyColors.textSecondary,
+                    color: overdue && !paused
+                        ? NaglyColors.coral
+                        : NaglyColors.textSecondary,
                   ),
                 ),
               ],
             ),
           ),
           if (paused)
-            TextButton(onPressed: () => openPaywall(context, placement: 'medication_limit'), child: const Text('Unpause'))
+            TextButton(
+              onPressed: () =>
+                  openPaywall(context, placement: 'medication_limit'),
+              child: const Text('Unpause'),
+            )
           else if (status == null)
             FilledButton(
-              style: FilledButton.styleFrom(minimumSize: const Size(96, 44), backgroundColor: NaglyColors.med),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(96, 44),
+                backgroundColor: NaglyColors.med,
+              ),
               onPressed: () {
                 HapticFeedback.mediumImpact();
                 c.markMed(med, MedStatus.taken);
@@ -335,8 +466,14 @@ class MedicationCard extends StatelessWidget {
           else
             TextButton(
               onPressed: () => c.markMed(med, null),
-              child: Text(status.status == MedStatus.taken ? '✓ Taken' : 'Undo',
-                  style: TextStyle(color: status.status == MedStatus.taken ? NaglyColors.success : null)),
+              child: Text(
+                status.status == MedStatus.taken ? '✓ Taken' : 'Undo',
+                style: TextStyle(
+                  color: status.status == MedStatus.taken
+                      ? NaglyColors.success
+                      : null,
+                ),
+              ),
             ),
         ],
       ),
@@ -367,15 +504,27 @@ class _TodayDrinks extends StatelessWidget {
                     color: NaglyColors.danger.withValues(alpha: 0.12),
                     alignment: Alignment.centerRight,
                     padding: const EdgeInsets.only(right: 20),
-                    child: const Icon(Icons.delete_outline, color: NaglyColors.danger),
+                    child: const Icon(
+                      Icons.delete_outline,
+                      color: NaglyColors.danger,
+                    ),
                   ),
                   onDismissed: (_) => c.deleteDrink(log.id),
                   child: ListTile(
                     leading: const Text('💧', style: TextStyle(fontSize: 20)),
-                    title: Text('+${formatVolume(log.amountMl, c.profile.volumeUnit)}',
-                        style: const TextStyle(fontWeight: FontWeight.w900)),
-                    trailing: Text(DateFormat.jm().format(DateTime.fromMillisecondsSinceEpoch(log.timestampMs)),
-                        style: const TextStyle(fontWeight: FontWeight.w700, color: NaglyColors.textSecondary)),
+                    title: Text(
+                      '+${formatVolume(log.amountMl, c.profile.volumeUnit)}',
+                      style: const TextStyle(fontWeight: FontWeight.w900),
+                    ),
+                    trailing: Text(
+                      DateFormat.jm().format(
+                        DateTime.fromMillisecondsSinceEpoch(log.timestampMs),
+                      ),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        color: NaglyColors.textSecondary,
+                      ),
+                    ),
                   ),
                 ),
             ],
@@ -383,8 +532,15 @@ class _TodayDrinks extends StatelessWidget {
         ),
         const Padding(
           padding: EdgeInsets.only(top: 6),
-          child: Text('Swipe left to remove an entry', textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: NaglyColors.textSecondary)),
+          child: Text(
+            'Swipe left to remove an entry',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: NaglyColors.textSecondary,
+            ),
+          ),
         ),
       ],
     );

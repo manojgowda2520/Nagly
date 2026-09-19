@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../config/integrations.dart';
 import '../services/push.dart';
 import '../state/app_controller.dart';
 import 'screens/history_screen.dart';
@@ -47,14 +48,19 @@ class _RootState extends State<_Root> {
 
   @override
   Widget build(BuildContext context) {
-    final onboarded = context.select<AppController, bool>((c) => c.profile.onboarded);
+    final onboarded = context.select<AppController, bool>(
+      (c) => c.profile.onboarded,
+    );
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 500),
       child: !_splashDone
-          ? SplashScreen(key: const ValueKey('splash'), onDone: () => setState(() => _splashDone = true))
+          ? SplashScreen(
+              key: const ValueKey('splash'),
+              onDone: () => setState(() => _splashDone = true),
+            )
           : onboarded
-              ? const MainShell(key: ValueKey('shell'))
-              : const OnboardingScreen(key: ValueKey('onboarding')),
+          ? const MainShell(key: ValueKey('shell'))
+          : const OnboardingScreen(key: ValueKey('onboarding')),
     );
   }
 }
@@ -83,7 +89,9 @@ class _MainShellState extends State<MainShell> {
     super.initState();
     _tabs.addListener(() => setState(() {}));
     // One modal at a time: each event waits for the previous one to be dismissed.
-    _sub = context.read<AppController>().events.asyncMap(_onEvent).listen((_) {});
+    final c = context.read<AppController>();
+    _sub = c.events.asyncMap(_onEvent).listen((_) {});
+    c.flushPendingEvents();
   }
 
   @override
@@ -106,14 +114,19 @@ class _MainShellState extends State<MainShell> {
             title: const Text("They're gone for now"),
             content: Text(message),
             actions: [
-              TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Okay')),
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Okay'),
+              ),
               FilledButton(
                 style: FilledButton.styleFrom(minimumSize: const Size(120, 48)),
                 onPressed: () {
                   Navigator.pop(ctx);
                   openPaywall(ctx, placement: 'persona_expired');
                 },
-                child: const Text('Keep them'),
+                child: Text(
+                  Integrations.purchasesEnabled ? 'Keep them' : 'Watch an ad',
+                ),
               ),
             ],
           ),
@@ -121,7 +134,11 @@ class _MainShellState extends State<MainShell> {
       case TrialEndingEvent():
         await showTrialEndingSheet(ctx, ended: false);
       case TrialEndedEvent(:final departedPersona):
-        await showTrialEndingSheet(ctx, ended: true, departedPersona: departedPersona);
+        await showTrialEndingSheet(
+          ctx,
+          ended: true,
+          departedPersona: departedPersona,
+        );
       case UpsellEvent(:final streak):
         await showUpsellDialog(ctx, streak);
       case RouteEvent(:final route):
@@ -164,21 +181,48 @@ class _MainShellState extends State<MainShell> {
                 ],
               ),
               bottomNavigationBar: DecoratedBox(
-                decoration: const BoxDecoration(border: Border(top: BorderSide(color: NaglyColors.outline))),
+                decoration: const BoxDecoration(
+                  border: Border(top: BorderSide(color: NaglyColors.outline)),
+                ),
                 child: NavigationBar(
                   selectedIndex: tab.index,
                   onDestinationSelected: (i) => _tabs.value = MainTab.values[i],
                   destinations: const [
-                    NavigationDestination(icon: Icon(Icons.water_drop_outlined), selectedIcon: Icon(Icons.water_drop), label: 'Home'),
-                    NavigationDestination(icon: Icon(Icons.chat_bubble_outline), selectedIcon: Icon(Icons.chat_bubble), label: 'History'),
-                    NavigationDestination(icon: Icon(Icons.people_outline), selectedIcon: Icon(Icons.people), label: 'Personas'),
-                    NavigationDestination(icon: Icon(Icons.insights_outlined), selectedIcon: Icon(Icons.insights), label: 'Insights'),
-                    NavigationDestination(icon: Icon(Icons.settings_outlined), selectedIcon: Icon(Icons.settings), label: 'Settings'),
+                    NavigationDestination(
+                      icon: Icon(Icons.water_drop_outlined),
+                      selectedIcon: Icon(Icons.water_drop),
+                      label: 'Home',
+                    ),
+                    NavigationDestination(
+                      icon: Icon(Icons.chat_bubble_outline),
+                      selectedIcon: Icon(Icons.chat_bubble),
+                      label: 'History',
+                    ),
+                    NavigationDestination(
+                      icon: Icon(Icons.people_outline),
+                      selectedIcon: Icon(Icons.people),
+                      label: 'Personas',
+                    ),
+                    NavigationDestination(
+                      icon: Icon(Icons.insights_outlined),
+                      selectedIcon: Icon(Icons.insights),
+                      label: 'Insights',
+                    ),
+                    NavigationDestination(
+                      icon: Icon(Icons.settings_outlined),
+                      selectedIcon: Icon(Icons.settings),
+                      label: 'Settings',
+                    ),
                   ],
                 ),
               ),
             ),
-            if (_confetti) Positioned.fill(child: ConfettiBurst(onDone: () => setState(() => _confetti = false))),
+            if (_confetti)
+              Positioned.fill(
+                child: ConfettiBurst(
+                  onDone: () => setState(() => _confetti = false),
+                ),
+              ),
           ],
         ),
       ),
@@ -186,9 +230,25 @@ class _MainShellState extends State<MainShell> {
   }
 }
 
-void openPaywall(BuildContext context, {required String placement, String? relationshipId}) {
-  Navigator.of(context).push(MaterialPageRoute<void>(
-    fullscreenDialog: true,
-    builder: (_) => PaywallScreen(placement: placement, relationshipId: relationshipId),
-  ));
+/// Opens the paywall — or, in Plan B (no purchases), the rewarded-ad unlock sheet.
+void openPaywall(
+  BuildContext context, {
+  required String placement,
+  String? relationshipId,
+}) {
+  if (!Integrations.purchasesEnabled) {
+    showAdUnlockHub(
+      context,
+      focusRelationshipId: relationshipId,
+      medsFirst: placement == 'medication_limit',
+    );
+    return;
+  }
+  Navigator.of(context).push(
+    MaterialPageRoute<void>(
+      fullscreenDialog: true,
+      builder: (_) =>
+          PaywallScreen(placement: placement, relationshipId: relationshipId),
+    ),
+  );
 }

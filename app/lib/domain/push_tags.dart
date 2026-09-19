@@ -19,7 +19,12 @@ Map<String, String> computePushTags({
       : recentLogs.map((l) => l.timestampMs).reduce((a, b) => a > b ? a : b);
   final lastLogDaysAgo = lastLogMs == null
       ? 999
-      : today.difference(dateOnly(DateTime.fromMillisecondsSinceEpoch(lastLogMs))).inDays.clamp(0, 999);
+      : today
+            .difference(
+              dateOnly(DateTime.fromMillisecondsSinceEpoch(lastLogMs)),
+            )
+            .inDays
+            .clamp(0, 999);
 
   return {
     'persona_id': profile.personaId,

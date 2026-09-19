@@ -65,16 +65,25 @@ class NaglyDatabase {
 
   // ── Key/value ─────────────────────────────────────────────
   Future<String?> getString(String key) async {
-    final rows = await db.query('kv', where: 'key = ?', whereArgs: [key], limit: 1);
+    final rows = await db.query(
+      'kv',
+      where: 'key = ?',
+      whereArgs: [key],
+      limit: 1,
+    );
     return rows.isEmpty ? null : rows.first['value'] as String;
   }
 
-  Future<void> setString(String key, String value) =>
-      db.insert('kv', {'key': key, 'value': value}, conflictAlgorithm: ConflictAlgorithm.replace);
+  Future<void> setString(String key, String value) => db.insert('kv', {
+    'key': key,
+    'value': value,
+  }, conflictAlgorithm: ConflictAlgorithm.replace);
 
-  Future<void> remove(String key) => db.delete('kv', where: 'key = ?', whereArgs: [key]);
+  Future<void> remove(String key) =>
+      db.delete('kv', where: 'key = ?', whereArgs: [key]);
 
-  Future<int?> getInt(String key) async => int.tryParse(await getString(key) ?? '');
+  Future<int?> getInt(String key) async =>
+      int.tryParse(await getString(key) ?? '');
 
   Future<void> setInt(String key, int value) => setString(key, '$value');
 
@@ -83,7 +92,8 @@ class NaglyDatabase {
     return v == null ? fallback : v == '1';
   }
 
-  Future<void> setBool(String key, bool value) => setString(key, value ? '1' : '0');
+  Future<void> setBool(String key, bool value) =>
+      setString(key, value ? '1' : '0');
 
   // ── Profile ───────────────────────────────────────────────
   Future<Profile> profile() async {
@@ -92,30 +102,42 @@ class NaglyDatabase {
     return Profile.fromJson((jsonDecode(raw) as Map).cast<String, Object?>());
   }
 
-  Future<void> saveProfile(Profile profile) => setString(Keys.profile, jsonEncode(profile.toJson()));
+  Future<void> saveProfile(Profile profile) =>
+      setString(Keys.profile, jsonEncode(profile.toJson()));
 
   // ── Drinks ────────────────────────────────────────────────
   Future<int> addDrink(int amountMl, {int? atMs}) => db.insert('drink_log', {
-        'timestamp_ms': atMs ?? DateTime.now().millisecondsSinceEpoch,
-        'amount_ml': amountMl,
-      });
+    'timestamp_ms': atMs ?? DateTime.now().millisecondsSinceEpoch,
+    'amount_ml': amountMl,
+  });
 
   Future<List<DrinkLog>> drinksBetween(int fromMs, int toMs) async {
-    final rows = await db.query('drink_log',
-        where: 'timestamp_ms >= ? AND timestamp_ms < ?',
-        whereArgs: [fromMs, toMs],
-        orderBy: 'timestamp_ms ASC, id ASC');
+    final rows = await db.query(
+      'drink_log',
+      where: 'timestamp_ms >= ? AND timestamp_ms < ?',
+      whereArgs: [fromMs, toMs],
+      orderBy: 'timestamp_ms ASC, id ASC',
+    );
     return [
       for (final r in rows)
-        DrinkLog(id: r['id'] as int, timestampMs: r['timestamp_ms'] as int, amountMl: r['amount_ml'] as int),
+        DrinkLog(
+          id: r['id'] as int,
+          timestampMs: r['timestamp_ms'] as int,
+          amountMl: r['amount_ml'] as int,
+        ),
     ];
   }
 
-  Future<void> deleteDrink(int id) => db.delete('drink_log', where: 'id = ?', whereArgs: [id]);
+  Future<void> deleteDrink(int id) =>
+      db.delete('drink_log', where: 'id = ?', whereArgs: [id]);
 
   // ── Medications ───────────────────────────────────────────
   Future<List<Medication>> medications() async {
-    final rows = await db.query('medication', where: 'active = 1', orderBy: 'hour, minute, id');
+    final rows = await db.query(
+      'medication',
+      where: 'active = 1',
+      orderBy: 'hour, minute, id',
+    );
     return [
       for (final r in rows)
         Medication(
@@ -128,15 +150,24 @@ class NaglyDatabase {
     ];
   }
 
-  Future<int> addMedication(String name, int hour, int minute, {String dose = ''}) =>
-      db.insert('medication', {'name': name, 'dose': dose, 'hour': hour, 'minute': minute});
+  Future<int> addMedication(
+    String name,
+    int hour,
+    int minute, {
+    String dose = '',
+  }) => db.insert('medication', {
+    'name': name,
+    'dose': dose,
+    'hour': hour,
+    'minute': minute,
+  });
 
   Future<void> updateMedication(Medication m) => db.update(
-        'medication',
-        {'name': m.name, 'dose': m.dose, 'hour': m.hour, 'minute': m.minute},
-        where: 'id = ?',
-        whereArgs: [m.id],
-      );
+    'medication',
+    {'name': m.name, 'dose': m.dose, 'hour': m.hour, 'minute': m.minute},
+    where: 'id = ?',
+    whereArgs: [m.id],
+  );
 
   /// Soft-delete so history keeps the medication's name.
   Future<void> removeMedication(int id) =>
@@ -156,22 +187,31 @@ class NaglyDatabase {
     };
   }
 
-  Future<void> logMed(int medId, String dateKey, MedStatus status, {int? atMs}) => db.insert(
-        'med_log',
-        {
-          'med_id': medId,
-          'date_key': dateKey,
-          'status': status.name,
-          'at_ms': atMs ?? DateTime.now().millisecondsSinceEpoch,
-        },
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
+  Future<void> logMed(
+    int medId,
+    String dateKey,
+    MedStatus status, {
+    int? atMs,
+  }) => db.insert('med_log', {
+    'med_id': medId,
+    'date_key': dateKey,
+    'status': status.name,
+    'at_ms': atMs ?? DateTime.now().millisecondsSinceEpoch,
+  }, conflictAlgorithm: ConflictAlgorithm.replace);
 
-  Future<void> clearMedLog(int medId, String dateKey) =>
-      db.delete('med_log', where: 'med_id = ? AND date_key = ?', whereArgs: [medId, dateKey]);
+  Future<void> clearMedLog(int medId, String dateKey) => db.delete(
+    'med_log',
+    where: 'med_id = ? AND date_key = ?',
+    whereArgs: [medId, dateKey],
+  );
 
   Future<List<MedLog>> medLogsSince(String fromDateKey) async {
-    final rows = await db.query('med_log', where: 'date_key >= ?', whereArgs: [fromDateKey], orderBy: 'at_ms');
+    final rows = await db.query(
+      'med_log',
+      where: 'date_key >= ?',
+      whereArgs: [fromDateKey],
+      orderBy: 'at_ms',
+    );
     return [
       for (final r in rows)
         MedLog(
@@ -186,15 +226,20 @@ class NaglyDatabase {
 
   // ── Unlocks ───────────────────────────────────────────────
   Future<Map<String, int>> activeUnlocks(int nowMs) async {
-    final rows = await db.query('unlock', where: 'expires_at_ms > ?', whereArgs: [nowMs]);
-    return {for (final r in rows) r['key'] as String: r['expires_at_ms'] as int};
+    final rows = await db.query(
+      'unlock',
+      where: 'expires_at_ms > ?',
+      whereArgs: [nowMs],
+    );
+    return {
+      for (final r in rows) r['key'] as String: r['expires_at_ms'] as int,
+    };
   }
 
-  Future<void> grantUnlock(String key, int expiresAtMs) => db.insert(
-        'unlock',
-        {'key': key, 'expires_at_ms': expiresAtMs},
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
+  Future<void> grantUnlock(String key, int expiresAtMs) => db.insert('unlock', {
+    'key': key,
+    'expires_at_ms': expiresAtMs,
+  }, conflictAlgorithm: ConflictAlgorithm.replace);
 
   // ── Nudge history (for "ignored" counting) ────────────────
   Future<List<int>> nudgeHistory() async {
@@ -203,7 +248,8 @@ class NaglyDatabase {
     return (jsonDecode(raw) as List).cast<int>();
   }
 
-  Future<void> setNudgeHistory(List<int> times) => setString(Keys.nudgeHistory, jsonEncode(times));
+  Future<void> setNudgeHistory(List<int> times) =>
+      setString(Keys.nudgeHistory, jsonEncode(times));
 }
 
 abstract final class Keys {

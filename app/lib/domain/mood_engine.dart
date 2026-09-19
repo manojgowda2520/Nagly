@@ -44,7 +44,10 @@ DayPart dayPartFor(int hour, int wakeHour, int sleepHour) {
 double expectedRatio(int nowHour, int wakeHour, int sleepHour) {
   if (wakeHour == sleepHour) return 1;
   final waking = _wakingHours(wakeHour, sleepHour);
-  return (_elapsedFromWake(nowHour, wakeHour, sleepHour) / waking).clamp(0.0, 1.0);
+  return (_elapsedFromWake(nowHour, wakeHour, sleepHour) / waking).clamp(
+    0.0,
+    1.0,
+  );
 }
 
 /// How far behind schedule: 0 = on track or ahead, 1 = far behind.
@@ -73,10 +76,15 @@ DateTime dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
 String dateKey(DateTime d) =>
     '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 
-DateTime _minusDays(DateTime d, int days) => DateTime(d.year, d.month, d.day - days);
+DateTime _minusDays(DateTime d, int days) =>
+    DateTime(d.year, d.month, d.day - days);
 
 List<DateTime> _completedDays(Map<DateTime, int> logsByDay, int dailyMl) =>
-    (logsByDay.entries.where((e) => e.value >= dailyMl).map((e) => dateOnly(e.key)).toSet().toList())
+    (logsByDay.entries
+          .where((e) => e.value >= dailyMl)
+          .map((e) => dateOnly(e.key))
+          .toSet()
+          .toList())
       ..sort();
 
 /// Consecutive completed days ending today or yesterday.
@@ -125,7 +133,9 @@ String pickLine(
   final lines = PersonaCatalog.linesFor(persona, mood, dayPart);
   if (lines.isEmpty) return 'Sip some water.';
   if (lines.length == 1) return lines.first;
-  final candidates = previousLine == null ? lines : lines.where((l) => l != previousLine).toList();
+  final candidates = previousLine == null
+      ? lines
+      : lines.where((l) => l != previousLine).toList();
   final pool = candidates.isEmpty ? lines : candidates;
   return pool[(random ?? Random()).nextInt(pool.length)];
 }
@@ -148,10 +158,13 @@ Map<DateTime, int> totalsByDay(Iterable<DrinkLog> logs) {
 
 const _mlPerOz = 29.5735;
 
-int mlToDisplay(int ml, VolumeUnit unit) => unit == VolumeUnit.ml ? ml : (ml / _mlPerOz).round();
+int mlToDisplay(int ml, VolumeUnit unit) =>
+    unit == VolumeUnit.ml ? ml : (ml / _mlPerOz).round();
 
-int displayToMl(int value, VolumeUnit unit) => unit == VolumeUnit.ml ? value : (value * _mlPerOz).round();
+int displayToMl(int value, VolumeUnit unit) =>
+    unit == VolumeUnit.ml ? value : (value * _mlPerOz).round();
 
 String unitLabel(VolumeUnit unit) => unit == VolumeUnit.ml ? 'ml' : 'oz';
 
-String formatVolume(int ml, VolumeUnit unit) => '${mlToDisplay(ml, unit)} ${unitLabel(unit)}';
+String formatVolume(int ml, VolumeUnit unit) =>
+    '${mlToDisplay(ml, unit)} ${unitLabel(unit)}';

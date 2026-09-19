@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:nagly/config/integrations.dart';
 import 'package:nagly/data/database.dart';
 import 'package:nagly/domain/models.dart';
 import 'package:nagly/services/ads.dart';
@@ -52,6 +53,14 @@ Future<void> _tap(WidgetTester tester, Finder f) async {
   await tester.tap(f);
   await tester.pump();
   await tester.pump(const Duration(milliseconds: 500));
+}
+
+/// Pump frames until [f] finds something (sheets arrive a few frames after events).
+Future<void> _pumpUntil(WidgetTester tester, Finder f, {int tries = 20}) async {
+  for (var i = 0; i < tries && f.evaluate().isEmpty; i++) {
+    await tester.pump(const Duration(milliseconds: 200));
+  }
+  await tester.pump(const Duration(milliseconds: 600)); // let the sheet finish sliding in
 }
 
 Future<void> _teardown(WidgetTester tester, AppController c) async {
@@ -141,6 +150,7 @@ void main() {
     expect(c.activeMeds.map((m) => m.name), ['A'], reason: 'first medication stays free');
     await tester.pump(const Duration(seconds: 1));
     // Trial-ended sheet.
+    await _pumpUntil(tester, find.text('My full care plan has ended'));
     expect(find.text('My full care plan has ended'), findsOneWidget);
     await _tap(tester, find.text('See plans'));
     await tester.pump(const Duration(seconds: 1));
@@ -162,10 +172,9 @@ void main() {
     await c.finishOnboarding(const Profile());
     await c.sandboxExpireTrial();
     await tester.pump(const Duration(seconds: 1));
-    // Dismiss any trial-ended sheet.
-    if (find.text('Keep free (water + 1 pill)').evaluate().isNotEmpty) {
-      await _tap(tester, find.text('Keep free (water + 1 pill)'));
-    }
+    await tester.pump(const Duration(seconds: 1));
+    await _pumpUntil(tester, find.text('Keep free (water + 1 pill)'));
+    await _tap(tester, find.text('Keep free (water + 1 pill)'));
     await _tap(tester, find.text('Personas'));
     await _tap(tester, find.text('Bestie'));
     await _tap(tester, find.text('The Bestie'));
@@ -178,6 +187,32 @@ void main() {
     expect(c.access.relationshipAccessible('bestie'), isTrue);
     expect(c.access.relationshipAccessible('dad'), isFalse);
 
+    await _teardown(tester, c);
+  });
+
+  testWidgets('Plan B (no purchases): paywall becomes ad-unlock hub; ad unlocks extra meds', (tester) async {
+    Integrations.purchasesEnabled = false;
+    addTearDown(() => Integrations.purchasesEnabled = true);
+    final (c, _, _) = await _boot(tester);
+    await c.addMedication('A', 8, 0);
+    await c.addMedication('B', 20, 0);
+    await c.finishOnboarding(const Profile(careMode: CareMode.medication));
+    await c.sandboxExpireTrial();
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pump(const Duration(seconds: 1));
+    await _pumpUntil(tester, find.text('Unlock with a short ad'));
+    expect(find.text('Unlock with a short ad'), findsOneWidget, reason: 'trial-ended sheet offers ads, not plans');
+    await _tap(tester, find.text('Unlock with a short ad'));
+    await _pumpUntil(tester, find.text('🎁 Unlock with a short ad'));
+    expect(find.text('🎁 Unlock with a short ad'), findsOneWidget);
+    expect(find.text('Go Pro'), findsNothing);
+    expect(c.activeMeds.length, 1);
+    await _tap(tester, find.text('Unlimited medications'));
+    expect(find.text('Sandbox ad'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 6));
+    await tester.pump(const Duration(seconds: 1));
+    expect(c.activeMeds.length, 2);
+    expect(c.access.canAddMedication(2), isTrue);
     await _teardown(tester, c);
   });
 }

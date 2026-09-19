@@ -66,44 +66,98 @@ List<ChatItem> buildChatTimeline({
       final before = profile.dailyMl <= 0 ? 0.0 : dayTotal / profile.dailyMl;
       dayTotal += log.amountMl;
       final after = profile.dailyMl <= 0 ? 0.0 : dayTotal / profile.dailyMl;
-      final expected = expectedRatio(at.hour, profile.wakeHour, profile.sleepHour);
+      final expected = expectedRatio(
+        at.hour,
+        profile.wakeHour,
+        profile.sleepHour,
+      );
       // The nag that prompted this sip reflects where you were *before* drinking —
       // unless this sip finished the goal, in which case she's proud.
       final mood = after >= 1
           ? Mood.proud
-          : computeMood(progressRatio: before, expectedRatio: expected, ignoredNudgeCount: 0);
+          : computeMood(
+              progressRatio: before,
+              expectedRatio: expected,
+              ignoredNudgeCount: 0,
+            );
       final lines = PersonaCatalog.linesFor(
-          persona, mood, dayPartFor(at.hour, profile.wakeHour, profile.sleepHour));
+        persona,
+        mood,
+        dayPartFor(at.hour, profile.wakeHour, profile.sleepHour),
+      );
       final pool = lines.where((l) => l != previous).toList();
       final from = pool.isEmpty ? lines : pool;
       final line = from.isEmpty ? 'Nice sip!' : from[log.id % from.length];
       previous = line;
       items
-        ..add(ChatMessage(id: 'p-${log.id}', isUser: false, text: line, timestampMs: e.ms - 60000, mood: mood))
-        ..add(ChatMessage(id: 'u-${log.id}', isUser: true, text: '+${formatVolume(log.amountMl, profile.volumeUnit)}', timestampMs: e.ms));
+        ..add(
+          ChatMessage(
+            id: 'p-${log.id}',
+            isUser: false,
+            text: line,
+            timestampMs: e.ms - 60000,
+            mood: mood,
+          ),
+        )
+        ..add(
+          ChatMessage(
+            id: 'u-${log.id}',
+            isUser: true,
+            text: '+${formatVolume(log.amountMl, profile.volumeUnit)}',
+            timestampMs: e.ms,
+          ),
+        );
     } else if (e.med case final m?) {
       final med = medsById[m.medId];
       final name = med?.name ?? 'medication';
       if (m.status == MedStatus.taken) {
         items
-          ..add(ChatMessage(id: 'mu-${m.id}', isUser: true, text: '💊 Took $name', timestampMs: e.ms, isMed: true))
-          ..add(ChatMessage(
+          ..add(
+            ChatMessage(
+              id: 'mu-${m.id}',
+              isUser: true,
+              text: '💊 Took $name',
+              timestampMs: e.ms,
+              isMed: true,
+            ),
+          )
+          ..add(
+            ChatMessage(
               id: 'mp-${m.id}',
               isUser: false,
-              text: PersonaCatalog.fillMed(persona.medTaken[m.id % persona.medTaken.length], name),
+              text: PersonaCatalog.fillMed(
+                persona.medTaken[m.id % persona.medTaken.length],
+                name,
+              ),
               timestampMs: e.ms + 1,
               mood: Mood.proud,
-              isMed: true));
+              isMed: true,
+            ),
+          );
       } else {
         items
-          ..add(ChatMessage(id: 'mu-${m.id}', isUser: true, text: '💊 Skipped $name', timestampMs: e.ms, isMed: true))
-          ..add(ChatMessage(
+          ..add(
+            ChatMessage(
+              id: 'mu-${m.id}',
+              isUser: true,
+              text: '💊 Skipped $name',
+              timestampMs: e.ms,
+              isMed: true,
+            ),
+          )
+          ..add(
+            ChatMessage(
               id: 'mp-${m.id}',
               isUser: false,
-              text: PersonaCatalog.fillMed(persona.medMissed[m.id % persona.medMissed.length], name),
+              text: PersonaCatalog.fillMed(
+                persona.medMissed[m.id % persona.medMissed.length],
+                name,
+              ),
               timestampMs: e.ms + 1,
               mood: Mood.disappointed,
-              isMed: true));
+              isMed: true,
+            ),
+          );
       }
     }
   }

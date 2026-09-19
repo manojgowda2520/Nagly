@@ -8,14 +8,20 @@ enum RelationshipLevel {
   family('Family', '🏠', 7, 10),
   soulReminder('Soul Reminder', '✨', 14, 13);
 
-  const RelationshipLevel(this.label, this.emoji, this.streakThreshold, this.consistencyThreshold);
+  const RelationshipLevel(
+    this.label,
+    this.emoji,
+    this.streakThreshold,
+    this.consistencyThreshold,
+  );
 
   final String label;
   final String emoji;
   final int streakThreshold;
   final int consistencyThreshold;
 
-  RelationshipLevel? get next => index + 1 < values.length ? values[index + 1] : null;
+  RelationshipLevel? get next =>
+      index + 1 < values.length ? values[index + 1] : null;
 }
 
 RelationshipLevel levelFromStreak(int streak) {
@@ -42,7 +48,11 @@ RelationshipLevel computeRelationshipLevel(int currentStreak, int daysMetIn14) {
 }
 
 /// Progress toward the next level, 0..1. 1 at max level.
-double relationshipProgressToNext(RelationshipLevel level, int currentStreak, int daysMetIn14) {
+double relationshipProgressToNext(
+  RelationshipLevel level,
+  int currentStreak,
+  int daysMetIn14,
+) {
   final next = level.next;
   if (next == null) return 1;
   final s = (currentStreak / next.streakThreshold).clamp(0.0, 1.0);
@@ -50,8 +60,12 @@ double relationshipProgressToNext(RelationshipLevel level, int currentStreak, in
   return ((s + c) / 2).clamp(0.0, 1.0);
 }
 
-int countDaysMetGoalInWindow(Map<DateTime, int> logsByDay, int dailyMl, DateTime today,
-    {int windowDays = 14}) {
+int countDaysMetGoalInWindow(
+  Map<DateTime, int> logsByDay,
+  int dailyMl,
+  DateTime today, {
+  int windowDays = 14,
+}) {
   final t = dateOnly(today);
   var count = 0;
   for (var offset = 0; offset < windowDays; offset++) {

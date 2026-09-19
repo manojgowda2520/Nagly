@@ -23,7 +23,11 @@ int sleepBoundaryMs(int nowMs, int wakeHour, int sleepHour) {
 
 /// Spread the remaining water over the rest of the waking day,
 /// at most [maxWaterNudges] reminders, never closer than 45 minutes.
-List<int> nextNudgeTimes({required int nowMs, required Profile profile, required int consumedMl}) {
+List<int> nextNudgeTimes({
+  required int nowMs,
+  required Profile profile,
+  required int consumedMl,
+}) {
   final remaining = max(0, profile.dailyMl - consumedMl);
   if (remaining == 0) return const [];
 
@@ -46,8 +50,13 @@ List<int> nextNudgeTimes({required int nowMs, required Profile profile, required
 }
 
 /// Nudges that already fired since the last drink — each one the user let slide.
-int ignoredNudgeCount({required List<int> nudgeHistory, required int nowMs, required int? lastLogMs}) {
-  final dayStart = dateOnly(DateTime.fromMillisecondsSinceEpoch(nowMs)).millisecondsSinceEpoch;
+int ignoredNudgeCount({
+  required List<int> nudgeHistory,
+  required int nowMs,
+  required int? lastLogMs,
+}) {
+  final dayStart = dateOnly(DateTime.fromMillisecondsSinceEpoch(nowMs))
+      .millisecondsSinceEpoch;
   final since = max(dayStart, lastLogMs ?? 0);
   return nudgeHistory.where((t) => t <= nowMs && t > since).length;
 }
@@ -93,7 +102,11 @@ List<PlannedNudge> planWaterNudges({
   Random? random,
 }) {
   final persona = PersonaCatalog.get(profile.personaId);
-  final times = nextNudgeTimes(nowMs: nowMs, profile: profile, consumedMl: consumedMl);
+  final times = nextNudgeTimes(
+    nowMs: nowMs,
+    profile: profile,
+    consumedMl: consumedMl,
+  );
   String? previous;
   final rnd = random ?? Random();
   return [
@@ -105,11 +118,23 @@ List<PlannedNudge> planWaterNudges({
           consumedMl: consumedMl,
           ignoredCount: ignoredSoFar + i,
         );
-        final part = dayPartFor(DateTime.fromMillisecondsSinceEpoch(times[i]).hour, profile.wakeHour,
-            profile.sleepHour);
-        final body = pickLine(persona, mood, dayPart: part, previousLine: previous, random: rnd);
+        final part = dayPartFor(
+          DateTime.fromMillisecondsSinceEpoch(times[i]).hour,
+          profile.wakeHour,
+          profile.sleepHour,
+        );
+        final body = pickLine(
+          persona,
+          mood,
+          dayPart: part,
+          previousLine: previous,
+          random: rnd,
+        );
         previous = body;
-        final skips = persona.skipLabels[mood] ?? persona.skipLabels[Mood.neutral] ?? const ['Skip'];
+        final skips =
+            persona.skipLabels[mood] ??
+            persona.skipLabels[Mood.neutral] ??
+            const ['Skip'];
         return PlannedNudge(
           atMs: times[i],
           title: '${persona.emoji} ${persona.displayName}',
@@ -130,7 +155,13 @@ List<DateTime> nextMedOccurrences({
 }) {
   final out = <DateTime>[];
   for (var offset = 0; offset < days + 1 && out.length < days; offset++) {
-    final at = DateTime(now.year, now.month, now.day + offset, med.hour, med.minute);
+    final at = DateTime(
+      now.year,
+      now.month,
+      now.day + offset,
+      med.hour,
+      med.minute,
+    );
     if (!at.isAfter(now)) continue;
     if (loggedDateKeys.contains(dateKey(at))) continue;
     out.add(at);
