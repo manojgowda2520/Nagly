@@ -132,7 +132,11 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     final installId = await _installId();
     unawaited(
       push
-          .init(installId, onRoute: (r) => _emit(RouteEvent(r)))
+          .init(
+            installId,
+            onRoute: (r) => _emit(RouteEvent(r)),
+            onAction: _onPushAction,
+          )
           .catchError((Object e) => debugPrint('Push init failed: $e')),
     );
     unawaited(
@@ -235,8 +239,6 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         recentLogs: recentLogs,
         access: access,
         now: now,
-        medCount: meds.length,
-        bondLevel: bondLevel.name,
       );
       unawaited(
         push
@@ -490,12 +492,34 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   // ── Actions ───────────────────────────────────────────────
+  /// Action buttons on cloud pushes (e.g. a win-back with "+250 ml").
+  void _onPushAction(String actionId) {
+    switch (actionId) {
+      case PushActionIds.add250:
+        logDrink(250);
+      case PushActionIds.add500:
+        logDrink(500);
+    }
+  }
+
+  void _outcome(String name, {double? value, bool unique = false}) => unawaited(
+    push
+        .outcome(name, value: value, unique: unique)
+        .catchError((Object e) => debugPrint('Push outcome failed: $e')),
+  );
+
   Future<void> logDrink(int ml) async {
     final before = consumedMl;
     await db.addDrink(ml);
     await _changed();
-    if (before < profile.dailyMl && consumedMl >= profile.dailyMl)
+    // OneSignal attributes these to the push that brought the user here, so the
+    // dashboard shows which messages actually make people drink.
+    _outcome(PushOutcomes.waterLogged);
+    _outcome(PushOutcomes.waterMl, value: ml.toDouble());
+    if (before < profile.dailyMl && consumedMl >= profile.dailyMl) {
+      _outcome(PushOutcomes.goalMet, unique: true);
       _emit(const GoalReachedEvent());
+    }
   }
 
   Future<void> undoLast() async {
@@ -568,6 +592,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Future<void> markMed(Medication med, MedStatus? status) async {
+    if (status == MedStatus.taken) _outcome(PushOutcomes.medTaken);
     if (status == null) {
       await db.clearMedLog(med.id, todayKey);
     } else {

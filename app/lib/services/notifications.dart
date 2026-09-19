@@ -8,6 +8,7 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
+import '../config/integrations.dart';
 import '../data/database.dart';
 import '../domain/access.dart';
 import '../domain/models.dart';
@@ -276,8 +277,12 @@ class NotificationService {
       }
     }
 
+    // Win-back and trial-ending are owned by OneSignal Journeys once it's live;
+    // these local versions are the offline fallback, so users never get both.
+    final cloudOwnsReengagement = Integrations.useOneSignal;
+
     // ── Trial ending (in her voice) ──
-    if (access.inTrial) {
+    if (access.inTrial && !cloudOwnsReengagement) {
       final end = DateTime.fromMillisecondsSinceEpoch(access.trialEndsAtMs!);
       var when = DateTime(end.year, end.month, end.day, 10);
       if (!when.isBefore(end)) when = when.subtract(const Duration(days: 1));
@@ -302,7 +307,7 @@ class NotificationService {
       base.day + 2,
       (profile.wakeHour + 4).clamp(0, 23),
     );
-    if (comebackAt.isAfter(at)) {
+    if (comebackAt.isAfter(at) && !cloudOwnsReengagement) {
       await _schedule(
         id: _Ids.comeback,
         at: comebackAt,
