@@ -5,7 +5,7 @@ Screenshots: still to capture (phone, 1080×2400+; Devpost needs 1179×2556 with
 
 ## Store listing
 
-**App name (≤30):** `Nagly: Water & Pill Reminder`
+**App name (≤30):** `Nagly: Mom's Water & Pill Nags` (30 chars)
 
 **Short description (≤80):**
 `Mom nags you to drink water & take your pills. Lovingly. Relentlessly.`
