@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart' show kReleaseMode;
+
 /// Single place to flip sandbox fakes → real SDK clients.
 ///
 /// Each integration goes live independently as soon as its key is filled in
@@ -23,9 +25,11 @@ abstract final class Integrations {
   static const String oneSignalAppId = '2858113c-c323-453d-bbc9-976b8d4c999e';
 
   // AdMob. The app id also lives in android/app/src/main/AndroidManifest.xml.
-  // Defaults are Google's official *test* ids — safe to ship in sandbox builds.
-  static const String adMobRewardedUnitAndroid =
-      'ca-app-pub-3940256099942544/5224354917';
+  // Real unit in release builds; Google's official test unit in debug so we
+  // never click our own live ads while developing.
+  static const String adMobRewardedUnitAndroid = kReleaseMode
+      ? 'ca-app-pub-7379182928133388/4618814501'
+      : 'ca-app-pub-3940256099942544/5224354917';
   static const String adMobRewardedUnitIos =
       'ca-app-pub-3940256099942544/1712485313';
 

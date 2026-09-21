@@ -44,7 +44,7 @@
         <!-- AdMob app id. This is Google's official TEST id; replace with the real one before going live. -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713"/>
+            android:value="ca-app-pub-7379182928133388~6057773279"/>
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_stat_nagly" />

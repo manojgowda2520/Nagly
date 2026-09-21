@@ -10,7 +10,7 @@ Branch: `flutter`. State as of 2026-09-21.
   - Closed testing (Alpha, tester list "Mobil80"): build 2 **approved and live**.
   - **Production: build 2 submitted by the user — in review.** Will go live when approved.
   - Products (all active): `nagly_lifetime` (purchase option `lifetime`, $29.99); subscription `nagly_pro` → base plans `annual` $19.99 (+ offer `trial-7d`, 7-day free trial) and `monthly` $1.99.
-  - Notification: "Android developer verification by Sep 30, 2026" (account-level) — user should complete it.
+  - Android developer verification: identity filled, com.manojbuilds.nagly **Registered** (checked 2026-09-21).
 - **RevenueCat** (project "Nagly", app "Nagly (Play Store)"):
   - Products created: `nagly_lifetime`, `nagly_pro:annual`, `nagly_pro:monthly`; all attached to entitlement **`pro`**.
   - Offering **`default`** ("Nagly Pro plans") — **done and Current**: `$rc_lifetime`→nagly_lifetime, `$rc_annual`→nagly_pro:annual, `$rc_monthly`→nagly_pro:monthly.
@@ -20,8 +20,8 @@ Branch: `flutter`. State as of 2026-09-21.
 
 ## Pending (in order)
 1. ~~RevenueCat offering~~ (done 2026-09-21).
-2. User: upload Play service-account JSON to RevenueCat (can take 24–36 h to activate).
-3. User: send AdMob App ID (`ca-app-pub-…~…`) + Rewarded unit ID (`ca-app-pub-…/…`) → put in `app/android/app/src/main/AndroidManifest.xml` and `app/lib/config/integrations.dart`, bump to **1.0.0+3**, `flutter test`, `flutter build appbundle --release`. AAB is ~62 MB (too big for Claude's browser upload — user drags it into Play Console).
+2. ~~Service-account JSON~~ (2026-09-21): GCP project nagly-3e4a0, APIs on, SA revenuecat@nagly-3e4a0.iam.gserviceaccount.com invited in Play (Nagly only), JSON uploaded to RevenueCat. Credentials VALID; RTDN topic projects/nagly-3e4a0/topics/Play-Store-Notifications connected + test received (all one-time products).
+3. ~~AdMob~~ (2026-09-21): personal AdMob account, app ID ca-app-pub-7379182928133388~6057773279, rewarded unit ca-app-pub-7379182928133388/4618814501 (test unit still used in debug). App is "not listed" in AdMob; link Play store in AdMob once Nagly is public. Built 1.0.0+3 AAB; user uploads.
 4. Real test purchase from the closed-testing link.
 5. Ship 1.0.0 (3) to Production as an update.
 6. OneSignal Journeys "Set live" (user approval).
@@ -32,7 +32,7 @@ Branch: `flutter`. State as of 2026-09-21.
 - Flutter 3.47.x, JDK 17, Android SDK 36. Run tests with `flutter test` (on macOS without `timeout`: `perl -e 'alarm shift; exec @ARGV' 240 flutter test`).
 - `path_provider_foundation` is pinned to 2.4.1 (macOS CLT linker issue).
 - Release signing: `app/android/key.properties` + upload keystore are **not in git**. Copy them securely from the original Mac (`~/development/nagly-keys/`) — without them you can't sign updates Play will accept. Back them up.
-- Claude in Chrome must be signed in to the same Claude account in both Chrome profiles (personal = RevenueCat/OneSignal, Work = Play Console).
+- Claude in Chrome: Play Console is now also signed in on the **personal** Chrome profile, so personal Chrome covers everything.
 
 ## Rules the user set
 - In the Work Chrome profile, touch only the Nagly app in Play Console.
