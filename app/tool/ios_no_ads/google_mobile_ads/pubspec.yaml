@@ -1,0 +1,9 @@
+name: google_mobile_ads
+description: Ad-free stand-in used only for iOS builds (tool/build_ios.sh). No native code.
+version: 0.0.0
+publish_to: none
+environment:
+  sdk: ^3.0.0
+dependencies:
+  flutter:
+    sdk: flutter
