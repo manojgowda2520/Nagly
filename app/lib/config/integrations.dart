@@ -59,7 +59,8 @@ abstract final class Integrations {
   static bool get useRevenueCat =>
       !sandboxMode && revenueCatAndroidKey.isNotEmpty;
   static bool get useOneSignal => !sandboxMode && oneSignalAppId.isNotEmpty;
-  static bool get useAdMob => !sandboxMode;
+  // Never on iOS: the iPhone app has no ads at all (App Store policy choice).
+  static bool get useAdMob => !sandboxMode && !Platform.isIOS;
 
   static const String privacyUrl =
       'https://manojgowda2520.github.io/Nagly/privacy.html';

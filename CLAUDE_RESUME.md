@@ -21,7 +21,7 @@ Branch: `flutter`. State as of 2026-09-21.
 ## Payments / ads switch (remote)
 RevenueCat → Product catalog → Offerings → default → Metadata: `{"monetization_mode": "payments" | "ads" | "both"}`.
 payments = paywall only, no ads (current). ads = no purchases, rewarded ads unlock 24h. both = paywall + ads on locked voices.
-iOS is always payments. Applied on next app launch. Code: `Integrations.applyRemoteMode` in lib/config/integrations.dart, read in RevenueCatBillingService.init.
+iOS is always payments. **iOS must have NO ads at all** (owner's rule, App Store policy fear): useAdMob=false on iOS; before the first iOS build, strip the google_mobile_ads pod from the iOS binary too (no GAD keys, no ATT prompt, no SKAdNetwork). Applied on next app launch. Code: `Integrations.applyRemoteMode` in lib/config/integrations.dart, read in RevenueCatBillingService.init.
 
 ## Pending (in order)
 1. ~~RevenueCat offering~~ (done 2026-09-21).
@@ -31,7 +31,7 @@ iOS is always payments. Applied on next app launch. Code: `Integrations.applyRem
 5. Ship 1.0.0 (3) to Production as an update.
 6. OneSignal Journeys "Set live" (user approval).
 7. Demo video + Devpost submission before **Sep 30, 11:45 pm PDT** (texts/script in SHIPATON.md).
-8. Later (Oct+): iOS App Store version.
+8. iOS (XcelAudit Apple team VGK8LY4A86): bundle ID registered (IAP + Push), app created (Apple ID 6814609746, SKU nagly-ios), IAPs created: group "Nagly Pro" → nagly_pro_annual (1y), nagly_pro_monthly (1m); non-consumable nagly_lifetime. Still need: prices, 7-day trial on annual, localizations, RevenueCat iOS app + keys, push key, build.
 
 ## Machine setup notes (from the original Mac)
 - Flutter 3.47.x, JDK 17, Android SDK 36. Run tests with `flutter test` (on macOS without `timeout`: `perl -e 'alarm shift; exec @ARGV' 240 flutter test`).
