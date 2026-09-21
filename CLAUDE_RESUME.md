@@ -18,6 +18,11 @@ Branch: `flutter`. State as of 2026-09-21.
 - **OneSignal** (app 2858113c-…): 3 segments, 5 persona push templates, 3 Journeys (win-back, streaks, trial ending) — all **Drafts**; set live only after user approval, ideally after Production approval.
 - **GitHub Pages**: privacy (with `#delete` section) and terms live at manojgowda2520.github.io/Nagly/.
 
+## Payments / ads switch (remote)
+RevenueCat → Product catalog → Offerings → default → Metadata: `{"monetization_mode": "payments" | "ads" | "both"}`.
+payments = paywall only, no ads (current). ads = no purchases, rewarded ads unlock 24h. both = paywall + ads on locked voices.
+iOS is always payments. Applied on next app launch. Code: `Integrations.applyRemoteMode` in lib/config/integrations.dart, read in RevenueCatBillingService.init.
+
 ## Pending (in order)
 1. ~~RevenueCat offering~~ (done 2026-09-21).
 2. ~~Service-account JSON~~ (2026-09-21): GCP project nagly-3e4a0, APIs on, SA revenuecat@nagly-3e4a0.iam.gserviceaccount.com invited in Play (Nagly only), JSON uploaded to RevenueCat. Credentials VALID; RTDN topic projects/nagly-3e4a0/topics/Play-Store-Notifications connected + test received (all one-time products).
