@@ -1,0 +1,4 @@
+- [Nagly Flutter rewrite](nagly-flutter-rewrite.md) — rewrite decided 2026-09-19, scope, fakes, tool locations
+- [Nagly builder workflow](nagly-user-workflow.md) — hands-off user, voice-to-text, git identity
+- [Work profile: Nagly only](work-profile-nagly-only.md) — in Work Chrome/Play Console touch only the Nagly app
+- [Nagly Play Console](nagly-play-console.md) — org account, IDs, setup tasks done, not yet sent for review
