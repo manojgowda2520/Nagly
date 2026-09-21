@@ -197,8 +197,12 @@ Future<void> showMedicationEditor(
 }
 
 // ── Locked persona: watch an ad (24h) or go Pro ────────────────
-Future<void> showUnlockSheet(BuildContext context, Persona persona) {
+Future<void> showUnlockSheet(BuildContext context, Persona persona) async {
   final rel = PersonaCatalog.relationshipOf(persona);
+  if (!Integrations.adsEnabled) {
+    openPaywall(context, placement: 'persona_locked', relationshipId: rel.id);
+    return;
+  }
   return showModalBottomSheet<void>(
     context: context,
     builder: (ctx) => Padding(

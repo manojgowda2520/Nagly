@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+
+import '../../config/integrations.dart';
+
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
@@ -46,7 +49,13 @@ class _PersonasScreenState extends State<PersonasScreen> {
                   ? 'Pro — every voice is yours 💛'
                   : access.inTrial
                   ? 'Everyone is free for ${access.trialDaysLeft} more day${access.trialDaysLeft == 1 ? '' : 's'}'
-                  : 'Mom is free forever. Others: watch an ad for 24h, or go Pro.',
+                  : switch (Integrations.monetizationMode) {
+                      MonetizationMode.payments =>
+                        'Mom is free forever. Go Pro for everyone else.',
+                      MonetizationMode.ads =>
+                        'Mom is free forever. Others: watch an ad for 24h.',
+                      MonetizationMode.both => 'Mom is free forever. Others: watch an ad for 24h, or go Pro.',
+                    },
               style: const TextStyle(
                 fontWeight: FontWeight.w800,
                 color: NaglyColors.textSecondary,

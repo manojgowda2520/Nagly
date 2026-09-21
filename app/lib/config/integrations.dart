@@ -1,4 +1,11 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/foundation.dart' show kReleaseMode;
+
+/// How the app makes money. Set remotely from the RevenueCat dashboard: current
+/// offering → Metadata → `{"monetization_mode": "payments" | "ads" | "both"}`.
+/// iOS is always [payments].
+enum MonetizationMode { payments, ads, both }
 
 /// Single place to flip sandbox fakes → real SDK clients.
 ///
@@ -9,10 +16,26 @@ import 'package:flutter/foundation.dart' show kReleaseMode;
 abstract final class Integrations {
   static const bool sandboxMode = false;
 
-  /// Plan A (true): paywall with Lifetime / Annual / Monthly via RevenueCat.
-  /// Plan B (false): no purchases anywhere — every Pro feature is unlocked for 24h by a
-  /// rewarded ad (still reported to RevenueCat Ads). Flip if Play payments aren't approved.
-  static bool purchasesEnabled = true;
+  /// payments: paywall only, no ads anywhere (default).
+  /// ads: no purchases — every Pro feature is unlocked for 24h by a rewarded ad.
+  /// both: paywall, plus "watch an ad for 24h" on locked voices.
+  static MonetizationMode _mode = MonetizationMode.payments;
+
+  static MonetizationMode get monetizationMode =>
+      Platform.isIOS ? MonetizationMode.payments : _mode;
+  static set monetizationMode(MonetizationMode m) => _mode = m;
+
+  /// Applies the remote `monetization_mode` value; unknown values are ignored.
+  static void applyRemoteMode(Object? value) {
+    for (final m in MonetizationMode.values) {
+      if (m.name == value) _mode = m;
+    }
+  }
+
+  static bool get purchasesEnabled => monetizationMode != MonetizationMode.ads;
+  static set purchasesEnabled(bool on) =>
+      _mode = on ? MonetizationMode.payments : MonetizationMode.ads;
+  static bool get adsEnabled => monetizationMode != MonetizationMode.payments;
 
   // RevenueCat public SDK keys (Project settings → API keys).
   static const String revenueCatAndroidKey = 'goog_fhjwCDIAKDpUQTIWJKNmIsozRWP';

@@ -211,6 +211,10 @@ void main() {
   testWidgets('locked persona → rewarded ad unlocks the relationship for 24h', (
     tester,
   ) async {
+    Integrations.monetizationMode = MonetizationMode.both;
+    addTearDown(
+      () => Integrations.monetizationMode = MonetizationMode.payments,
+    );
     final (c, db, _) = await _boot(tester);
     await c.finishOnboarding(const Profile());
     await c.sandboxExpireTrial();
@@ -265,4 +269,20 @@ void main() {
       await _teardown(tester, c);
     },
   );
+
+  test('remote monetization_mode switch', () {
+    addTearDown(
+      () => Integrations.monetizationMode = MonetizationMode.payments,
+    );
+    expect(Integrations.purchasesEnabled, isTrue);
+    expect(Integrations.adsEnabled, isFalse);
+    Integrations.applyRemoteMode('ads');
+    expect(Integrations.purchasesEnabled, isFalse);
+    expect(Integrations.adsEnabled, isTrue);
+    Integrations.applyRemoteMode('both');
+    expect(Integrations.purchasesEnabled, isTrue);
+    expect(Integrations.adsEnabled, isTrue);
+    Integrations.applyRemoteMode('nonsense');
+    expect(Integrations.monetizationMode, MonetizationMode.both);
+  });
 }

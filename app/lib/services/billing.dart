@@ -137,6 +137,18 @@ class RevenueCatBillingService implements BillingService {
     } on PlatformException catch (e) {
       debugPrint('RevenueCat getCustomerInfo failed: $e');
     }
+    // Remote payments/ads switch (offering metadata). The SDK caches offerings, so
+    // this is fast after first launch; on failure we keep the last/default mode.
+    try {
+      final offerings = await Purchases.getOfferings().timeout(
+        const Duration(seconds: 4),
+      );
+      Integrations.applyRemoteMode(
+        offerings.current?.metadata['monetization_mode'],
+      );
+    } catch (e) {
+      debugPrint('RevenueCat monetization_mode fetch failed: $e');
+    }
   }
 
   @override
