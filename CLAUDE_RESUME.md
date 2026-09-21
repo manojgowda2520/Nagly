@@ -13,13 +13,13 @@ Branch: `flutter`. State as of 2026-09-21.
   - Notification: "Android developer verification by Sep 30, 2026" (account-level) — user should complete it.
 - **RevenueCat** (project "Nagly", app "Nagly (Play Store)"):
   - Products created: `nagly_lifetime`, `nagly_pro:annual`, `nagly_pro:monthly`; all attached to entitlement **`pro`**.
-  - Offering **`default`** ("Nagly Pro plans") with packages Lifetime / Annual / Monthly — was being saved when the session ended. **Verify it exists and that each package has the right identifier ($rc_lifetime, $rc_annual, $rc_monthly) and product.** Make it the Current offering.
+  - Offering **`default`** ("Nagly Pro plans") — **done and Current**: `$rc_lifetime`→nagly_lifetime, `$rc_annual`→nagly_pro:annual, `$rc_monthly`→nagly_pro:monthly.
   - **Service Account Credentials JSON is NOT uploaded** → purchases can't be validated until the user uploads it (Play Console → Setup → API access → service account with financial permissions; RevenueCat → Apps → Nagly (Play Store)). It's a secret — the user uploads it, never paste it to Claude.
 - **OneSignal** (app 2858113c-…): 3 segments, 5 persona push templates, 3 Journeys (win-back, streaks, trial ending) — all **Drafts**; set live only after user approval, ideally after Production approval.
 - **GitHub Pages**: privacy (with `#delete` section) and terms live at manojgowda2520.github.io/Nagly/.
 
 ## Pending (in order)
-1. Verify/finish the RevenueCat `default` offering (above).
+1. ~~RevenueCat offering~~ (done 2026-09-21).
 2. User: upload Play service-account JSON to RevenueCat (can take 24–36 h to activate).
 3. User: send AdMob App ID (`ca-app-pub-…~…`) + Rewarded unit ID (`ca-app-pub-…/…`) → put in `app/android/app/src/main/AndroidManifest.xml` and `app/lib/config/integrations.dart`, bump to **1.0.0+3**, `flutter test`, `flutter build appbundle --release`. AAB is ~62 MB (too big for Claude's browser upload — user drags it into Play Console).
 4. Real test purchase from the closed-testing link.
