@@ -214,6 +214,8 @@ Future<void> logWithFeedback(BuildContext context, int ml) async {
       SnackBar(
         content: Text('+${formatVolume(ml, c.profile.volumeUnit)} logged'),
         duration: const Duration(seconds: 3),
+        // Newer Flutter keeps action snackbars up until tapped; this one should time out.
+        persist: false,
         action: SnackBarAction(
           label: 'Undo',
           textColor: NaglyColors.primary,
