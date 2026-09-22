@@ -44,3 +44,12 @@ Still need: user's App Review contact info; availability (China?); version page 
 - In the Work Chrome profile, touch only the Nagly app in Play Console.
 - Ask before accepting terms, submitting for review, publishing, or setting Journeys live.
 - Never handle passwords, service-account JSON, or secret keys (only public keys/IDs).
+
+## Status 2026-09-22 evening
+- iOS 1.0 build 5 + 3 IAPs + Nagly Pro group SUBMITTED to App Review (auto-release on approval). Privacy published, not a medical device, 174 countries (no China), Free.
+- TestFlight: external group "Public testers", build 5 waiting beta review, public link https://testflight.apple.com/join/neVfb471
+- OneSignal iOS APNs active (key 9B7V775A4K, topic-specific Production); 3 Journeys live.
+- RevenueCat monetization_mode = "both" (Android ads on for Catvertising; iOS always payments).
+- Android build 5 AAB built (undo-snackbar fix). Play submission 4 (prod build 2 + alpha build 3) still in review; upload build 5 after approval, then Production.
+- Uploads from CLI hit "Failed to Use Accounts"; workaround: `open app/build/ios/archive/Runner.xcarchive` -> Organizer -> Distribute App.
+- Pending: demo video + Devpost (Sep 30), AdMob store link after Play goes public.
