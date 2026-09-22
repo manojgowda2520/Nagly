@@ -57,7 +57,8 @@ abstract final class Integrations {
       'ca-app-pub-3940256099942544/1712485313';
 
   static bool get useRevenueCat =>
-      !sandboxMode && revenueCatAndroidKey.isNotEmpty;
+      !sandboxMode &&
+      (Platform.isIOS ? revenueCatIosKey : revenueCatAndroidKey).isNotEmpty;
   static bool get useOneSignal => !sandboxMode && oneSignalAppId.isNotEmpty;
   // Never on iOS: the iPhone app has no ads at all (App Store policy choice).
   static bool get useAdMob => !sandboxMode && !Platform.isIOS;
