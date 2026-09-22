@@ -31,7 +31,8 @@ iOS is always payments. **iOS must have NO ads at all** (owner's rule, App Store
 5. Ship 1.0.0 (3) to Production as an update.
 6. OneSignal Journeys "Set live" (user approval).
 7. Demo video + Devpost submission before **Sep 30, 11:45 pm PDT** (texts/script in SHIPATON.md).
-8. iOS (XcelAudit Apple team VGK8LY4A86): bundle ID registered (IAP + Push), app created (Apple ID 6814609746, SKU nagly-ios), IAPs created: group "Nagly Pro" → nagly_pro_annual (1y), nagly_pro_monthly (1m); non-consumable nagly_lifetime. Still need: prices, 7-day trial on annual, localizations, RevenueCat iOS app + keys, push key, build.
+8. iOS (XcelAudit Apple team VGK8LY4A86): bundle ID registered (IAP + Push), app created (Apple ID 6814609746, SKU nagly-ios), IAPs created: group "Nagly Pro" → nagly_pro_annual (1y), nagly_pro_monthly (1m); non-consumable nagly_lifetime. Done 2026-09-22: prices ($29.99 / $19.99 + 7-day free trial / $1.99, 175 countries), IAP names, RevenueCat App Store app (appl_ key in app, 3 products -> pro, in default offering), ASC server notification URLs -> RevenueCat, app icon, subtitle, category Health & Fitness + Lifestyle, content rights, age 4+, privacy types (not yet Published), price Free. Build 3 uploaded (Ready to Submit, location purpose-string warning). Build 4 (adds NSLocationWhenInUseUsageDescription) archived but NOT uploaded: Xcode lost its Apple account sign-in. iOS builds: `tool/build_ios.sh build ipa --release` (ad-free stub). Upload: xcodebuild -exportArchive with destination=upload, team VGK8LY4A86. Screenshots in app/store/ios_screenshots (1242x2688).
+Still need: user's App Review contact info; availability (China?); version page save + select build; IAP review screenshots; OneSignal APNs .p8; submit (user OK).
 
 ## Machine setup notes (from the original Mac)
 - Flutter 3.47.x, JDK 17, Android SDK 36. Run tests with `flutter test` (on macOS without `timeout`: `perl -e 'alarm shift; exec @ARGV' 240 flutter test`).
