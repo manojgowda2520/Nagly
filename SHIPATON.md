@@ -12,6 +12,8 @@ Deadline: **Wed Sep 30, 11:45 pm PDT**. App must be **live on Google Play** by t
 | **Keep Them Coming Back (OneSignal)** | Implementation · User value · Creativity | Cloud messages **in the persona's voice**, segmented by tags the app syncs: win-back after silence, streak milestones, trial ending, upsell for engaged free users; IAM triggers; deep links (`route` → paywall/home/…). | `services/push.dart`, tags in `domain/push_tags.dart` |
 | **Catvertising** (bonus) | Ads integrated naturally | Rewarded ads *only*, user-initiated, as a "borrow a persona for 24h" sampler that doubles as the most honest upsell. Every ad event reported to **RevenueCat Ads** (`Purchases.adTracker`) + RevenueCat server-side reward verification. | `services/ads.dart` |
 
+**Decided 2026-09-24:** focus on OneSignal, Catvertising, Peace, Design, HAMM + influencer entry **Abbey's Kitchen**. Skip Funnel Vision (Stripe, judged on web sales), Galaxy (review time), Layers, Replit. Devpost needs a 1179x2556 screenshot (in `app/store/devpost/`), 1024 icon, free trial for judges; write Devpost text in own words (office advice). Office (Mobil80) internal pitch ~Oct 1, 100-pt rubric: Problem 15, Functionality 25, UI/UX 20, Innovation 15, Polish 15, Track fit 10; top 3 get Rs 30k/20k/10k if live in stores.
+
 Skip: Grand Prize (needs revenue traction), Kotlin Everywhere (we're Flutter now), Funnel Vision (needs Stripe web funnel), Galaxy (optional second store if time allows — same AAB works).
 
 ## Timeline (11 days)
@@ -59,6 +61,8 @@ Journeys (all **Draft** until the builder approves Set live):
 1. **Win-back: Mom misses you** — Gone quiet → 8am–6pm window → Win-back 1 → wait 24h → Win-back 2 → IAM "Welcome back 💛" (button `add_250`). Exits when they log again; re-entry after 7 days.
 2. **Streak celebrations: proud family** — Streak 3+ → window → Streak 3 push → wait 4 days → window → Streak 7 push. Exits if the streak breaks; re-entry after 14 days.
 3. **Trial ending: keep me around?** — Trial ends tomorrow → window → trial push → IAM "Keep me around? 🥺" (button `paywall`; opens the ad hub in Plan B). Exits on going Pro; once per user.
+
+**2026-09-24 update:** all 5 push templates now target iOS too (they were Android-only, created before APNs was set up) and carry a **persona picture** via Liquid in the image URL: `https://manojgowda2520.github.io/Nagly/push/{{ tag.persona_id | default: "indian_mom" }}.png` (12 images in `docs/push/`, Fluent UI Emoji art, MIT). Early real data: Win-back Journey entered by 9 users; Win-back 1 delivered 5, 1 click (20% CTR). iOS shows the image only with a Notification Service Extension (not added; Android shows Big Picture).
 
 Push goals are Clicks (>10% CTR) for now. After launch, switch them to the `water_logged` Outcome if the goal picker offers it.
 
