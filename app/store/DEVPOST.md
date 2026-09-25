@@ -74,7 +74,8 @@ Requirement: strategy, paywall/pricing approach, conversion or revenue numbers.
 - Free forever: Mom + water + 1 medication. 7-day no-card welcome trial of everything.
 - Pro: Lifetime $29.99 (anchor), Annual $19.99 with store 7-day trial, Monthly $1.99.
 - Personal paywall: the locked persona pleads for itself ("Keep Dad around").
-- Paywall opened from 6 moments (locked persona, medication limit, trial end, streak upsell, custom persona, settings) — each passes a RevenueCat **placement** name. Today all placements serve the default offering (no per-placement rules configured yet — be accurate about this).
+- Paywall opened from 6 moments (locked persona, medication limit, trial end, streak upsell, custom persona, settings) — each passes a RevenueCat **placement** name.
+- Live RevenueCat Targeting rule "Paywall moments (placements)" (2026-09-25): `trial_end` → offering `annual_first` (paywall opens on Annual, which has the store free trial — the natural next step when the app trial ends); `medication_limit` → `monthly_first` (opens on $1.99 Monthly — small step for someone who just needs a second pill reminder); everything else → `default` (Lifetime first). The offering's `highlight` metadata picks the plan the paywall opens on (app 1.0.1+). Change or A/B test from the dashboard with no app update.
 - Rewarded ads as a second stream on Android.
 - Customer attributes (persona, care mode, streak, bond) sent to RevenueCat for segmenting.
 - Numbers: §5.
@@ -95,5 +96,8 @@ Requirement: unique design elements and where judges should look.
 - History is a chat with your nagger, with a mood stripe on each message.
 - The paywall is personal: the persona you tried to unlock asks you to keep them.
 
-### Influencer award (only one allowed)
-Abbey's Kitchen is about **meals and nutrition without calorie counting**. Nagly is water + medication, so the fit is weak — see the decision in chat before entering.
+### Influencer award
+Not entering (decided 2026-09-25): Abbey's Kitchen is about meals/nutrition without calorie counting; Nagly is water + medication.
+
+## 7. Awards to select on the form
+Keep Them Coming Back (OneSignal) · Catvertising · HAMM · RevenueCat Peace Prize · RevenueCat Design Award.
