@@ -305,12 +305,12 @@ void main() {
   group('make it yours', () {
     const profile = Profile(
       personaId: 'indian_mom',
-      customName: '  Lakshmi Amma ',
+      customName: '  Subbu Amma ',
       customEmoji: '👵',
     );
     test('speaks under the custom name and emoji when allowed', () {
       final p = PersonaCatalog.forProfile(profile, customAllowed: true);
-      expect(p.displayName, 'Lakshmi Amma');
+      expect(p.displayName, 'Subbu Amma');
       expect(p.emoji, '👵');
       expect(p.id, 'indian_mom');
       expect(p.signature, PersonaCatalog.get('indian_mom').signature);
@@ -365,7 +365,7 @@ void main() {
         persona: PersonaCatalog.forProfile(profile, customAllowed: true),
       );
       expect(plan, isNotEmpty);
-      expect(plan.every((n) => n.title == '👵 Lakshmi Amma'), isTrue);
+      expect(plan.every((n) => n.title == '👵 Subbu Amma'), isTrue);
     });
   });
 

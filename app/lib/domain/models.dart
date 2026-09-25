@@ -110,7 +110,7 @@ class Profile {
   final ActivityLevel activity;
 
   /// "Make it yours" (Pro): the chosen persona speaks under this name and emoji,
-  /// e.g. "Lakshmi Amma". Empty = use the persona's own name. Never leaves the phone.
+  /// e.g. "Subbu Amma". Empty = use the persona's own name. Never leaves the phone.
   final String customName;
   final String customEmoji;
 

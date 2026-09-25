@@ -738,7 +738,7 @@ Future<void> showCustomIdentitySheet(BuildContext context) {
                 onChanged: (_) => set(() {}),
                 decoration: const InputDecoration(
                   labelText: 'Name',
-                  hintText: 'e.g. Lakshmi Amma, Priya, Papa',
+                  hintText: 'e.g. Subbu Amma, Priya, Papa',
                   border: OutlineInputBorder(),
                 ),
               ),

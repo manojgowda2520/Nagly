@@ -217,7 +217,7 @@ class _MakeItYoursCard extends StatelessWidget {
               Text(
                 isCustom
                     ? "$baseName's voice · tap to edit"
-                    : 'Hear "Lakshmi Amma" or "Priya" instead of "$baseName"',
+                    : 'Hear "Subbu Amma" or "Priya" instead of "$baseName"',
                 style: const TextStyle(
                   fontWeight: FontWeight.w700,
                   color: NaglyColors.textSecondary,

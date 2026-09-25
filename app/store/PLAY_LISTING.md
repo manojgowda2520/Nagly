@@ -26,7 +26,7 @@ Every reminder has buttons: +250 ml, +500 ml, or a cheeky "Later, Amma". One tap
 Mom (always free), Dad, Grandparent, Bestie and Spouse — each with three personalities. Their mood changes with your behaviour: proud when you're on track, worried when you're behind, disappointed when you ignore them twice.
 
 ✏️ MAKE IT YOURS
-Give your nagger a real name and emoji. Hear "Lakshmi Amma" or "Priya" instead of "Indian Mom".
+Give your nagger a real name and emoji. Hear "Subbu Amma" or "Priya" instead of "Indian Mom".
 
 💊 MEDS, VITAMINS & SUPPLEMENTS — ONE IS FREE, FOREVER
 Blood-pressure tablet, vitamin D, creatine, your protein shake. "Took your creatine? I'll wait." Tap "Took it" right from the notification. Your most important one is never behind a paywall.
