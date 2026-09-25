@@ -60,3 +60,11 @@ Still need: user's App Review contact info; availability (China?); version page 
 - Google Play: Production build 2 + Alpha build 3 still in review (since Sep 21). After approval upload build 5 AAB as Production update.
 - Play notifications (Mobil80 account, Sep 24): app transfer from XcelAudit Technologies LLP in progress. User asked to confirm it doesn't include Nagly.
 - Next: real iOS test purchase (user), video script, WhatsApp invite, Devpost fact sheet, OneSignal A/B split (Journey editor was not loading).
+
+## Post-hackathon list (after Sep 30, 2026)
+- **Welcome-trial reset on reinstall.** The 7-day app-managed trial start (`Keys.trialEndsAt`) lives only in the local SQLite db, so uninstall + reinstall gives a fresh trial. Store trials and purchases are tied to Apple ID / Google account and are not affected.
+  - iOS: also write the trial start to the Keychain (survives uninstall) and read it back on first launch.
+  - Android: no Keychain equivalent; check trial eligibility server-side via RevenueCat (e.g. a subscriber attribute) once there are real users.
+  - Decided 2026-09-25: leave as is until after the deadline (low abuse risk: reinstall wipes history, streak, meds).
+- iOS Notification Service Extension so OneSignal push images show on iPhone (Android already shows them).
+- OneSignal A/B variant in the Win-back Journey (Journey editor was not loading on 2026-09-24).
