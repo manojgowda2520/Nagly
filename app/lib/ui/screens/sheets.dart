@@ -735,6 +735,9 @@ Future<void> showCustomIdentitySheet(BuildContext context) {
                 autofocus: true,
                 maxLength: PersonaCatalog.customNameMaxLength,
                 textCapitalization: TextCapitalization.words,
+                // Names like "Subbu Amma" or "Nani" get "corrected" otherwise.
+                autocorrect: false,
+                enableSuggestions: false,
                 onChanged: (_) => set(() {}),
                 decoration: const InputDecoration(
                   labelText: 'Name',
