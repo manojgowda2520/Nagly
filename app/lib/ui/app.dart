@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../config/integrations.dart';
+import '../domain/models.dart';
 import '../services/push.dart';
 import '../state/app_controller.dart';
 import 'screens/history_screen.dart';
@@ -109,7 +110,13 @@ class _MainShellState extends State<MainShell> {
     if (HomeScreen.scroll.hasClients) HomeScreen.scroll.jumpTo(0);
     Future<void>.delayed(const Duration(milliseconds: 700), () async {
       if (!mounted) return;
-      await showFeatureTour(context, tourSteps(c.persona.displayName));
+      await showFeatureTour(
+        context,
+        tourSteps(
+          c.persona.displayName,
+          medMode: c.profile.careMode == CareMode.medication,
+        ),
+      );
       await c.markTourSeen();
       _touring = false;
     });
@@ -239,9 +246,12 @@ class _MainShellState extends State<MainShell> {
                       selectedIcon: const Icon(Icons.insights),
                       label: 'Insights',
                     ),
-                    const NavigationDestination(
-                      icon: Icon(Icons.settings_outlined),
-                      selectedIcon: Icon(Icons.settings),
+                    NavigationDestination(
+                      icon: KeyedSubtree(
+                        key: TourKeys.settingsTab,
+                        child: const Icon(Icons.settings_outlined),
+                      ),
+                      selectedIcon: const Icon(Icons.settings),
                       label: 'Settings',
                     ),
                   ],
@@ -285,7 +295,7 @@ void openPaywall(
 }
 
 /// The spotlight tour, in order. [name] is the persona the user hears.
-List<TourStep> tourSteps(String name) => [
+List<TourStep> tourSteps(String name, {bool medMode = false}) => [
   TourStep(
     target: TourKeys.bubble,
     title: '$name has more to say',
@@ -320,5 +330,12 @@ List<TourStep> tourSteps(String name) => [
     target: TourKeys.insightsTab,
     title: 'See your week',
     body: 'Streaks, charts, and a weekly summary you can share with family.',
+  ),
+  TourStep(
+    target: TourKeys.settingsTab,
+    title: 'Pills, vitamins, creatine too',
+    body: medMode
+        ? 'Add more meds or supplements any time in Settings: BP tablets, vitamins, protein, creatine.'
+        : 'Switch Care mode to Meds & Supplements in Settings and $name will remind you about pills, vitamins, protein or creatine too.',
   ),
 ];

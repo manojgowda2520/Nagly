@@ -14,6 +14,7 @@ abstract final class TourKeys {
   static final personasTab = GlobalKey(debugLabel: 'tour-personas-tab');
   static final historyTab = GlobalKey(debugLabel: 'tour-history-tab');
   static final insightsTab = GlobalKey(debugLabel: 'tour-insights-tab');
+  static final settingsTab = GlobalKey(debugLabel: 'tour-settings-tab');
 }
 
 class TourStep {

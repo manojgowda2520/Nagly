@@ -218,7 +218,7 @@ void main() {
       await c.finishOnboarding(const Profile());
       await _pumpUntil(tester, find.text('Indian Mom has more to say'));
       expect(find.text('Indian Mom has more to say'), findsOneWidget);
-      expect(find.text('1 of 7'), findsOneWidget);
+      expect(find.text('1 of 8'), findsOneWidget);
 
       await _tap(tester, find.text('Next'));
       expect(find.text('Your bond grows'), findsOneWidget);
@@ -233,9 +233,11 @@ void main() {
       }
       await _tap(tester, find.text('Next'));
       expect(find.text('See your week'), findsOneWidget);
+      await _tap(tester, find.text('Next'));
+      expect(find.text('Pills, vitamins, creatine too'), findsOneWidget);
       await _tap(tester, find.text('Got it'));
       await tester.pump(const Duration(milliseconds: 500));
-      expect(find.text('See your week'), findsNothing);
+      expect(find.text('Pills, vitamins, creatine too'), findsNothing);
       expect(c.tourSeen, isTrue);
       expect(await db.getBool(Keys.tourSeen), isTrue);
 
