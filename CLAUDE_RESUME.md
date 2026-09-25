@@ -53,3 +53,10 @@ Still need: user's App Review contact info; availability (China?); version page 
 - Android build 5 AAB built (undo-snackbar fix). Play submission 4 (prod build 2 + alpha build 3) still in review; upload build 5 after approval, then Production.
 - Uploads from CLI hit "Failed to Use Accounts"; workaround: `open app/build/ios/archive/Runner.xcarchive` -> Organizer -> Distribute App.
 - Pending: demo video + Devpost (Sep 30), AdMob store link after Play goes public.
+
+
+## Status 2026-09-25
+- **iOS 1.0 (build 5) APPROVED and LIVE on the App Store**: https://apps.apple.com/us/app/nagly-moms-water-pill-nags/id6814609746 (also live in IN, GB). TestFlight public link now joinable: https://testflight.apple.com/join/neVfb471
+- Google Play: Production build 2 + Alpha build 3 still in review (since Sep 21). After approval upload build 5 AAB as Production update.
+- Play notifications (Mobil80 account, Sep 24): app transfer from XcelAudit Technologies LLP in progress. User asked to confirm it doesn't include Nagly.
+- Next: real iOS test purchase (user), video script, WhatsApp invite, Devpost fact sheet, OneSignal A/B split (Journey editor was not loading).
