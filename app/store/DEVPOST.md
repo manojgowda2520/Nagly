@@ -17,7 +17,7 @@ Deadline: **Sep 30, 2026, 11:45 pm PDT** (= Oct 1, 12:15 pm IST). Aim to submit 
 | Demo video (≤ 2 min, public YouTube/Vimeo) | — | ❌ to record |
 | App icon 1024×1024 | `app/store/devpost/icon-1024.png` | ✅ |
 | Screenshot 1179×2556, no frame | `app/store/devpost/1_home.png` (+ 2–4) | ✅ |
-| Judge access | 7-day free trial of everything, no card. **Judging lasts longer than 7 days → also give promo codes** (see §4) | ⚠️ |
+| Judge access | 7-day free trial + free Lifetime promo codes (§4) | ✅ |
 | Text description | §3 | you write |
 
 ## 2. IDs and links the form may ask for
@@ -35,11 +35,15 @@ Logline pattern: *For [who], Nagly helps [job] by [approach], so they can [outco
 - **How it's different:** mood engine (proud / worried / disappointed) changes the words *and* the animation; log from the lock screen (+250 ml / +500 ml / "Took it"); history is a chat with your nagger; bond level grows with consistency.
 - **Evidence:** live on the App Store; first real users and a first paid subscriber within a day (numbers in §5).
 
-## 4. Judge access — decision needed
+## 4. Judge access
 
-The trial is 7 days; judging runs longer. The rules say: if the app can't be accessed with a free trial, provide a promo code.
-- iOS: App Store Connect → In-App Purchases → Lifetime → offer/promo codes (a handful for judges).
-- Android: Play Console → Monetize → Promo codes for `nagly_lifetime` (once the app is live).
+- 7-day free trial of everything, no card (starts after onboarding).
+- **Promo codes (created 2026-09-25):** App Store offer "Shipaton judges - free Lifetime" — free Nagly Pro Lifetime, one-time codes, expire Nov 30, 2026. The CSV is in your Downloads folder — **never commit it or post codes publicly**; paste ~5 into the Devpost judges field only.
+- Judge instructions to paste with the codes:
+  1. Install Nagly from the App Store link above.
+  2. Redeem a code: https://apps.apple.com/redeem?ctx=offercodes&id=6814609746&code=CODE (or App Store → your photo → Redeem Gift Card or Code).
+  3. Open Nagly → Settings → **Restore purchases** → every persona and unlimited medications unlock.
+- Android (once live): Play Console → Monetize → Promo codes for `nagly_lifetime`.
 
 ## 5. Numbers (2026-09-25)
 
