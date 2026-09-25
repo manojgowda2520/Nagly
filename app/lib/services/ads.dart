@@ -116,7 +116,7 @@ class AdMobAdService implements AdService {
 
     // Server-side reward verification through RevenueCat, when available.
     RewardVerificationToken? token;
-    if (trackWithRevenueCat) {
+    if (trackWithRevenueCat && Integrations.verifyAdRewards) {
       try {
         token = await Purchases.generateRewardVerificationToken(impressionId);
         await ad.setServerSideOptions(

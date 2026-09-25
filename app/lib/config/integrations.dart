@@ -63,6 +63,11 @@ abstract final class Integrations {
   // Never on iOS: the iPhone app has no ads at all (App Store policy choice).
   static bool get useAdMob => !sandboxMode && !Platform.isIOS;
 
+  /// RevenueCat server-side reward verification. Needs the AdMob SSV callback URL
+  /// on the ad unit and a reward rule in RevenueCat (Ads → Rewards); until both are
+  /// set, verification times out and the viewer would lose a reward they earned.
+  static const bool verifyAdRewards = false;
+
   static const String privacyUrl =
       'https://manojgowda2520.github.io/Nagly/privacy.html';
   static const String termsUrl =
