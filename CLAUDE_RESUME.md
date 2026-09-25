@@ -68,3 +68,9 @@ Still need: user's App Review contact info; availability (China?); version page 
   - Decided 2026-09-25: leave as is until after the deadline (low abuse risk: reinstall wipes history, streak, meds).
 - iOS Notification Service Extension so OneSignal push images show on iPhone (Android already shows them).
 - OneSignal A/B variant in the Win-back Journey (Journey editor was not loading on 2026-09-24).
+
+## Status 2026-09-25 (late)
+- Devpost work **paused by the user** (fact sheet ready in app/store/DEVPOST.md; video + written answers not started; deadline Sep 30 11:45 pm PDT, target submit Sep 28).
+- Pending on user: upload iOS 1.0.1 (6) via Xcode Organizer (archive built 17:48, no ad SDK), test one judge promo code, ask friends for permission to quote them.
+- Android 1.0.1 (6) AAB built (reward verification off); upload after Google approves the Sep 21 review.
+- RevenueCat Targeting rule live: trial_end -> annual_first, medication_limit -> monthly_first, else default. Public TestFlight link disabled.
