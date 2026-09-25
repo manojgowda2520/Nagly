@@ -645,3 +645,145 @@ Future<void> showUpsellDialog(BuildContext context, int streak) {
     ),
   );
 }
+
+// ── Make it yours (custom name + emoji, Pro) ─────────────────
+Future<void> showCustomIdentitySheet(BuildContext context) {
+  final c = context.read<AppController>();
+  final base = PersonaCatalog.get(c.profile.personaId);
+  final name = TextEditingController(text: c.profile.customName);
+  var emoji = c.profile.customEmoji.isEmpty
+      ? base.emoji
+      : c.profile.customEmoji;
+  return showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    builder: (ctx) => StatefulBuilder(
+      builder: (ctx, set) {
+        final preview = name.text.trim().isEmpty
+            ? base.displayName
+            : name.text.trim();
+        return Padding(
+          padding: EdgeInsets.fromLTRB(
+            24,
+            0,
+            24,
+            24 + MediaQuery.of(ctx).viewInsets.bottom,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text('Make it yours', style: Theme.of(ctx).textTheme.titleLarge),
+              const SizedBox(height: 4),
+              Text(
+                "${base.displayName}'s voice, under the name you'd actually hear.",
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: NaglyColors.textSecondary,
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: name,
+                autofocus: true,
+                maxLength: PersonaCatalog.customNameMaxLength,
+                textCapitalization: TextCapitalization.words,
+                onChanged: (_) => set(() {}),
+                decoration: const InputDecoration(
+                  labelText: 'Name',
+                  hintText: 'e.g. Lakshmi Amma, Priya, Papa',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Wrap(
+                spacing: 6,
+                runSpacing: 6,
+                children: [
+                  for (final e in {base.emoji, ...PersonaCatalog.customEmojis})
+                    Semantics(
+                      button: true,
+                      selected: e == emoji,
+                      label: 'Emoji $e',
+                      child: GestureDetector(
+                        onTap: () {
+                          HapticFeedback.selectionClick();
+                          set(() => emoji = e);
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 150),
+                          width: 44,
+                          height: 44,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: e == emoji
+                                ? NaglyColors.primary.withValues(alpha: 0.18)
+                                : Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: e == emoji
+                                  ? NaglyColors.primaryDeep
+                                  : NaglyColors.outline,
+                              width: e == emoji ? 2 : 1,
+                            ),
+                          ),
+                          child: Text(e, style: const TextStyle(fontSize: 24)),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              NCard(
+                child: Row(
+                  children: [
+                    Text(emoji, style: const TextStyle(fontSize: 28)),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            preview,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w900,
+                              color: NaglyColors.ink,
+                            ),
+                          ),
+                          Text(
+                            base.signature,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w700,
+                              color: NaglyColors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              FilledButton(
+                onPressed: () {
+                  HapticFeedback.mediumImpact();
+                  c.setCustomIdentity(name: name.text, emoji: emoji);
+                  Navigator.pop(ctx);
+                },
+                child: const Text('Save'),
+              ),
+              if (c.profile.customName.isNotEmpty)
+                TextButton(
+                  onPressed: () {
+                    c.setCustomIdentity(name: '', emoji: '');
+                    Navigator.pop(ctx);
+                  },
+                  child: Text('Use "${base.displayName}" again'),
+                ),
+            ],
+          ),
+        );
+      },
+    ),
+  );
+}

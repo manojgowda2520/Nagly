@@ -93,7 +93,11 @@ class Access {
   final persona = PersonaCatalog.get(profile.personaId);
   if (access.personaAccessible(persona)) return null;
   return (
-    profile: profile.copyWith(personaId: PersonaCatalog.freeFallbackId),
+    profile: profile.copyWith(
+      personaId: PersonaCatalog.freeFallbackId,
+      customName: '',
+      customEmoji: '',
+    ),
     message:
         "${persona.displayName} had to go for now. Mom's back on duty — she never really left.",
   );

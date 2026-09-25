@@ -95,6 +95,8 @@ class Profile {
     this.careMode = CareMode.hydration,
     this.weightKg = 70,
     this.activity = ActivityLevel.light,
+    this.customName = '',
+    this.customEmoji = '',
   });
 
   final int dailyMl;
@@ -107,6 +109,11 @@ class Profile {
   final int weightKg;
   final ActivityLevel activity;
 
+  /// "Make it yours" (Pro): the chosen persona speaks under this name and emoji,
+  /// e.g. "Lakshmi Amma". Empty = use the persona's own name. Never leaves the phone.
+  final String customName;
+  final String customEmoji;
+
   Profile copyWith({
     int? dailyMl,
     int? wakeHour,
@@ -117,6 +124,8 @@ class Profile {
     CareMode? careMode,
     int? weightKg,
     ActivityLevel? activity,
+    String? customName,
+    String? customEmoji,
   }) => Profile(
     dailyMl: dailyMl ?? this.dailyMl,
     wakeHour: wakeHour ?? this.wakeHour,
@@ -127,6 +136,8 @@ class Profile {
     careMode: careMode ?? this.careMode,
     weightKg: weightKg ?? this.weightKg,
     activity: activity ?? this.activity,
+    customName: customName ?? this.customName,
+    customEmoji: customEmoji ?? this.customEmoji,
   );
 
   Map<String, Object?> toJson() => {
@@ -139,6 +150,8 @@ class Profile {
     'careMode': careMode.name,
     'weightKg': weightKg,
     'activity': activity.name,
+    'customName': customName,
+    'customEmoji': customEmoji,
   };
 
   factory Profile.fromJson(Map<String, Object?> json) {
@@ -155,6 +168,8 @@ class Profile {
       careMode: byName(CareMode.values, json['careMode'], d.careMode),
       weightKg: (json['weightKg'] as int?) ?? d.weightKg,
       activity: byName(ActivityLevel.values, json['activity'], d.activity),
+      customName: (json['customName'] as String?) ?? d.customName,
+      customEmoji: (json['customEmoji'] as String?) ?? d.customEmoji,
     );
   }
 }

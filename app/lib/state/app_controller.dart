@@ -271,7 +271,8 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   // ── Derived state ─────────────────────────────────────────
-  Persona get persona => PersonaCatalog.get(profile.personaId);
+  Persona get persona =>
+      PersonaCatalog.forProfile(profile, customAllowed: access.fullAccess);
 
   Access get access => Access(
     isPro: billing.isPro.value,
@@ -539,8 +540,29 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     await _changed();
   }
 
-  Future<void> selectPersona(String id) =>
-      updateProfile((p) => p.copyWith(personaId: id));
+  /// A custom name belongs to one persona, so switching persona clears it.
+  Future<void> selectPersona(String id) => updateProfile(
+    (p) => p.personaId == id
+        ? p
+        : p.copyWith(personaId: id, customName: '', customEmoji: ''),
+  );
+
+  /// "Make it yours": empty name clears it.
+  Future<void> setCustomIdentity({
+    required String name,
+    required String emoji,
+  }) {
+    final trimmed = name.trim();
+    final capped = trimmed.length > PersonaCatalog.customNameMaxLength
+        ? trimmed.substring(0, PersonaCatalog.customNameMaxLength)
+        : trimmed;
+    return updateProfile(
+      (p) => p.copyWith(
+        customName: capped,
+        customEmoji: capped.isEmpty ? '' : emoji,
+      ),
+    );
+  }
 
   Future<void> setCareMode(CareMode mode) =>
       updateProfile((p) => p.copyWith(careMode: mode));

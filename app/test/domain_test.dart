@@ -285,12 +285,86 @@ void main() {
         expect(p.comeback, isNotEmpty);
       }
     });
-    test('12 personas across 4 relationships, Mom free', () {
-      expect(PersonaCatalog.all.length, 12);
+    test('15 personas across 5 relationships, Mom free, Spouse Pro', () {
+      expect(PersonaCatalog.all.length, 15);
+      expect(PersonaCatalog.relationships.length, 5);
       for (final r in PersonaCatalog.relationships) {
         expect(PersonaCatalog.variantsOf(r.id).length, 3);
       }
       expect(PersonaCatalog.relationship('mom').tier, Tier.free);
+      expect(PersonaCatalog.relationship('spouse').tier, Tier.pro);
+      expect(
+        PersonaCatalog.all.map((p) => p.id).toSet().length,
+        PersonaCatalog.all.length,
+        reason: 'persona ids must be unique',
+      );
+    });
+  });
+
+  group('make it yours', () {
+    const profile = Profile(
+      personaId: 'indian_mom',
+      customName: '  Lakshmi Amma ',
+      customEmoji: '👵',
+    );
+    test('speaks under the custom name and emoji when allowed', () {
+      final p = PersonaCatalog.forProfile(profile, customAllowed: true);
+      expect(p.displayName, 'Lakshmi Amma');
+      expect(p.emoji, '👵');
+      expect(p.id, 'indian_mom');
+      expect(p.signature, PersonaCatalog.get('indian_mom').signature);
+    });
+    test('falls back to the real persona without Pro or trial', () {
+      final p = PersonaCatalog.forProfile(profile, customAllowed: false);
+      expect(p.displayName, 'Indian Mom');
+    });
+    test(
+      'blank name means no custom identity; blank emoji keeps the base one',
+      () {
+        expect(
+          PersonaCatalog.forProfile(
+            const Profile(customName: '   '),
+            customAllowed: true,
+          ).displayName,
+          'Indian Mom',
+        );
+        expect(
+          PersonaCatalog.forProfile(
+            const Profile(customName: 'Ma'),
+            customAllowed: true,
+          ).emoji,
+          PersonaCatalog.get('indian_mom').emoji,
+        );
+      },
+    );
+    test(
+      'trial lapse on a Pro persona drops back to Mom and clears the name',
+      () {
+        final fb = resolvePersonaFallback(
+          const Profile(personaId: 'caring_wife', customName: 'Priya'),
+          const Access(isPro: false, trialEndsAtMs: 1, unlocks: {}, nowMs: 2),
+        );
+        expect(fb, isNotNull);
+        expect(fb!.profile.personaId, PersonaCatalog.freeFallbackId);
+        expect(fb.profile.customName, '');
+      },
+    );
+    test('custom identity survives a save/load round trip', () {
+      final back = Profile.fromJson(profile.toJson());
+      expect(back.customName, profile.customName);
+      expect(back.customEmoji, '👵');
+      expect(Profile.fromJson(const {}).customName, '');
+    });
+    test('notification titles use the custom name', () {
+      final plan = planWaterNudges(
+        nowMs: DateTime(2026, 9, 19, 9).millisecondsSinceEpoch,
+        profile: const Profile(onboarded: true),
+        consumedMl: 0,
+        ignoredSoFar: 0,
+        persona: PersonaCatalog.forProfile(profile, customAllowed: true),
+      );
+      expect(plan, isNotEmpty);
+      expect(plan.every((n) => n.title == '👵 Lakshmi Amma'), isTrue);
     });
   });
 

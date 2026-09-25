@@ -99,9 +99,10 @@ List<PlannedNudge> planWaterNudges({
   required Profile profile,
   required int consumedMl,
   required int ignoredSoFar,
+  Persona? persona,
   Random? random,
 }) {
-  final persona = PersonaCatalog.get(profile.personaId);
+  final speaker = persona ?? PersonaCatalog.get(profile.personaId);
   final times = nextNudgeTimes(
     nowMs: nowMs,
     profile: profile,
@@ -124,7 +125,7 @@ List<PlannedNudge> planWaterNudges({
           profile.sleepHour,
         );
         final body = pickLine(
-          persona,
+          speaker,
           mood,
           dayPart: part,
           previousLine: previous,
@@ -132,12 +133,12 @@ List<PlannedNudge> planWaterNudges({
         );
         previous = body;
         final skips =
-            persona.skipLabels[mood] ??
-            persona.skipLabels[Mood.neutral] ??
+            speaker.skipLabels[mood] ??
+            speaker.skipLabels[Mood.neutral] ??
             const ['Skip'];
         return PlannedNudge(
           atMs: times[i],
-          title: '${persona.emoji} ${persona.displayName}',
+          title: '${speaker.emoji} ${speaker.displayName}',
           body: body,
           skipLabel: skips[rnd.nextInt(skips.length)],
           mood: mood,

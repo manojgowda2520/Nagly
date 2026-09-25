@@ -208,6 +208,38 @@ void main() {
     },
   );
 
+  testWidgets('spouse persona + "Make it yours" rename during the trial', (
+    tester,
+  ) async {
+    final (c, _, _) = await _boot(tester);
+    await c.finishOnboarding(const Profile());
+    await tester.pump(const Duration(seconds: 1));
+    await _tap(tester, find.text('Personas'));
+    await _tap(tester, find.text('Spouse'));
+    await _tap(tester, find.text('Caring Wife'));
+    expect(c.profile.personaId, 'caring_wife');
+
+    await _tap(tester, find.text('Give them a real name'));
+    await _pumpUntil(tester, find.text('Make it yours'));
+    await tester.enterText(find.byType(TextField), 'Priya');
+    await tester.pump();
+    await _tap(tester, find.text('🥰'));
+    await _tap(tester, find.text('Save'));
+    await tester.pump(const Duration(seconds: 1));
+    expect(c.persona.displayName, 'Priya');
+    expect(c.persona.emoji, '🥰');
+    expect(c.persona.id, 'caring_wife');
+    expect(find.text('Priya'), findsWidgets);
+
+    // Switching persona drops the custom name (it belonged to the Caring Wife).
+    await c.selectPersona('indian_mom');
+    await tester.pump(const Duration(seconds: 1));
+    expect(c.persona.displayName, 'Indian Mom');
+    expect(c.profile.customName, '');
+
+    await _teardown(tester, c);
+  });
+
   testWidgets('locked persona → rewarded ad unlocks the relationship for 24h', (
     tester,
   ) async {

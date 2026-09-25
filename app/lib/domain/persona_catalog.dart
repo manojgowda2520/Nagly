@@ -47,6 +47,21 @@ class Persona {
 
   /// The persona's signature line, shown on picker cards.
   String get signature => bodyLines[Mood.neutral]![DayPart.anytime]!.first;
+
+  /// Same voice and lines, shown under a name and emoji the user chose.
+  Persona withIdentity({required String name, required String emoji}) =>
+      Persona(
+        id: id,
+        relationshipId: relationshipId,
+        displayName: name,
+        emoji: emoji,
+        bodyLines: bodyLines,
+        skipLabels: skipLabels,
+        medDue: medDue,
+        medTaken: medTaken,
+        medMissed: medMissed,
+        comeback: comeback,
+      );
 }
 
 Persona _persona({
@@ -111,6 +126,28 @@ class PersonaCatalog {
     Relationship('dad', 'Dad', '👨', Tier.pro, 'Puns & tough love'),
     Relationship('grandparent', 'Grandparent', '🧓', Tier.pro, 'Gentle guilt'),
     Relationship('bestie', 'Bestie', '🤗', Tier.pro, 'Side-eye & slay'),
+    Relationship('spouse', 'Spouse', '💑', Tier.pro, 'Love you. Now drink.'),
+  ];
+
+  /// "Make it yours": longest custom name, and the emoji choices offered.
+  static const customNameMaxLength = 20;
+  static const customEmojis = [
+    '👩',
+    '👨',
+    '👵',
+    '👴',
+    '🧕',
+    '🧔',
+    '👩‍🦱',
+    '👨‍🦱',
+    '💁',
+    '🧑',
+    '👸',
+    '🤴',
+    '😎',
+    '🥰',
+    '💖',
+    '🐱',
   ];
 
   static final List<Persona> all = [
@@ -772,11 +809,222 @@ class PersonaCatalog {
         "Following up on your water intake.",
       ],
     ),
+    // ── Spouse (PRO) ────────────────────────────────────────────
+    _persona(
+      id: 'caring_wife',
+      rel: 'spouse',
+      name: 'Caring Wife',
+      emoji: '👩🏽',
+      neutral: [
+        "Drink some water, my love.",
+        "I packed your bottle. Use it.",
+        "One glass for me?",
+      ],
+      proud: [
+        "Goal done. I married well.",
+        "Look at you, hydrated and handsome.",
+        "Proud of you, jaan.",
+      ],
+      worriedMorning: [
+        "You had chai. Where's the water?",
+        "Morning, sleepyhead. Water first.",
+        "Start the day with a glass, please.",
+      ],
+      worriedAfternoon: [
+        "Your bottle is still full. Explain.",
+        "Lunch done? Now water.",
+        "You're behind, love.",
+      ],
+      worriedEvening: [
+        "Evening already. Catch up for me?",
+        "Don't make me bring you a glass.",
+        "Finish your water before dinner.",
+      ],
+      disappointedMorning: [
+        "Seen. Ignored. Noted.",
+        "I asked nicely this morning.",
+        "Fine. Drink when you're ready.",
+      ],
+      disappointedAfternoon: [
+        "I reminded you twice, love.",
+        "Ignoring your wife? Brave.",
+        "We'll talk about this at dinner.",
+      ],
+      disappointedEvening: [
+        "Whole day and barely a sip.",
+        "I'm not angry. I'm hurt.",
+        "Tomorrow, we do better. Together.",
+      ],
+      skips: [
+        "Not now",
+        "In a meeting",
+        "Later, love",
+        "Busy",
+        "Skip",
+        "Sorry",
+      ],
+      medDue: [
+        "Did you take your {med}, love?",
+        "{med} time. I'm watching.",
+        "Your {med}, with a full glass of water.",
+      ],
+      medTaken: ["{med} done. That's my person.", "Good. Now I can relax."],
+      medMissed: [
+        "You skipped your {med}? Really?",
+        "Tomorrow, {med} on time. For me.",
+      ],
+      comeback: [
+        "3 days, no water, no word. Should I be worried?",
+        "Your wife misses nagging you. Come back?",
+      ],
+    ),
+    _persona(
+      id: 'worried_husband',
+      rel: 'spouse',
+      name: 'Worried Husband',
+      emoji: '👨🏽',
+      neutral: [
+        "Water, dear. Just one glass.",
+        "Did you drink anything today?",
+        "Hydrate, please. For my peace of mind.",
+      ],
+      proud: [
+        "Goal done! Best wife ever.",
+        "You did it. I can finally relax.",
+        "Proud of you, darling.",
+      ],
+      worriedMorning: [
+        "Morning, darling. Water before coffee?",
+        "You skipped breakfast water again.",
+        "I left a glass on the table for you.",
+      ],
+      worriedAfternoon: [
+        "It's afternoon. How many glasses? Honestly.",
+        "You're behind. I'm getting nervous.",
+        "Please sip something, I'm worried.",
+      ],
+      worriedEvening: [
+        "Almost night and still behind.",
+        "One more glass before dinner?",
+        "I'll feel better if you drink now.",
+      ],
+      disappointedMorning: [
+        "You ignored me. I'm pacing.",
+        "Two reminders already, dear.",
+        "Should I call you?",
+      ],
+      disappointedAfternoon: [
+        "Still nothing? I'm really worried now.",
+        "Please. Just one glass.",
+        "I'm googling dehydration symptoms.",
+      ],
+      disappointedEvening: [
+        "Whole day. Barely a sip. I'm sad.",
+        "I'll bring you water myself.",
+        "Tomorrow, promise me more water.",
+      ],
+      skips: [
+        "Not now",
+        "Later, dear",
+        "Busy",
+        "I'm fine",
+        "Skip",
+        "Stop worrying",
+      ],
+      medDue: [
+        "Did you take your {med}, dear?",
+        "{med} time. Please don't forget.",
+        "Gentle reminder: {med}. I worry.",
+      ],
+      medTaken: ["{med} done. Phew.", "Thank you. I can breathe now."],
+      medMissed: [
+        "No {med} today? I'm worried.",
+        "Please take {med} tomorrow, dear.",
+      ],
+      comeback: [
+        "You've gone quiet for days. Are you okay? Drink something?",
+        "I miss reminding you. Please come back.",
+      ],
+    ),
+    _persona(
+      id: 'sarcastic_partner',
+      rel: 'spouse',
+      name: 'Sarcastic Partner',
+      emoji: '🧑',
+      neutral: [
+        "Water. It's the clear stuff.",
+        "Hydrate. I'd like you to live.",
+        "Sip. Wow. Groundbreaking.",
+      ],
+      proud: [
+        "Goal done. Who even are you?",
+        "Look at you, adulting.",
+        "Fine. I'm impressed. Don't tell anyone.",
+      ],
+      worriedMorning: [
+        "Coffee isn't water. Shocking, I know.",
+        "Morning. Your bottle filed a complaint.",
+        "Drink first, be grumpy later.",
+      ],
+      worriedAfternoon: [
+        "Your bottle is basically decor now.",
+        "Behind again? Classic you.",
+        "Drink before you turn into a raisin.",
+      ],
+      worriedEvening: [
+        "Night already. Still a cactus.",
+        "Last chance to not be a raisin.",
+        "Drink. Then we can watch the show.",
+      ],
+      disappointedMorning: [
+        "Ignored me. Bold.",
+        "Left on read before noon.",
+        "Cool. Cool cool cool.",
+      ],
+      disappointedAfternoon: [
+        "Two reminders. Zero sips. Iconic.",
+        "I'm telling your mom.",
+        "Drink, or I pick the movie. Forever.",
+      ],
+      disappointedEvening: [
+        "A whole day. Desert mode.",
+        "I expected nothing and I'm still let down.",
+        "Tomorrow. Water. I mean it.",
+      ],
+      skips: ["Not now", "Later", "Busy", "Whatever", "Skip", "Ugh, fine"],
+      medDue: [
+        "{med} time. Try not to forget. Again.",
+        "Your {med} isn't going to take itself.",
+        "Reminder: {med}. You're welcome.",
+      ],
+      medTaken: ["{med} done. Look at you.", "Wow. Responsible. Who knew."],
+      medMissed: [
+        "Skipped {med}? Shocking. Not.",
+        "{med} tomorrow. I'll be watching.",
+      ],
+      comeback: [
+        "3 days of silence? I'll assume you're a raisin now. Drink.",
+        "Missed you. Don't let it go to your head. Drink water.",
+      ],
+    ),
   ];
 
   static final Map<String, Persona> _byId = {for (final p in all) p.id: p};
 
   static Persona get(String id) => _byId[id] ?? all.first;
+
+  /// The persona the user actually hears: their pick, under their own name and
+  /// emoji when "Make it yours" is set and allowed (Pro or trial).
+  static Persona forProfile(Profile profile, {required bool customAllowed}) {
+    final base = get(profile.personaId);
+    final name = profile.customName.trim();
+    if (!customAllowed || name.isEmpty) return base;
+    final emoji = profile.customEmoji.trim();
+    return base.withIdentity(
+      name: name,
+      emoji: emoji.isEmpty ? base.emoji : emoji,
+    );
+  }
 
   static Relationship relationship(String id) =>
       relationships.where((r) => r.id == id).firstOrNull ?? relationships.first;

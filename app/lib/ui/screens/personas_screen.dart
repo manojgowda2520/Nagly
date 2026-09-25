@@ -9,6 +9,7 @@ import '../../domain/access.dart';
 import '../../domain/models.dart';
 import '../../domain/persona_catalog.dart';
 import '../../state/app_controller.dart';
+import '../app.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
 import '../widgets/persona_widgets.dart';
@@ -154,11 +155,87 @@ class _PersonasScreenState extends State<PersonasScreen> {
               ),
               const SizedBox(height: 10),
             ],
+            const SectionLabel('3 · Make it yours'),
+            _MakeItYoursCard(
+              persona: c.persona,
+              baseName: PersonaCatalog.get(c.profile.personaId).displayName,
+              isCustom:
+                  c.persona.displayName !=
+                  PersonaCatalog.get(c.profile.personaId).displayName,
+              locked: !access.fullAccess,
+              onTap: () {
+                HapticFeedback.selectionClick();
+                if (!access.fullAccess) {
+                  openPaywall(context, placement: 'custom_persona');
+                  return;
+                }
+                showCustomIdentitySheet(context);
+              },
+            ),
           ],
         ),
       ),
     );
   }
+}
+
+class _MakeItYoursCard extends StatelessWidget {
+  const _MakeItYoursCard({
+    required this.persona,
+    required this.baseName,
+    required this.isCustom,
+    required this.locked,
+    required this.onTap,
+  });
+  final Persona persona;
+  final String baseName;
+  final bool isCustom, locked;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => NCard(
+    onTap: onTap,
+    child: Row(
+      children: [
+        Text(
+          isCustom ? persona.emoji : '✏️',
+          style: const TextStyle(fontSize: 30),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                isCustom ? persona.displayName : 'Give them a real name',
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w900,
+                  color: NaglyColors.ink,
+                ),
+              ),
+              Text(
+                isCustom
+                    ? "$baseName's voice · tap to edit"
+                    : 'Hear "Lakshmi Amma" or "Priya" instead of "$baseName"',
+                style: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: NaglyColors.textSecondary,
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (locked)
+          const Tag('PRO', color: NaglyColors.accent)
+        else
+          const Icon(
+            Icons.chevron_right_rounded,
+            color: NaglyColors.textSecondary,
+          ),
+      ],
+    ),
+  );
 }
 
 class _RelTile extends StatelessWidget {

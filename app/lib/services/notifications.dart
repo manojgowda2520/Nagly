@@ -203,7 +203,10 @@ class NotificationService {
       unlocks: await db.activeUnlocks(nowMs),
       nowMs: nowMs,
     );
-    final persona = PersonaCatalog.get(profile.personaId);
+    final persona = PersonaCatalog.forProfile(
+      profile,
+      customAllowed: access.fullAccess,
+    );
     final dayStart = dateOnly(at);
     final today = await db.drinksBetween(
       dayStart.millisecondsSinceEpoch,
@@ -225,6 +228,7 @@ class NotificationService {
       profile: profile,
       consumedMl: consumed,
       ignoredSoFar: ignored,
+      persona: persona,
     );
     for (var i = 0; i < nudges.length; i++) {
       final n = nudges[i];
@@ -326,11 +330,21 @@ class NotificationService {
   }) async {
     final profile = await db.profile();
     final at = DateTime.now().add(after);
+    final access = Access(
+      isPro: await db.getBool(Keys.isPro),
+      trialEndsAtMs: await db.getInt(Keys.trialEndsAt),
+      unlocks: const {},
+      nowMs: at.millisecondsSinceEpoch,
+    );
     final plan = planWaterNudges(
       nowMs: at.millisecondsSinceEpoch - minNudgeIntervalMs,
       profile: profile.copyWith(wakeHour: 0, sleepHour: 23),
       consumedMl: 0,
       ignoredSoFar: 1,
+      persona: PersonaCatalog.forProfile(
+        profile,
+        customAllowed: access.fullAccess,
+      ),
     );
     if (plan.isEmpty) return;
     final n = plan.first;
