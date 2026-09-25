@@ -74,3 +74,9 @@ Still need: user's App Review contact info; availability (China?); version page 
 - Pending on user: upload iOS 1.0.1 (6) via Xcode Organizer (archive built 17:48, no ad SDK), test one judge promo code, ask friends for permission to quote them.
 - Android 1.0.1 (6) AAB built (reward verification off); upload after Google approves the Sep 21 review.
 - RevenueCat Targeting rule live: trial_end -> annual_first, medication_limit -> monthly_first, else default. Public TestFlight link disabled.
+
+## Status 2026-09-26 (~1:30 AM IST)
+- **iOS 1.0.1 (6) submitted to App Review** (Waiting for Review). Auto-release after approval. Contains: Spouse, Make it yours (example "Subbu Amma", no autocorrect on the name field), Meds & Supplements + quick picks, 8-step spotlight tour, placement-highlight paywall. Subtitle "Water, pills & supplement nags"; 7 screenshots Mom-first.
+- Upload tip: `xcodebuild -exportArchive ... destination=upload` works once Xcode has an Apple account session (Validate App in Organizer refreshes it).
+- Android 1.0.1 (6) AAB built 2026-09-25 22:42; upload after Google approves the Sep 21 review.
+- If 1.0.1 still Waiting for Review on Sep 28, consider an expedited review request (deadline Sep 30).
