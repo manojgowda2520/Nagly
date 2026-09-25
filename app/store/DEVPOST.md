@@ -23,7 +23,6 @@ Deadline: **Sep 30, 2026, 11:45 pm PDT** (= Oct 1, 12:15 pm IST). Aim to submit 
 ## 2. IDs and links the form may ask for
 
 - OneSignal App ID: `2858113c-c323-453d-bbc9-976b8d4c999e`
-- TestFlight public link: https://testflight.apple.com/join/neVfb471
 - Support: https://manojgowda2520.github.io/Nagly/ · Privacy: …/privacy.html · Terms: …/terms.html
 - Built with: Flutter, Dart, RevenueCat (purchases_flutter, RevenueCat Ads tracking, placements), OneSignal, Google AdMob (Android), SQLite, flutter_local_notifications
 
