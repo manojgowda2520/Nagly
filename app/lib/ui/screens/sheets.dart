@@ -657,12 +657,13 @@ Future<void> showCustomIdentitySheet(BuildContext context) {
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
+    useSafeArea: true,
     builder: (ctx) => StatefulBuilder(
       builder: (ctx, set) {
         final preview = name.text.trim().isEmpty
             ? base.displayName
             : name.text.trim();
-        return Padding(
+        return SingleChildScrollView(
           padding: EdgeInsets.fromLTRB(
             24,
             0,
