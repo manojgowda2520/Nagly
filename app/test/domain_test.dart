@@ -8,6 +8,7 @@ import 'package:nagly/domain/nudge_plan.dart';
 import 'package:nagly/domain/persona_catalog.dart';
 import 'package:nagly/domain/push_tags.dart';
 import 'package:nagly/domain/relationship_meter.dart';
+import 'package:nagly/services/billing.dart';
 
 void main() {
   group('mood', () {
@@ -459,4 +460,19 @@ void main() {
       expect(tags['is_pro'], 'false');
     },
   );
+
+  test('placement offering metadata picks the plan the paywall opens on', () {
+    const plans = [
+      Plan(kind: PlanKind.lifetime, title: 'L', price: '', detail: ''),
+      Plan(kind: PlanKind.annual, title: 'A', price: '', detail: ''),
+      Plan(kind: PlanKind.monthly, title: 'M', price: '', detail: ''),
+    ];
+    expect(orderPlans(plans, 'annual').map((p) => p.kind), [
+      PlanKind.annual,
+      PlanKind.lifetime,
+      PlanKind.monthly,
+    ]);
+    expect(orderPlans(plans, null).first.kind, PlanKind.lifetime);
+    expect(orderPlans(plans, 'weekly').first.kind, PlanKind.lifetime);
+  });
 }

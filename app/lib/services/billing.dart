@@ -32,6 +32,15 @@ class Plan {
 
 enum PurchaseOutcome { success, cancelled, failed }
 
+/// Puts the plan named by an offering's `highlight` metadata first, so a
+/// placement's offering decides which plan the paywall opens on. Unknown or
+/// missing values keep the default order (Lifetime first).
+List<Plan> orderPlans(List<Plan> plans, Object? highlight) {
+  final first = plans.where((p) => p.kind.name == highlight).firstOrNull;
+  if (first == null) return plans;
+  return [first, ...plans.where((p) => p != first)];
+}
+
 /// Store billing. Apple/Google take the payment and email the receipt;
 /// RevenueCat tells us whether the `pro` entitlement is active. No gateway, no accounts.
 abstract class BillingService {
@@ -167,7 +176,7 @@ class RevenueCatBillingService implements BillingService {
           await Purchases.getCurrentOfferingForPlacement(placement) ??
           (await Purchases.getOfferings()).current;
       if (current == null) return _fallbackPlans;
-      return [
+      return orderPlans([
         if (current.lifetime case final p?)
           Plan(
             kind: PlanKind.lifetime,
@@ -194,7 +203,7 @@ class RevenueCatBillingService implements BillingService {
             detail: 'Cancel any time',
             rcPackage: p,
           ),
-      ];
+      ], current.metadata['highlight']);
     } on PlatformException catch (e) {
       debugPrint('RevenueCat getOfferings failed: $e');
       return _fallbackPlans;

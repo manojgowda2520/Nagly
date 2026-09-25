@@ -33,7 +33,9 @@ class _PaywallScreenState extends State<PaywallScreen> {
       .read<AppController>()
       .billing
       .plans(placement: widget.placement);
-  PlanKind _selected = PlanKind.lifetime;
+
+  /// Null until the user taps a plan; the paywall opens on the offering's first plan.
+  PlanKind? _selected;
   bool _busy = false;
 
   Persona get _pleader {
