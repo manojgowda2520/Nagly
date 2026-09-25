@@ -438,7 +438,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
       );
     if (profile.careMode == CareMode.medication && adherence.due > 0) {
       b.writeln(
-        '💊 Medication taken ${adherence.taken}/${adherence.due} doses',
+        '💊 Meds & supplements taken ${adherence.taken}/${adherence.due} doses',
       );
     }
     b.writeln(

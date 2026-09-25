@@ -370,7 +370,7 @@ class _MedicationHome extends StatelessWidget {
             ],
           ),
         ),
-        const SectionLabel('Medication'),
+        const SectionLabel('Meds & supplements'),
         for (final med in c.meds) ...[
           MedicationCard(med: med),
           const SizedBox(height: 10),
@@ -379,7 +379,9 @@ class _MedicationHome extends StatelessWidget {
           onPressed: () => addMedicationFlow(context),
           icon: const Icon(Icons.add_rounded),
           label: Text(
-            c.meds.isEmpty ? 'Add your first medication' : 'Add medication',
+            c.meds.isEmpty
+                ? 'Add your first med or supplement'
+                : 'Add med or supplement',
           ),
         ),
       ],

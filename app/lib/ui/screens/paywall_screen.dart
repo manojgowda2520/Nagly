@@ -48,17 +48,17 @@ class _PaywallScreenState extends State<PaywallScreen> {
   String get _headline => switch (widget.placement) {
     'persona_locked' || 'persona_expired' =>
       'Keep ${PersonaCatalog.relationship(_pleader.relationshipId).displayName} around',
-    'medication_limit' => 'Every pill, remembered',
+    'medication_limit' => 'Every dose, remembered',
     'custom_persona' => 'Make them yours',
     'trial_end' => 'Keep the whole family',
     _ => 'Unlock every nagger',
   };
 
   String get _plea => switch (widget.placement) {
-    'medication_limit' => "Your first pill stays free forever. Let me remind you about the rest too.",
+    'medication_limit' => "Your first reminder stays free forever. Let me remind you about the rest too — pills, vitamins, protein, all of it.",
     'custom_persona' => "Call me by the name you'd actually hear. Amma, Papa, Priya — your choice.",
     'persona_locked' || 'persona_expired' => _pleader.signature,
-    _ => "Water and one medication stay free forever. Pro is for the whole family.",
+    _ => "Water and one med or supplement stay free forever. Pro is for the whole family.",
   };
 
   Future<void> _buy(Plan plan) async {
@@ -165,15 +165,15 @@ class _PaywallScreenState extends State<PaywallScreen> {
                         const SizedBox(height: 14),
                         const _Perk(
                           emoji: '🧔',
-                          text: 'All 9 extra voices: Dad, Grandparent & Bestie',
+                          text: '12 more voices incl. Spouse — and give them a real name',
                         ),
                         const _Perk(
                           emoji: '💊',
-                          text: 'Unlimited medication reminders',
+                          text: 'Unlimited meds & supplement reminders',
                         ),
                         const _Perk(
                           emoji: '🌱',
-                          text: 'Water + your first pill stay free, always',
+                          text: 'Water + your first reminder stay free, always',
                         ),
                         const SizedBox(height: 14),
                         if (snap.connectionState != ConnectionState.done)

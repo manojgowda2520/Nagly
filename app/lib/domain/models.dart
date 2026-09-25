@@ -15,7 +15,7 @@ enum CareMode { hydration, medication }
 extension CareModeX on CareMode {
   String get label => switch (this) {
     CareMode.hydration => 'Hydration',
-    CareMode.medication => 'Medication',
+    CareMode.medication => 'Meds & Supplements',
   };
   String get emoji => switch (this) {
     CareMode.hydration => '💧',
@@ -23,7 +23,7 @@ extension CareModeX on CareMode {
   };
   String get tagline => switch (this) {
     CareMode.hydration => 'Water · the classic',
-    CareMode.medication => 'Pills + water · 1 med free',
+    CareMode.medication => 'Pills, vitamins, protein + water · 1 free',
   };
 }
 

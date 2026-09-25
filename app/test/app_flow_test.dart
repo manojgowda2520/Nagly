@@ -97,7 +97,7 @@ void main() {
       expect(find.text('Your daily goal'), findsOneWidget);
       await _tap(tester, find.text('Sounds good'));
 
-      await _tap(tester, find.text('Medication'));
+      await _tap(tester, find.text('Meds & Supplements'));
       await _tap(tester, find.text('Continue'));
 
       // Continue must be disabled until a name is typed.
@@ -307,8 +307,8 @@ void main() {
     await c.sandboxExpireTrial();
     await tester.pump(const Duration(seconds: 1));
     await tester.pump(const Duration(seconds: 1));
-    await _pumpUntil(tester, find.text('Keep free (water + 1 pill)'));
-    await _tap(tester, find.text('Keep free (water + 1 pill)'));
+    await _pumpUntil(tester, find.text('Keep free (water + 1 reminder)'));
+    await _tap(tester, find.text('Keep free (water + 1 reminder)'));
     await _tap(tester, find.text('Personas'));
     await _tap(tester, find.text('Bestie'));
     await _tap(tester, find.text('The Bestie'));
@@ -347,7 +347,7 @@ void main() {
       expect(find.text('🎁 Unlock with a short ad'), findsOneWidget);
       expect(find.text('Go Pro'), findsNothing);
       expect(c.activeMeds.length, 1);
-      await _tap(tester, find.text('Unlimited medications'));
+      await _tap(tester, find.text('Unlimited meds & supplements'));
       expect(find.text('Sandbox ad'), findsOneWidget);
       await tester.pump(const Duration(seconds: 6));
       await tester.pump(const Duration(seconds: 1));

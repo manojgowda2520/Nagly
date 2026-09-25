@@ -65,8 +65,8 @@ class SettingsScreen extends StatelessWidget {
                           a.isPro
                               ? 'Every voice, unlimited meds. Thank you!'
                               : Integrations.purchasesEnabled
-                              ? 'Mom, water & 1 medication free forever. Tap for Pro.'
-                              : 'Mom, water & 1 medication free forever. Tap to unlock more with an ad.',
+                              ? 'Mom, water & 1 med or supplement free forever. Tap for Pro.'
+                              : 'Mom, water & 1 med or supplement free forever. Tap to unlock more with an ad.',
                           style: const TextStyle(
                             fontWeight: FontWeight.w700,
                             color: NaglyColors.textSecondary,
@@ -137,7 +137,7 @@ class SettingsScreen extends StatelessWidget {
               ],
             ),
             if (p.careMode == CareMode.medication) ...[
-              const SectionLabel('Medication'),
+              const SectionLabel('Meds & supplements'),
               for (final m in c.meds) ...[
                 MedicationCard(med: m),
                 const SizedBox(height: 10),
@@ -145,7 +145,7 @@ class SettingsScreen extends StatelessWidget {
               OutlinedButton.icon(
                 onPressed: () => addMedicationFlow(context),
                 icon: const Icon(Icons.add_rounded),
-                label: const Text('Add medication'),
+                label: const Text('Add med or supplement'),
               ),
             ],
             const SectionLabel('Nagging'),
@@ -255,7 +255,7 @@ class SettingsScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             const Text(
-              'Your water & medication log stays on this phone. No account needed.',
+              'Your water, meds & supplements log stays on this phone. No account needed.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontWeight: FontWeight.w700,

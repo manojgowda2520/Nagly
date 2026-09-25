@@ -70,6 +70,42 @@ Future<int?> showCustomAmountSheet(BuildContext context) {
   );
 }
 
+// ── Quick picks for the med / supplement name field ──────────
+/// Nagly's "medication" mode is for anything you take on schedule: BP tablets,
+/// vitamins, creatine, protein shakes. One tap fills the name (and a dose hint).
+const medQuickPicks = <(String, String, String)>[
+  ('💊', 'BP tablet', '1 tablet'),
+  ('☀️', 'Vitamin D', '1 capsule'),
+  ('💪', 'Creatine', '5 g'),
+  ('🥤', 'Protein shake', '1 scoop'),
+  ('🐟', 'Omega-3', '1 capsule'),
+  ('🍊', 'Multivitamin', '1 tablet'),
+];
+
+class MedQuickPicks extends StatelessWidget {
+  const MedQuickPicks({super.key, required this.onPick});
+
+  /// Called with (name, dose).
+  final void Function(String name, String dose) onPick;
+
+  @override
+  Widget build(BuildContext context) => Wrap(
+    spacing: 8,
+    runSpacing: 8,
+    children: [
+      for (final (emoji, name, dose) in medQuickPicks)
+        ActionChip(
+          avatar: Text(emoji),
+          label: Text(name),
+          onPressed: () {
+            HapticFeedback.selectionClick();
+            onPick(name, dose);
+          },
+        ),
+    ],
+  );
+}
+
 // ── Medication editor ─────────────────────────────────────────
 Future<void> showMedicationEditor(
   BuildContext context, {
@@ -85,8 +121,9 @@ Future<void> showMedicationEditor(
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
+    useSafeArea: true,
     builder: (ctx) => StatefulBuilder(
-      builder: (ctx, set) => Padding(
+      builder: (ctx, set) => SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(
           24,
           0,
@@ -98,7 +135,7 @@ Future<void> showMedicationEditor(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              existing == null ? 'Add medication' : 'Edit medication',
+              existing == null ? 'Add med or supplement' : 'Edit reminder',
               style: Theme.of(ctx).textTheme.titleLarge,
             ),
             const SizedBox(height: 16),
@@ -108,16 +145,25 @@ Future<void> showMedicationEditor(
               textCapitalization: TextCapitalization.sentences,
               decoration: const InputDecoration(
                 labelText: 'Name',
-                hintText: 'e.g. Vitamin D',
+                hintText: 'e.g. Vitamin D, Creatine',
                 border: OutlineInputBorder(),
               ),
             ),
+            if (existing == null) ...[
+              const SizedBox(height: 10),
+              MedQuickPicks(
+                onPick: (n, d) => set(() {
+                  name.text = n;
+                  if (dose.text.trim().isEmpty) dose.text = d;
+                }),
+              ),
+            ],
             const SizedBox(height: 12),
             TextField(
               controller: dose,
               decoration: const InputDecoration(
                 labelText: 'Dose (optional)',
-                hintText: 'e.g. 1 tablet',
+                hintText: 'e.g. 1 tablet, 1 scoop',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -187,7 +233,7 @@ Future<void> showMedicationEditor(
                   Navigator.pop(ctx);
                   c.removeMedication(existing.id);
                 },
-                child: const Text('Remove medication'),
+                child: const Text('Remove reminder'),
               ),
           ],
         ),
@@ -397,12 +443,12 @@ Future<void> showAdUnlockHub(
               row(
                 ctx,
                 '💊',
-                'Unlimited medications',
-                'Remind me about every pill',
+                'Unlimited meds & supplements',
+                'Every pill, vitamin and scoop',
                 () => watchAdFor(
                   context,
                   key: medsUnlockKey,
-                  label: 'Unlimited medications',
+                  label: 'Unlimited meds & supplements',
                 ),
               ),
             for (final r in rels)
@@ -423,12 +469,12 @@ Future<void> showAdUnlockHub(
               row(
                 ctx,
                 '💊',
-                'Unlimited medications',
-                'Remind me about every pill',
+                'Unlimited meds & supplements',
+                'Every pill, vitamin and scoop',
                 () => watchAdFor(
                   context,
                   key: medsUnlockKey,
-                  label: 'Unlimited medications',
+                  label: 'Unlimited meds & supplements',
                 ),
               ),
             if (rels.isEmpty && !medsLocked)
@@ -578,7 +624,7 @@ Future<void> showTrialEndingSheet(
           Text(
             ended
                 ? '${departedPersona != null ? '$departedPersona had to go for now. ' : ''}"I\'m still here for your water — and your most important pill. Always free. But I\'ll miss the rest of the family."'
-                : '"You\'ve had all of me free for 7 days. Keep me around? Water and one medication stay free — but I\'ll miss the rest."',
+                : '"You\'ve had all of me free for 7 days. Keep me around? Water and one med or supplement stay free — but I\'ll miss the rest."',
             textAlign: TextAlign.center,
             style: const TextStyle(
               fontSize: 16,
@@ -601,7 +647,7 @@ Future<void> showTrialEndingSheet(
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Keep free (water + 1 pill)'),
+            child: const Text('Keep free (water + 1 reminder)'),
           ),
         ],
       ),
@@ -620,7 +666,7 @@ Future<void> showUpsellDialog(BuildContext context, int streak) {
         textAlign: TextAlign.center,
       ),
       content: Text(
-        '$streak-day streak! Unlock every persona and unlimited medication reminders — try the Annual plan free for 7 days.',
+        '$streak-day streak! Unlock every persona and unlimited med & supplement reminders — try the Annual plan free for 7 days.',
         textAlign: TextAlign.center,
       ),
       actionsAlignment: MainAxisAlignment.center,

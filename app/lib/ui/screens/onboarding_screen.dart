@@ -10,6 +10,7 @@ import '../theme.dart';
 import '../widgets/common.dart';
 import '../widgets/persona_widgets.dart';
 import '../widgets/water_bottle.dart';
+import 'sheets.dart';
 
 enum _Step {
   weight,
@@ -477,8 +478,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         _ChoiceCard(
           selected: _mode == CareMode.medication,
           leading: const Text('💊', style: TextStyle(fontSize: 30)),
-          title: 'Medication',
-          subtitle: 'Pills + water. One medication is free forever — nobody should pay to be reminded of their most important pill.',
+          title: 'Meds & Supplements',
+          subtitle: 'Pills, vitamins, protein, creatine — plus water. One reminder is free forever: nobody should pay to be reminded of their most important pill.',
           trailing: const Tag('1 FREE', color: NaglyColors.med),
           onTap: () => setState(() => _mode = CareMode.medication),
         ),
@@ -488,58 +489,62 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   );
 
   Widget _medicationStep() => _frame(
-    title: 'Which pill should I nag you about?',
+    title: 'What should I remind you to take?',
     subtitle: 'You can add more later. Skip if you prefer.',
-    body: Column(
-      children: [
-        TextField(
-          controller: _medName,
-          textCapitalization: TextCapitalization.sentences,
-          decoration: InputDecoration(
-            hintText: 'e.g. Blood pressure tablet',
-            filled: true,
-            fillColor: Colors.white,
-            prefixIcon: const Padding(
-              padding: EdgeInsets.all(12),
-              child: Text('💊', style: TextStyle(fontSize: 20)),
-            ),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(18),
-              borderSide: const BorderSide(color: NaglyColors.outline),
+    body: SingleChildScrollView(
+      child: Column(
+        children: [
+          TextField(
+            controller: _medName,
+            textCapitalization: TextCapitalization.sentences,
+            decoration: InputDecoration(
+              hintText: 'e.g. BP tablet, Vitamin D, Creatine',
+              filled: true,
+              fillColor: Colors.white,
+              prefixIcon: const Padding(
+                padding: EdgeInsets.all(12),
+                child: Text('💊', style: TextStyle(fontSize: 20)),
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(18),
+                borderSide: const BorderSide(color: NaglyColors.outline),
+              ),
             ),
           ),
-        ),
-        const SizedBox(height: 12),
-        NCard(
-          onTap: () async {
-            final t = await showTimePicker(
-              context: context,
-              initialTime: _medTime,
-            );
-            if (t != null) setState(() => _medTime = t);
-          },
-          child: Row(
-            children: [
-              const Text('⏰', style: TextStyle(fontSize: 22)),
-              const SizedBox(width: 12),
-              const Expanded(
-                child: Text(
-                  'Remind me at',
-                  style: TextStyle(fontWeight: FontWeight.w800),
+          const SizedBox(height: 10),
+          MedQuickPicks(onPick: (n, _) => setState(() => _medName.text = n)),
+          const SizedBox(height: 12),
+          NCard(
+            onTap: () async {
+              final t = await showTimePicker(
+                context: context,
+                initialTime: _medTime,
+              );
+              if (t != null) setState(() => _medTime = t);
+            },
+            child: Row(
+              children: [
+                const Text('⏰', style: TextStyle(fontSize: 22)),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Text(
+                    'Remind me at',
+                    style: TextStyle(fontWeight: FontWeight.w800),
+                  ),
                 ),
-              ),
-              Text(
-                _medTime.format(context),
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w900,
-                  color: NaglyColors.med,
+                Text(
+                  _medTime.format(context),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                    color: NaglyColors.med,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     ),
     footer: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,

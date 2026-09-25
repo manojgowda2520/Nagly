@@ -314,7 +314,7 @@ List<TourStep> tourSteps(String name) => [
   TourStep(
     target: TourKeys.historyTab,
     title: 'Your history is a chat',
-    body: 'Every sip and every pill becomes a little conversation with $name.',
+    body: 'Every sip and every dose becomes a little conversation with $name.',
   ),
   TourStep(
     target: TourKeys.insightsTab,
