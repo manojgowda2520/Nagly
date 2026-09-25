@@ -31,7 +31,8 @@ Deadline: **Sep 30, 2026, 11:45 pm PDT** (= Oct 1, 12:15 pm IST). Aim to submit 
 Logline pattern: *For [who], Nagly helps [job] by [approach], so they can [outcome].*
 
 - **Problem:** generic reminders get swiped away. About half of people with chronic conditions don't take medicines as prescribed; forgetting is a top reason. People ignore alarms, not their mom.
-- **What it is:** water + medication reminders written in the voice of someone who loves you. 15 personas in 5 families: Mom (free), Dad, Grandparent, Bestie, Spouse. "Make it yours": rename your persona to the real person ("Lakshmi Amma", "Priya").
+- **What it is:** water + medication/supplement reminders (pills, vitamins, protein, creatine) written in the voice of someone who loves you. 15 personas in 5 families: Mom (free), Dad, Grandparent, Bestie, Spouse. "Make it yours": rename your persona to the real person ("Lakshmi Amma", "Priya").
+- **New in 1.0.1:** Spouse family, "Make it yours" (real name + emoji), Meds & Supplements quick picks (BP tablet, Vitamin D, Creatine, Protein shake…), a 7-step spotlight tour for first-time users.
 - **How it's different:** mood engine (proud / worried / disappointed) changes the words *and* the animation; log from the lock screen (+250 ml / +500 ml / "Took it"); history is a chat with your nagger; bond level grows with consistency.
 - **Evidence:** live on the App Store; first real users and a first paid subscriber within a day (numbers in §5).
 

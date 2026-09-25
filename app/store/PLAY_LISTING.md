@@ -8,25 +8,28 @@ Screenshots: still to capture (phone, 1080×2400+; Devpost needs 1179×2556 with
 **App name (≤30):** `Nagly: Mom's Water & Pill Nags` (30 chars)
 
 **Short description (≤80):**
-`Mom nags you to drink water & take your pills. Lovingly. Relentlessly.`
+`Mom nags you to drink water & take your pills or supplements. Lovingly.`
 
 **Full description (≤4000):**
 
 ```
 Your reminders finally have a personality.
 
-Nagly is the water and medication reminder that sounds like someone who loves you. Pick your nagger — Indian Mom, Punjabi Dad, Italian Nonna, your Bestie, even Corporate HR — and they'll check on you all day, in their own voice.
+Nagly is the water, medication and supplement reminder that sounds like someone who loves you. Pick your nagger — Indian Mom, Punjabi Dad, Italian Nonna, your Bestie, your Spouse, even Corporate HR — and they'll check on you all day, in their own voice.
 
 "Afternoon check — bottle empty? You're behind today, beta."
 
 💧 LOG WITHOUT OPENING THE APP
 Every reminder has buttons: +250 ml, +500 ml, or a cheeky "Later, Amma". One tap from your lock screen and she's satisfied. For now.
 
-🎭 12 VOICES, 4 FAMILIES
-Mom (always free), Dad, Grandparent and Bestie — each with three personalities. Their mood changes with your behaviour: proud when you're on track, worried when you're behind, disappointed when you ignore them twice.
+🎭 15 VOICES, 5 FAMILIES
+Mom (always free), Dad, Grandparent, Bestie and Spouse — each with three personalities. Their mood changes with your behaviour: proud when you're on track, worried when you're behind, disappointed when you ignore them twice.
 
-💊 MEDICATION REMINDERS — ONE IS FREE, FOREVER
-"Did you take your BP tablet, beta?" Tap "Took it" right from the notification. Your most important pill is never behind a paywall.
+✏️ MAKE IT YOURS
+Give your nagger a real name and emoji. Hear "Lakshmi Amma" or "Priya" instead of "Indian Mom".
+
+💊 MEDS, VITAMINS & SUPPLEMENTS — ONE IS FREE, FOREVER
+Blood-pressure tablet, vitamin D, creatine, your protein shake. "Took your creatine? I'll wait." Tap "Took it" right from the notification. Your most important one is never behind a paywall.
 
 🫧 A BOTTLE THAT'S ACTUALLY ALIVE
 Water sloshes when you tilt your phone. Bubbles rise with every sip. Confetti when you hit your goal.
@@ -41,11 +44,11 @@ Streaks, weekly charts, your best hour — and a relationship that grows from St
 Share a simple weekly summary with the people who worry about you.
 
 🔒 PRIVATE BY DESIGN
-No account. Your water and medication log stays on your phone.
+No account. Your water, meds and supplements log stays on your phone.
 
-FREE FOREVER: Mom personas, water tracking, reminders, and one medication.
+FREE FOREVER: Mom personas, water tracking, reminders, and one med or supplement.
 TRY EVERYTHING FREE FOR 7 DAYS — no card needed.
-NAGLY PRO: every persona + unlimited medications. Lifetime $29.99, Annual $19.99 (7-day free trial) or Monthly $1.99.
+NAGLY PRO: every persona, real names, and unlimited meds & supplements. Lifetime $29.99, Annual $19.99 (7-day free trial) or Monthly $1.99.
 Or watch a short ad to borrow any persona for 24 hours.
 
 Nagly is a reminder tool, not a medical device. Always follow your doctor's advice.
