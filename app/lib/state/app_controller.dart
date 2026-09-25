@@ -99,6 +99,9 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   List<MedLog> recentMedLogs = const []; // last 14 days
   Map<String, int> unlocks = const {};
   int? trialEndsAtMs;
+
+  /// Whether the spotlight feature tour has been shown (or skipped).
+  bool tourSeen = true;
   bool notificationsEnabled = true;
   bool permissionGranted = true;
   List<int> nudgeHistory = const [];
@@ -217,6 +220,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     );
     unlocks = await db.activeUnlocks(now.millisecondsSinceEpoch);
     trialEndsAtMs = await db.getInt(Keys.trialEndsAt);
+    tourSeen = await db.getBool(Keys.tourSeen);
     notificationsEnabled = await db.getBool(
       Keys.notificationsEnabled,
       fallback: true,
@@ -562,6 +566,19 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         customEmoji: capped.isEmpty ? '' : emoji,
       ),
     );
+  }
+
+  Future<void> markTourSeen() async {
+    tourSeen = true;
+    await db.setBool(Keys.tourSeen, true);
+    notifyListeners();
+  }
+
+  /// Settings → "Show app tour".
+  Future<void> replayTour() async {
+    tourSeen = false;
+    await db.setBool(Keys.tourSeen, false);
+    notifyListeners();
   }
 
   Future<void> setCareMode(CareMode mode) =>

@@ -11,12 +11,16 @@ import '../../state/app_controller.dart';
 import '../app.dart';
 import '../theme.dart';
 import '../widgets/common.dart';
+import '../widgets/feature_tour.dart';
 import '../widgets/persona_widgets.dart';
 import '../widgets/water_bottle.dart';
 import 'sheets.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
+
+  /// Lets the feature tour start from the top of Home.
+  static final scroll = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +31,7 @@ class HomeScreen extends StatelessWidget {
       child: SafeArea(
         bottom: false,
         child: ListView(
+          controller: scroll,
           padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
           children: [
             _Header(medMode: medMode),
@@ -75,7 +80,10 @@ class _Header extends StatelessWidget {
         ),
         GestureDetector(
           onTap: () => context.read<TabSwitcher>().value = MainTab.personas,
-          child: BondChip(level: c.bondLevel, progress: c.bondProgress),
+          child: KeyedSubtree(
+            key: TourKeys.bond,
+            child: BondChip(level: c.bondLevel, progress: c.bondProgress),
+          ),
         ),
       ],
     );
@@ -104,13 +112,16 @@ class _PersonaSays extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 18),
-        SpeechBubble(
-          text: overrideLine ?? c.line,
-          name: c.persona.displayName,
-          onTap: () {
-            HapticFeedback.selectionClick();
-            c.cycleLine();
-          },
+        KeyedSubtree(
+          key: TourKeys.bubble,
+          child: SpeechBubble(
+            text: overrideLine ?? c.line,
+            name: c.persona.displayName,
+            onTap: () {
+              HapticFeedback.selectionClick();
+              c.cycleLine();
+            },
+          ),
         ),
       ],
     );
@@ -129,10 +140,13 @@ class _HydrationHero extends StatelessWidget {
       children: [
         const _PersonaSays(),
         const SizedBox(height: 22),
-        WaterBottle(
-          progress: c.progress,
-          label: '${(c.progress * 100).round()}%',
-          onTap: () => logWithFeedback(context, 250),
+        KeyedSubtree(
+          key: TourKeys.bottle,
+          child: WaterBottle(
+            progress: c.progress,
+            label: '${(c.progress * 100).round()}%',
+            onTap: () => logWithFeedback(context, 250),
+          ),
         ),
         const SizedBox(height: 16),
         Text.rich(
@@ -170,7 +184,7 @@ class _HydrationHero extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 18),
-        const QuickAddRow(),
+        KeyedSubtree(key: TourKeys.quickAdd, child: const QuickAddRow()),
         const SizedBox(height: 12),
         Text(
           c.nextNudgeLabel,
@@ -346,7 +360,10 @@ class _MedicationHome extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    const QuickAddRow(compact: true),
+                    KeyedSubtree(
+                      key: TourKeys.quickAdd,
+                      child: const QuickAddRow(compact: true),
+                    ),
                   ],
                 ),
               ),

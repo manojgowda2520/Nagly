@@ -213,6 +213,14 @@ class SettingsScreen extends StatelessWidget {
             _Group(
               children: [
                 _Row(
+                  emoji: '🧭',
+                  title: 'Show app tour',
+                  onTap: () {
+                    context.read<TabSwitcher>().value = MainTab.home;
+                    c.replayTour();
+                  },
+                ),
+                _Row(
                   emoji: '📣',
                   title: 'Tell a friend',
                   onTap: () => SharePlus.instance.share(

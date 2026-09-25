@@ -3,6 +3,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:nagly/config/integrations.dart';
 import 'package:nagly/data/database.dart';
+import 'package:nagly/ui/screens/settings_screen.dart';
 import 'package:nagly/domain/models.dart';
 import 'package:nagly/services/ads.dart';
 import 'package:nagly/services/billing.dart';
@@ -29,10 +30,12 @@ class FakeNotifications extends NotificationService {
 }
 
 Future<(AppController, NaglyDatabase, FakeNotifications)> _boot(
-  WidgetTester tester,
-) async {
+  WidgetTester tester, {
+  bool tourSeen = true,
+}) async {
   databaseFactory = databaseFactoryFfiNoIsolate;
   final db = await NaglyDatabase.open(path: inMemoryDatabasePath);
+  await db.setBool(Keys.tourSeen, tourSeen);
   addTearDown(
     db.close,
   ); // always close, so a failed test can't leak state into the next
@@ -203,6 +206,58 @@ void main() {
       await tester.pump(const Duration(seconds: 2));
       expect(c.access.isPro, isTrue);
       expect(c.activeMeds.length, 2);
+
+      await _teardown(tester, c);
+    },
+  );
+
+  testWidgets(
+    'feature tour: runs once after onboarding, replays from Settings',
+    (tester) async {
+      final (c, db, _) = await _boot(tester, tourSeen: false);
+      await c.finishOnboarding(const Profile());
+      await _pumpUntil(tester, find.text('Indian Mom has more to say'));
+      expect(find.text('Indian Mom has more to say'), findsOneWidget);
+      expect(find.text('1 of 7'), findsOneWidget);
+
+      await _tap(tester, find.text('Next'));
+      expect(find.text('Your bond grows'), findsOneWidget);
+      for (final title in [
+        'Tap to sip, tilt to slosh',
+        'Log in one tap',
+        'Pick your nagger',
+        'Your history is a chat',
+      ]) {
+        await _tap(tester, find.text('Next'));
+        expect(find.text(title), findsOneWidget);
+      }
+      await _tap(tester, find.text('Next'));
+      expect(find.text('See your week'), findsOneWidget);
+      await _tap(tester, find.text('Got it'));
+      await tester.pump(const Duration(milliseconds: 500));
+      expect(find.text('See your week'), findsNothing);
+      expect(c.tourSeen, isTrue);
+      expect(await db.getBool(Keys.tourSeen), isTrue);
+
+      // Settings → Show app tour brings it back; Skip ends it.
+      await _tap(tester, find.text('Settings'));
+      await tester.scrollUntilVisible(
+        find.text('Show app tour'),
+        300,
+        scrollable: find
+            .descendant(
+              of: find.byType(SettingsScreen),
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
+      await _tap(tester, find.text('Show app tour'));
+      await _pumpUntil(tester, find.text('Indian Mom has more to say'));
+      expect(find.text('Indian Mom has more to say'), findsOneWidget);
+      await _tap(tester, find.text('Skip'));
+      await tester.pump(const Duration(milliseconds: 500));
+      expect(find.text('Indian Mom has more to say'), findsNothing);
+      expect(c.tourSeen, isTrue);
 
       await _teardown(tester, c);
     },

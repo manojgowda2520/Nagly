@@ -262,4 +262,5 @@ abstract final class Keys {
   static const trialEndedShown = 'trial_ended_shown';
   static const upsellShownAt = 'upsell_shown_at';
   static const installId = 'install_id';
+  static const tourSeen = 'tour_seen';
 }

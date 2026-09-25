@@ -17,6 +17,7 @@ import 'screens/sheets.dart';
 import 'screens/splash_screen.dart';
 import 'theme.dart';
 import 'widgets/common.dart';
+import 'widgets/feature_tour.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
@@ -83,19 +84,40 @@ class _MainShellState extends State<MainShell> {
   final _tabs = TabSwitcher();
   StreamSubscription<void>? _sub;
   bool _confetti = false;
+  bool _touring = false;
+  late final AppController _controller;
 
   @override
   void initState() {
     super.initState();
     _tabs.addListener(() => setState(() {}));
+    _controller = context.read<AppController>()..addListener(_maybeStartTour);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeStartTour());
     // One modal at a time: each event waits for the previous one to be dismissed.
     final c = context.read<AppController>();
     _sub = c.events.asyncMap(_onEvent).listen((_) {});
     c.flushPendingEvents();
   }
 
+  /// Spotlight tour: once after onboarding (and after updating), or on request
+  /// from Settings.
+  void _maybeStartTour() {
+    final c = _controller;
+    if (_touring || c.tourSeen || !c.profile.onboarded) return;
+    _touring = true;
+    _tabs.value = MainTab.home;
+    if (HomeScreen.scroll.hasClients) HomeScreen.scroll.jumpTo(0);
+    Future<void>.delayed(const Duration(milliseconds: 700), () async {
+      if (!mounted) return;
+      await showFeatureTour(context, tourSteps(c.persona.displayName));
+      await c.markTourSeen();
+      _touring = false;
+    });
+  }
+
   @override
   void dispose() {
+    _controller.removeListener(_maybeStartTour);
     _sub?.cancel();
     _tabs.dispose();
     super.dispose();
@@ -187,28 +209,37 @@ class _MainShellState extends State<MainShell> {
                 child: NavigationBar(
                   selectedIndex: tab.index,
                   onDestinationSelected: (i) => _tabs.value = MainTab.values[i],
-                  destinations: const [
-                    NavigationDestination(
+                  destinations: [
+                    const NavigationDestination(
                       icon: Icon(Icons.water_drop_outlined),
                       selectedIcon: Icon(Icons.water_drop),
                       label: 'Home',
                     ),
                     NavigationDestination(
-                      icon: Icon(Icons.chat_bubble_outline),
-                      selectedIcon: Icon(Icons.chat_bubble),
+                      icon: KeyedSubtree(
+                        key: TourKeys.historyTab,
+                        child: const Icon(Icons.chat_bubble_outline),
+                      ),
+                      selectedIcon: const Icon(Icons.chat_bubble),
                       label: 'History',
                     ),
                     NavigationDestination(
-                      icon: Icon(Icons.people_outline),
-                      selectedIcon: Icon(Icons.people),
+                      icon: KeyedSubtree(
+                        key: TourKeys.personasTab,
+                        child: const Icon(Icons.people_outline),
+                      ),
+                      selectedIcon: const Icon(Icons.people),
                       label: 'Personas',
                     ),
                     NavigationDestination(
-                      icon: Icon(Icons.insights_outlined),
-                      selectedIcon: Icon(Icons.insights),
+                      icon: KeyedSubtree(
+                        key: TourKeys.insightsTab,
+                        child: const Icon(Icons.insights_outlined),
+                      ),
+                      selectedIcon: const Icon(Icons.insights),
                       label: 'Insights',
                     ),
-                    NavigationDestination(
+                    const NavigationDestination(
                       icon: Icon(Icons.settings_outlined),
                       selectedIcon: Icon(Icons.settings),
                       label: 'Settings',
@@ -252,3 +283,42 @@ void openPaywall(
     ),
   );
 }
+
+/// The spotlight tour, in order. [name] is the persona the user hears.
+List<TourStep> tourSteps(String name) => [
+  TourStep(
+    target: TourKeys.bubble,
+    title: '$name has more to say',
+    body: 'Tap the bubble for another line. Their mood changes with how you\'re doing today.',
+  ),
+  TourStep(
+    target: TourKeys.bond,
+    title: 'Your bond grows',
+    body: 'Stay consistent and you go from Stranger to Soul Reminder.',
+  ),
+  TourStep(
+    target: TourKeys.bottle,
+    title: 'Tap to sip, tilt to slosh',
+    body: 'Tap the bottle to log a glass. Tilt your phone and watch the water move.',
+  ),
+  TourStep(
+    target: TourKeys.quickAdd,
+    title: 'Log in one tap',
+    body: 'Every reminder has these buttons too, so you can log straight from your lock screen.',
+  ),
+  TourStep(
+    target: TourKeys.personasTab,
+    title: 'Pick your nagger',
+    body: 'Mom, Dad, Grandparent, Bestie, and new: Spouse. Give them a real name with "Make it yours".',
+  ),
+  TourStep(
+    target: TourKeys.historyTab,
+    title: 'Your history is a chat',
+    body: 'Every sip and every pill becomes a little conversation with $name.',
+  ),
+  TourStep(
+    target: TourKeys.insightsTab,
+    title: 'See your week',
+    body: 'Streaks, charts, and a weekly summary you can share with family.',
+  ),
+];
