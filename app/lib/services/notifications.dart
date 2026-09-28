@@ -28,6 +28,35 @@ abstract final class NudgeAction {
   static const medSkip = 'MED_SKIP';
 }
 
+/// iOS shows action buttons per category, registered once at startup.
+abstract final class _IosCategory {
+  static const water = 'nagly_water';
+  static const med = 'nagly_med';
+}
+
+final _iosCategories = [
+  DarwinNotificationCategory(
+    _IosCategory.water,
+    actions: [
+      DarwinNotificationAction.plain(NudgeAction.add250, '+250 ml'),
+      DarwinNotificationAction.plain(NudgeAction.add500, '+500 ml'),
+      DarwinNotificationAction.plain(NudgeAction.skip, 'Later'),
+    ],
+  ),
+  DarwinNotificationCategory(
+    _IosCategory.med,
+    actions: [
+      DarwinNotificationAction.plain(NudgeAction.medTaken, 'Took it 💊'),
+      DarwinNotificationAction.plain(NudgeAction.medSnooze, 'Snooze 30m'),
+      DarwinNotificationAction.plain(
+        NudgeAction.medSkip,
+        'Not today',
+        options: {DarwinNotificationActionOption.destructive},
+      ),
+    ],
+  ),
+];
+
 abstract final class _Ids {
   static const waterBase = 1; // 1..8
   static const trialEnding = 900;
@@ -88,12 +117,13 @@ class NotificationService {
   Future<void> init({void Function(NotificationResponse)? onResponse}) async {
     await _initTimezones();
     await _plugin.initialize(
-      settings: const InitializationSettings(
-        android: AndroidInitializationSettings('ic_stat_nagly'),
+      settings: InitializationSettings(
+        android: const AndroidInitializationSettings('ic_stat_nagly'),
         iOS: DarwinInitializationSettings(
           requestAlertPermission: false,
           requestBadgePermission: false,
           requestSoundPermission: false,
+          notificationCategories: _iosCategories,
         ),
       ),
       onDidReceiveNotificationResponse: onResponse,
@@ -239,6 +269,7 @@ class NotificationService {
         body: n.body,
         channel: _waterChannel,
         payload: 'water',
+        iosCategory: _IosCategory.water,
         actions: [
           const AndroidNotificationAction(NudgeAction.add250, '+250 ml'),
           const AndroidNotificationAction(NudgeAction.add500, '+500 ml'),
@@ -355,6 +386,7 @@ class NotificationService {
       body: n.body,
       channel: _waterChannel,
       payload: 'water',
+      iosCategory: _IosCategory.water,
       actions: [
         const AndroidNotificationAction(NudgeAction.add250, '+250 ml'),
         const AndroidNotificationAction(NudgeAction.add500, '+500 ml'),
@@ -381,6 +413,7 @@ class NotificationService {
       ),
       channel: _medChannel,
       payload: 'med:${med.id}:${dateKey(at)}',
+      iosCategory: _IosCategory.med,
       actions: const [
         AndroidNotificationAction(NudgeAction.medTaken, 'Took it 💊'),
         AndroidNotificationAction(NudgeAction.medSnooze, 'Snooze 30m'),
@@ -397,6 +430,7 @@ class NotificationService {
     required AndroidNotificationChannel channel,
     required String payload,
     List<AndroidNotificationAction> actions = const [],
+    String? iosCategory,
   }) async {
     try {
       await _plugin.zonedSchedule(
@@ -421,7 +455,7 @@ class NotificationService {
             category: AndroidNotificationCategory.reminder,
             actions: actions,
           ),
-          iOS: const DarwinNotificationDetails(),
+          iOS: DarwinNotificationDetails(categoryIdentifier: iosCategory),
         ),
       );
     } catch (e) {
