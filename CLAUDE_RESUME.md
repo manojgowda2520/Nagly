@@ -5,7 +5,8 @@ Say to Claude Code: **"Read CLAUDE_RESUME.md and docs/claude-memory/, then conti
 ## LATEST — 2026-09-30 evening IST (Shipaton deadline: Oct 1, 12:15 PM IST)
 - **iOS 1.0.3 (8)** submitted to App Review, auto-release. Fix: lock-screen buttons open the app so taps save
   (commit 1cae2b4, local only, not pushed). Needs a real-device check of "Took it" from the lock screen (TestFlight).
-- **Demo video DONE**: `app/store/video/Nagly_demo_v3.mp4` (1:50, 1080p). Built by `app/store/video/assemble.py`
+- **YouTube LIVE (Oct 1): https://youtu.be/cYa6-qM5r9I** (channel mj manoj) = Nagly_demo_v2.mp4 with music lowered (MUSIC_VOL 0.14). Thumbnail: app/store/youtube/Nagly_thumbnail.png. Next: link into Devpost.
+- Demo video: `app/store/video/Nagly_demo_v3.mp4` (1:50, 1080p). Built by `app/store/video/assemble.py`
   (`~/development/videnv/bin/python assemble.py` → writes Nagly_demo_v2.mp4; copy to v3).
   AI clips in `clips_q/K1..K5.mp4` (Veo 3.1 Quality via Google Flow), real iPhone recordings in `rec/`.
   Story: Arjun swipes machine alarms → memory of Amma's "drink water first" → Nagly nudges in her voice →

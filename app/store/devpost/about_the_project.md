@@ -38,7 +38,7 @@ So I built Nagly: reminders that sound like someone who loves you.
 
 ## Challenges
 - Writing 15 personalities that feel caring, not annoying, and funny without being mean.
-- Getting notification action buttons to log water without opening the app on both platforms.
+- Getting notification action buttons to log water with one tap on the reminder on both platforms.
 - Keeping the iPhone build completely free of ad code while Android has rewarded ads.
 - First time shipping to both stores: privacy rules for many countries, store reviews, in-app purchases and promo codes.
 

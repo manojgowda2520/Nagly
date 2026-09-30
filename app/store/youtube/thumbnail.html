@@ -1,0 +1,28 @@
+<html><head><meta charset="utf-8"><style>
+@font-face{font-family:Nunito;font-weight:800;src:url(../../assets/fonts/Nunito-800.ttf)}
+@font-face{font-family:Nunito;font-weight:900;src:url(../../assets/fonts/Nunito-900.ttf)}
+@font-face{font-family:Nunito;font-weight:700;src:url(../../assets/fonts/Nunito-700.ttf)}
+*{margin:0;box-sizing:border-box}
+body{width:1280px;height:720px;overflow:hidden;background:#2B1A12;font-family:Nunito,sans-serif;position:relative}
+.photo{position:absolute;top:0;right:0;width:840px;height:720px;
+  background:url(bg_kitchen.jpg) 42% 50%/auto 720px no-repeat}
+.fade{position:absolute;top:0;left:0;width:760px;height:720px;
+  background:linear-gradient(90deg,#2B1A12 0%,#2B1A12 52%,rgba(43,26,18,.85) 68%,rgba(43,26,18,0) 100%)}
+.wm{position:absolute;right:0;bottom:0;width:120px;height:60px;background:linear-gradient(135deg,rgba(0,0,0,0),rgba(20,12,8,.9))}
+.brand{position:absolute;left:56px;top:48px;display:flex;align-items:center;gap:18px}
+.brand img{width:84px;height:84px;border-radius:20px;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+.brand span{color:#FFF3E6;font-size:54px;font-weight:900;letter-spacing:-.5px}
+h1{position:absolute;left:56px;top:176px;width:600px;color:#fff;font-size:86px;line-height:1.02;font-weight:900;letter-spacing:-1.5px}
+h1 em{font-style:normal;color:#FFB48A}
+.note{position:absolute;left:56px;top:470px;width:520px;display:flex;gap:18px;align-items:center;
+  background:rgba(255,248,240,.97);border-radius:26px;padding:22px 26px;box-shadow:0 14px 40px rgba(0,0,0,.45)}
+.note img{width:60px;height:60px;border-radius:14px}
+.note b{display:block;color:#2B1A12;font-size:26px;font-weight:900}
+.note p{color:#4A3226;font-size:25px;font-weight:700;line-height:1.2}
+.note small{position:absolute;right:24px;top:20px;color:#9A7F70;font-size:20px;font-weight:700}
+</style></head><body>
+<div class="photo"></div><div class="fade"></div><div class="wm"></div>
+<div class="brand"><img src="../icon-512.png"><span>Nagly</span></div>
+<h1>Alarms get ignored.<br><em>Mom doesn't.</em></h1>
+<div class="note"><img src="../icon-512.png"><div><b>Subbu Amma</b><p>Kanna, drink water first, then go.</p></div><small>now</small></div>
+</body></html>

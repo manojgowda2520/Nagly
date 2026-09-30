@@ -265,10 +265,13 @@ def main():
     open(ass, "w").write("\n".join(lines))
     fc.append(f"{prev}subtitles={ass}[v]")
     silent = os.path.join(B, "v2_video.mp4")
-    run(vin + ["-filter_complex", ";".join(fc), "-map", "[v]", "-c:v", "libx264", "-crf", "18", "-preset", "medium",
-               "-pix_fmt", "yuv420p", "-r", str(FPS), silent])
+    if not (os.environ.get("AUDIO_ONLY") and os.path.exists(silent)):  # AUDIO_ONLY=1 reuses the rendered picture
+        run(vin + ["-filter_complex", ";".join(fc), "-map", "[v]", "-c:v", "libx264", "-crf", "18", "-preset", "medium",
+                   "-pix_fmt", "yuv420p", "-r", str(FPS), silent])
 
     # ---- audio: VO + SFX placed on the timeline, music ducked under voice ----
+    MUSIC_VOL = float(os.environ.get("MUSIC_VOL", "0.14"))  # was 0.42; user asked for quieter music
+    MASTER_GAIN = float(os.environ.get("MASTER_GAIN", "6"))  # fixed gain (loudnorm used to undo the music cut)
     ain, parts, idx = [], [], 0
     for st, s in zip(starts, S):
         for name, off in s[2]:
@@ -282,10 +285,10 @@ def main():
     music_i = idx
     ain += ["-i", p("music", "heartfelt_app_score.mp3")]
     fc = parts + [voice_mix, "[voice]asplit=2[vo1][vo2]",
-                  f"[{music_i}:a]aformat=sample_rates=48000:channel_layouts=stereo,atrim=0:{total:.2f},volume=0.42,"
+                  f"[{music_i}:a]aformat=sample_rates=48000:channel_layouts=stereo,atrim=0:{total:.2f},volume={MUSIC_VOL},"
                   f"afade=t=in:d=1.5,afade=t=out:st={total-3:.2f}:d=3[mus]",
                   "[mus][vo2]sidechaincompress=threshold=0.03:ratio=8:attack=20:release=400[duck]",
-                  "[vo1][duck]amix=inputs=2:normalize=0,alimiter=limit=0.95,loudnorm=I=-14:TP=-1.5:LRA=11[a]"]
+                  f"[vo1][duck]amix=inputs=2:normalize=0,volume={MASTER_GAIN}dB,alimiter=limit=0.95[a]"]
     audio = os.path.join(B, "v2_audio.m4a")
     run(ain + ["-filter_complex", ";".join(fc), "-map", "[a]", "-t", f"{total:.2f}", "-c:a", "aac", "-b:a", "192k", audio])
 
