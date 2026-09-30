@@ -1,9 +1,25 @@
 # Resume Nagly with Claude (new machine / new account)
 
 Say to Claude Code: **"Read CLAUDE_RESUME.md and docs/claude-memory/, then continue."**
-Branch: `flutter`. State as of 2026-09-21.
 
-## Where things stand
+## LATEST — 2026-09-30 evening IST (Shipaton deadline: Oct 1, 12:15 PM IST)
+- **iOS 1.0.3 (8)** submitted to App Review, auto-release. Fix: lock-screen buttons open the app so taps save
+  (commit 1cae2b4, local only, not pushed). Needs a real-device check of "Took it" from the lock screen (TestFlight).
+- **Demo video DONE**: `app/store/video/Nagly_demo_v3.mp4` (1:50, 1080p). Built by `app/store/video/assemble.py`
+  (`~/development/videnv/bin/python assemble.py` → writes Nagly_demo_v2.mp4; copy to v3).
+  AI clips in `clips_q/K1..K5.mp4` (Veo 3.1 Quality via Google Flow), real iPhone recordings in `rec/`.
+  Story: Arjun swipes machine alarms → memory of Amma's "drink water first" → Nagly nudges in her voice →
+  he sips (open tumbler) → Amma gets "Appa" BP-tablet nudge (clear glass) → video call toast (clear glass).
+  User rules for the video: no fake app features (tilt line removed), no closed-lid drinking, soft smiles,
+  notifications must visibly arrive on the phone first.
+- **Still to do (user):** upload video to YouTube (credit: Voices ElevenLabs.io · Music Google Flow Music ·
+  Video Google Flow (Veo 3.1) · Motion HyperFrames) → paste link in Devpost Project details → change
+  "without opening the app" to "with one tap on the reminder" in story/Challenges/OneSignal/Grand Prize answers →
+  user ticks terms and clicks Submit (Claude must not submit).
+- Devpost draft: devpost.com/submit-to/29969-revenuecat-shipaton-2026/manage/submissions/1202724-nagly-reminders-that-sound-like-mom
+- Flow credits nearly used up; ElevenLabs free plan (~7,000 credits left).
+
+## Where things stand (older, 2026-09-21)
 - **App**: Flutter, in `app/`. Version **1.0.0 (2)**, `sandboxMode=false` (real RevenueCat + OneSignal), AdMob still Google **test** IDs. 34 tests pass.
 - **Play Console** (Mobil80 org account, Work Chrome profile; touch only the Nagly app):
   - All "Set up your app" tasks done (listing, 4 screenshots, Data safety, PEGI 3, declarations).

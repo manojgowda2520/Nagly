@@ -1,0 +1,136 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="assets/gsap.min.js"></script>
+<style>
+  @font-face { font-family:'New York'; src: local('New York'), local('NewYork'), local('Georgia'); }
+
+  :root { --ink:#2B1A12; --soft:#6B4A3A; --teal:#12808C; --cream:#FFF3E6; --peach:#FFD9C2; }
+  * { margin:0; box-sizing:border-box; }
+  body { width:1920px; height:1080px; overflow:hidden; background:var(--cream);
+         font-family:-apple-system,'SF Pro Display','Helvetica Neue',sans-serif; }
+  #root { position:relative; width:1920px; height:1080px;
+          background:linear-gradient(135deg,var(--cream),var(--peach)); }
+  .label { font-size:26px; font-weight:800; letter-spacing:.18em; color:var(--teal); }
+  .serif { font-family:'New York','Georgia',serif; }
+  #left { position:absolute; left:150px; top:170px; width:820px; }
+  #headline, #headline2 { margin-top:26px; font-size:76px; font-weight:700; line-height:1.08; color:var(--ink); }
+  #timeline { position:absolute; left:150px; top:560px; width:780px; }
+  .tick { display:flex; align-items:center; gap:22px; margin-bottom:26px; opacity:0; }
+  .tick .time { width:170px; font-size:34px; font-weight:800; color:var(--ink); }
+  .tick .dot { width:22px; height:22px; border-radius:50%; background:var(--teal); flex:none; }
+  .tick .what { font-size:32px; font-weight:600; color:var(--soft); }
+  .tick.bad .dot { background:#D9534F; }
+  .tick.good .dot { background:#3BAA5C; }
+
+  /* phone */
+  #phone { position:absolute; right:200px; top:30px; width:500px; height:1020px; border-radius:72px;
+           background:#111; padding:14px; box-shadow:0 40px 80px rgba(60,30,10,.35); }
+  #screen { position:relative; width:100%; height:100%; border-radius:60px; overflow:hidden;
+            background:radial-gradient(120% 80% at 30% 20%,#F6C9A8 0%,#C98B6B 45%,#6E4A5E 100%); }
+  #island { position:absolute; top:18px; left:50%; width:130px; height:38px; margin-left:-65px;
+            background:#000; border-radius:20px; z-index:5; }
+  #date { position:absolute; top:100px; width:100%; text-align:center; color:rgba(255,255,255,.9);
+          font-size:26px; font-weight:600; }
+  .clock { position:absolute; top:128px; width:100%; text-align:center; color:#fff;
+           font-size:132px; font-weight:700; letter-spacing:-2px; }
+  #stack { position:absolute; left:18px; right:18px; bottom:120px; }
+  .note { position:absolute; left:0; right:0; bottom:0; padding:18px 18px 20px;
+          border-radius:30px; background:rgba(255,255,255,.78); backdrop-filter:blur(20px);
+          display:flex; gap:14px; opacity:0; transform-origin:50% 100%; }
+  .note img { width:62px; height:62px; border-radius:12px; flex:none; }
+  .note .t { display:flex; justify-content:space-between; font-size:26px; font-weight:700; color:#111; }
+  .note .t span { font-weight:500; color:#666; font-size:21px; }
+  .note .b { margin-top:4px; font-size:28px; line-height:1.25; color:#222; }
+  #actions { position:absolute; left:18px; right:18px; bottom:120px; opacity:0; }
+  .act { height:76px; border-radius:18px; background:rgba(255,255,255,.82); margin-top:8px;
+         display:flex; align-items:center; padding:0 24px; font-size:30px; font-weight:600; color:#111; }
+  #act250 { position:relative; }
+  #tap { position:absolute; left:0; top:0; width:70px; height:70px; border-radius:50%; background:rgba(255,255,255,.55);
+         border:3px solid #fff; opacity:0; z-index:9; }
+  #toast { position:absolute; top:330px; left:50%; width:300px; margin-left:-150px; padding:18px 0;
+           text-align:center; border-radius:24px; background:rgba(18,128,140,.95); color:#fff;
+           font-size:30px; font-weight:800; opacity:0; }
+  #dim { position:absolute; inset:0; background:rgba(0,0,0,.35); opacity:0; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="notify" data-width="1920" data-height="1080" data-duration="14">
+  <div id="left">
+    <div class="label">HOW A REMINDER REACHES YOU</div>
+    <div style="position:relative"><div id="headline" class="serif">She gets louder when you ignore her.</div><div id="headline2" class="serif" style="position:absolute;top:0;opacity:0">And proud the second you listen.</div></div>
+  </div>
+  <div id="timeline">
+    <div class="tick" id="k1"><div class="time">9:00 AM</div><div class="dot"></div><div class="what">A gentle nudge</div></div>
+    <div class="tick bad" id="k2"><div class="time">11:30 AM</div><div class="dot"></div><div class="what">Ignored → she worries</div></div>
+    <div class="tick bad" id="k3"><div class="time">2:00 PM</div><div class="dot"></div><div class="what">Ignored again → guilt trip</div></div>
+    <div class="tick good" id="k4"><div class="time">2:01 PM</div><div class="dot"></div><div class="what">+250 ml from the lock screen</div></div>
+  </div>
+
+  <div id="phone"><div id="screen">
+    <div id="island"></div>
+    <div id="date">Tuesday 29 September</div>
+    <div class="clock" id="c1">9:00</div><div class="clock" id="c2" style="opacity:0">11:30</div><div class="clock" id="c3" style="opacity:0">2:00</div><div class="clock" id="c4" style="opacity:0">2:01</div>
+    <div id="dim"></div>
+    <div id="stack">
+      <div class="note" id="n1"><img src="assets/icon.png"><div style="flex:1">
+        <div class="t">👩 Subbu Amma <span>now</span></div><div class="b">Beta, sip some water.</div></div></div>
+      <div class="note" id="n2"><img src="assets/icon.png"><div style="flex:1">
+        <div class="t">👩 Subbu Amma <span>now</span></div><div class="b">You're behind today, beta.</div></div></div>
+      <div class="note" id="n3"><img src="assets/icon.png"><div style="flex:1">
+        <div class="t">👩 Subbu Amma <span>now</span></div><div class="b">Ignoring Amma? Bold choice.</div></div></div>
+      <div class="note" id="n4"><img src="assets/icon.png"><div style="flex:1">
+        <div class="t">👩 Subbu Amma <span>now</span></div><div class="b">That's my child! 💧</div></div></div>
+    </div>
+    <div id="actions">
+      <div class="act" id="act250">+250 ml<div id="hl" style="position:absolute;inset:0;border-radius:18px;background:rgba(18,128,140,.95);color:#fff;display:flex;align-items:center;padding:0 24px;opacity:0">+250 ml</div></div>
+      <div class="act">+500 ml</div>
+      <div class="act">Later</div>
+    </div>
+    <div id="tap"></div>
+    <div id="toast">+250 ml logged</div>
+  </div></div>
+
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    const pop = (sel, t) => tl.fromTo(sel, { y: 60, opacity: 0, scale: .96 },
+      { y: 0, opacity: 1, scale: 1, duration: .45, ease: "back.out(1.6)" }, t);
+    const bump = (sel, t) => tl.to(sel, { y: -150, scale: .94, opacity: .55, duration: .4, ease: "power2.out" }, t);
+    const swap = (a, b, t) => { tl.to(a, { opacity: 0, duration: .2 }, t); tl.to(b, { opacity: 1, duration: .2 }, t); };
+
+    tl.from("#left", { y: 30, opacity: 0, duration: .6, ease: "power2.out" }, 0);
+    tl.to("#k1", { opacity: 1, duration: .3 }, .6); pop("#n1", .8);
+    swap("#c1", "#c2", 3.0); tl.to("#k2", { opacity: 1, duration: .3 }, 3.0);
+    bump("#n1", 3.1); pop("#n2", 3.2);
+    swap("#c2", "#c3", 5.4); tl.to("#k3", { opacity: 1, duration: .3 }, 5.4);
+    tl.to("#n1", { opacity: 0, duration: .3 }, 5.5); bump("#n2", 5.5); pop("#n3", 5.6);
+    // long-press
+    tl.set("#tap", { x: 200, y: 830, opacity: 0, scale: .6 }, 0);
+    tl.to("#tap", { opacity: 1, scale: 1, duration: .3 }, 7.4);
+    tl.to("#n3", { scale: 1.04, duration: .4 }, 7.6);
+    tl.to("#dim", { opacity: 1, duration: .4 }, 8.0);
+    tl.to("#n2", { opacity: 0, duration: .2 }, 8.0);
+    tl.to("#n3", { y: -250, scale: 1, duration: .4, ease: "power2.out" }, 8.0);
+    tl.to("#tap", { opacity: 0, duration: .15 }, 8.0);
+    tl.fromTo("#actions", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: .35 }, 8.1);
+    // tap +250
+    tl.set("#tap", { x: 170, y: 690, scale: .6 }, 8.9);
+    tl.to("#tap", { opacity: 1, scale: 1, duration: .25 }, 9.0);
+    tl.to("#hl", { opacity: 1, duration: .15 }, 9.3);
+    tl.to("#tap", { scale: .8, duration: .1 }, 9.3);
+    tl.to("#tap", { scale: 1, duration: .1 }, 9.4);
+    tl.to(["#actions", "#n3", "#dim", "#tap"], { opacity: 0, duration: .3 }, 9.7);
+    swap("#c3", "#c4", 9.8); tl.to("#k4", { opacity: 1, duration: .3 }, 9.8);
+    tl.fromTo("#toast", { opacity: 0, scale: .8 }, { opacity: 1, scale: 1, duration: .35, ease: "back.out(2)" }, 9.9);
+    tl.to("#toast", { opacity: 0, duration: .3 }, 11.3);
+    pop("#n4", 11.4);
+    swap("#headline", "#headline2", 11.3);
+    tl.to("#k4", { opacity: 1, duration: 2.3 }, 11.7);
+
+    window.__timelines = window.__timelines || {};
+    window.__timelines["notify"] = tl;
+  </script>
+</div>
+</body>
+</html>

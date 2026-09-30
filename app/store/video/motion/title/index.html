@@ -1,0 +1,12 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="s/base.css"><script src="s/gsap.min.js"></script>
+<style>#c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+#icon{width:250px;border-radius:56px;box-shadow:0 24px 60px rgba(60,30,10,.3)}
+#name{margin-top:36px;font-size:160px;font-weight:800;color:var(--ink)} #tag{font-size:58px;font-weight:700;color:var(--teal)}</style></head>
+<body><div class="root" id="root" data-composition-id="title" data-width="1920" data-height="1080" data-duration="4">
+<div id="c"><img id="icon" src="s/icon.png"><div id="name" class="serif">Nagly</div><div id="tag">Reminders that sound like Mom</div></div>
+<script>const tl=gsap.timeline({paused:true});
+tl.fromTo("#icon",{y:-420,scale:.7,opacity:0},{y:0,scale:1,opacity:1,duration:.6,ease:"bounce.out"},0.1);
+tl.fromTo("#name",{y:40,opacity:0},{y:0,opacity:1,duration:.5,ease:"power3.out"},0.6);
+tl.fromTo("#tag",{y:30,opacity:0},{y:0,opacity:1,duration:.5,ease:"power3.out"},0.9);
+tl.to("#c",{scale:1.03,duration:3,ease:"none"},0.9);
+window.__timelines={title:tl};</script></div></body></html>

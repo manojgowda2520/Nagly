@@ -1,0 +1,32 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="s/base.css"><script src="s/gsap.min.js"></script>
+<style>#hd{position:absolute;left:110px;top:80px;width:1100px}
+#os{position:absolute;right:110px;top:92px;font-size:24px;font-weight:700;color:#fff;background:#E54B4D;padding:10px 18px;border-radius:14px}
+.n{position:absolute;padding:22px 26px;width:330px} .n .k{font-size:20px;font-weight:800;letter-spacing:.12em;color:var(--teal)}
+.n .t{margin-top:6px;font-size:28px;font-weight:700;color:var(--ink);line-height:1.2}
+.ar{position:absolute;height:5px;background:var(--teal);transform-origin:0 50%}
+#push{position:absolute;left:600px;top:640px;width:720px;padding:18px;border-radius:30px;background:rgba(255,255,255,.95);box-shadow:0 20px 50px rgba(60,30,10,.2);display:flex;gap:16px}
+#push .ic{width:60px;height:60px;border-radius:14px} #push .tt{font-size:24px;font-weight:700} #push .bb{font-size:24px;color:#333;margin-top:4px}
+#push .im{margin-top:12px;width:100%;border-radius:16px}
+#stat{position:absolute;left:110px;top:720px;width:420px}
+#stat .big{font-size:120px;font-weight:800;color:var(--teal);line-height:1} #stat .s{font-size:28px;font-weight:600;color:var(--soft)}</style></head>
+<body><div class="root" id="root" data-composition-id="os" data-width="1920" data-height="1080" data-duration="9">
+<div id="hd"><div class="label">WHEN YOU GO QUIET</div><div class="h1 serif" style="margin-top:18px">She comes looking for you.</div></div>
+<div id="os">OneSignal Journeys</div>
+<div class="n card" id="j1" style="left:110px;top:340px"><div class="k">TRIGGER</div><div class="t">No sip for 2 days</div></div>
+<div class="ar" id="a1" style="left:440px;top:400px;width:90px"></div>
+<div class="n card" id="j2" style="left:530px;top:340px"><div class="k">PUSH · HER VOICE</div><div class="t">Persona photo, 15 voices, 1 template</div></div>
+<div class="ar" id="a2" style="left:860px;top:400px;width:90px"></div>
+<div class="n card" id="j3" style="left:950px;top:340px"><div class="k">+250 ML BUTTON</div><div class="t">Log with one tap</div></div>
+<div class="ar" id="a3" style="left:1280px;top:400px;width:90px"></div>
+<div class="n card" id="j4" style="left:1370px;top:340px"><div class="k">IN-APP</div><div class="t">“Welcome back” + outcome tracked</div></div>
+<div id="push"><img class="ic" src="s/icon.png"><div style="flex:1"><div class="tt">👩 Subbu Amma</div><div class="bb">Beta, did you forget your Amma?</div><img class="im" src="s/push_mom.png"></div></div>
+<div id="stat"><div class="big">75%</div><div class="s">click rate on the in-app “Welcome back”</div></div>
+<script>const tl=gsap.timeline({paused:true});
+tl.fromTo("#hd",{y:30,opacity:0},{y:0,opacity:1,duration:.5},0);
+tl.fromTo("#os",{opacity:0,scale:.9},{opacity:1,scale:1,duration:.4},.4);
+[1,2,3,4].forEach((k,i)=>{const t=.8+i*.7; tl.fromTo("#j"+k,{y:30,opacity:0},{y:0,opacity:1,duration:.4,ease:"back.out(1.6)"},t);
+ if(k<4) tl.fromTo("#a"+k,{scaleX:0},{scaleX:1,duration:.35},t+.35);});
+tl.fromTo("#push",{y:120,opacity:0},{y:0,opacity:1,duration:.55,ease:"back.out(1.4)"},3.8);
+tl.fromTo("#stat",{x:-30,opacity:0},{x:0,opacity:1,duration:.5},5.2);
+tl.to("#push",{y:-8,duration:3,ease:"none"},4.4);
+window.__timelines={os:tl};</script></div></body></html>

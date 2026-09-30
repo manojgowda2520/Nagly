@@ -1,0 +1,11 @@
+# Large media stays local (final video goes to YouTube)
+*.mp4
+*.mov
+*.wav
+*.mp3
+*.m4a
+*.webm
+*.png
+*.jpg
+*.jpeg
+node_modules/

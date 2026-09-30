@@ -1,0 +1,17 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="s/base.css"><script src="s/gsap.min.js"></script>
+<style>#c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+#icon{width:200px;border-radius:46px;box-shadow:0 20px 50px rgba(60,30,10,.3)} #n{margin-top:24px;font-size:120px;font-weight:800;color:var(--ink)}
+#l{font-size:50px;font-weight:700;color:var(--ink);margin-top:6px} #a{margin-top:40px;padding:18px 40px;border-radius:22px;background:#111;color:#fff;font-size:34px;font-weight:700}
+#s{margin-top:22px;font-size:28px;color:var(--soft);font-weight:600}</style></head>
+<body><div class="root" id="root" data-composition-id="end" data-width="1920" data-height="1080" data-duration="6">
+<div id="c"><img id="icon" src="s/icon.png"><div id="n" class="serif">Nagly</div>
+<div id="l">People ignore alarms. They don't ignore their mom.</div>
+<div id="a">Available on the App Store</div><div id="s">Search “Nagly” · Free to start · Water · Meds · Supplements</div></div>
+<script>const tl=gsap.timeline({paused:true});
+tl.fromTo("#icon",{y:-300,opacity:0},{y:0,opacity:1,duration:.6,ease:"bounce.out"},0.1);
+tl.fromTo("#n",{y:30,opacity:0},{y:0,opacity:1,duration:.45},.5);
+tl.fromTo("#l",{y:30,opacity:0},{y:0,opacity:1,duration:.45},.8);
+tl.fromTo("#a",{scale:.8,opacity:0},{scale:1,opacity:1,duration:.45,ease:"back.out(2)"},1.3);
+tl.fromTo("#s",{opacity:0},{opacity:1,duration:.4},1.7);
+tl.to("#c",{scale:1.02,duration:4,ease:"none"},2);
+window.__timelines={end:tl};</script></div></body></html>
