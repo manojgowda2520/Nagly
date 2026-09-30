@@ -660,8 +660,14 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     return ok;
   }
 
+  String? _lastActionKey;
+
   Future<void> handleNotificationResponse(NotificationResponse response) async {
     if (response.actionId != null) {
+      // A launch tap can arrive both as launch details and as a live callback.
+      final key = '${response.id}:${response.actionId}:${response.payload}';
+      if (key == _lastActionKey) return;
+      _lastActionKey = key;
       await notifications.handleResponse(db, response);
       await reload();
       return;

@@ -40,6 +40,8 @@ Future<void> main() async {
   );
   await notifications.init(onResponse: controller.handleNotificationResponse);
   await controller.init();
+  final launch = await notifications.launchResponse();
+  if (launch != null) await controller.handleNotificationResponse(launch);
 
   runApp(
     ChangeNotifierProvider.value(value: controller, child: const NaglyApp()),

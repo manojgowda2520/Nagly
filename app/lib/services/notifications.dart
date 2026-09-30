@@ -34,20 +34,41 @@ abstract final class _IosCategory {
   static const med = 'nagly_med';
 }
 
+/// iOS suspends the app right after a background action, often before the
+/// background isolate has written anything, so actions that change data open
+/// the app and are handled by the main isolate instead.
+const _opensApp = {DarwinNotificationActionOption.foreground};
+
 final _iosCategories = [
   DarwinNotificationCategory(
     _IosCategory.water,
     actions: [
-      DarwinNotificationAction.plain(NudgeAction.add250, '+250 ml'),
-      DarwinNotificationAction.plain(NudgeAction.add500, '+500 ml'),
+      DarwinNotificationAction.plain(
+        NudgeAction.add250,
+        '+250 ml',
+        options: _opensApp,
+      ),
+      DarwinNotificationAction.plain(
+        NudgeAction.add500,
+        '+500 ml',
+        options: _opensApp,
+      ),
       DarwinNotificationAction.plain(NudgeAction.skip, 'Later'),
     ],
   ),
   DarwinNotificationCategory(
     _IosCategory.med,
     actions: [
-      DarwinNotificationAction.plain(NudgeAction.medTaken, 'Took it 💊'),
-      DarwinNotificationAction.plain(NudgeAction.medSnooze, 'Snooze 30m'),
+      DarwinNotificationAction.plain(
+        NudgeAction.medTaken,
+        'Took it 💊',
+        options: _opensApp,
+      ),
+      DarwinNotificationAction.plain(
+        NudgeAction.medSnooze,
+        'Snooze 30m',
+        options: _opensApp,
+      ),
       DarwinNotificationAction.plain(
         NudgeAction.medSkip,
         'Not today',
@@ -136,6 +157,13 @@ class NotificationService {
     for (final c in const [_waterChannel, _medChannel, _careChannel]) {
       await android?.createNotificationChannel(c);
     }
+  }
+
+  /// The action or tap that launched the app from a terminated state, if any.
+  Future<NotificationResponse?> launchResponse() async {
+    final details = await _plugin.getNotificationAppLaunchDetails();
+    if (details == null || !details.didNotificationLaunchApp) return null;
+    return details.notificationResponse;
   }
 
   Future<bool> requestPermission() async {
