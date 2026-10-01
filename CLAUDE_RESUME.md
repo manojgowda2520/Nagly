@@ -97,3 +97,9 @@ Still need: user's App Review contact info; availability (China?); version page 
 - Upload tip: `xcodebuild -exportArchive ... destination=upload` works once Xcode has an Apple account session (Validate App in Organizer refreshes it).
 - Android 1.0.1 (6) AAB built 2026-09-25 22:42; upload after Google approves the Sep 21 review.
 - If 1.0.1 still Waiting for Review on Sep 28, consider an expedited review request (deadline Sep 30).
+
+## Oct 1 afternoon (deadline extended to 2 Oct 00:30 IST)
+- Competition review: app/store/research/shipaton_gallery/ (scraper, pools, scores_*.json, Nagly_Shipaton_Review.pdf). Focus: OneSignal (#4 public) + Peace Prize; HAMM #2.
+- Devpost story: added "Who it helps", "How OneSignal brings people back", "Where to look (design)", 3 GIFs (app/store/devpost/gifs). Numbers: 46 active customers, win-back 28 users ~14% CTR, in-app 75–80%.
+- OneSignal: A/B push sent 15:45 IST (ab_tests/efe74594-e6c3-499d-91f6-8ae2d204fa45, 10+10 delivered); in-app "Hi from Nagly (everyone, once)" live; templates "Hydration check A/B".
+- Android still In review. PENDING at ~22:00 when user says "refresh": D1 proof screenshots (Journey, A/B, RevenueCat), D2 upload to gallery, D3 update numbers + A/B result in story; user edits judge answers by hand (auto-edit blocked).

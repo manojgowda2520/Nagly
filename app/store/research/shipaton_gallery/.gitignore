@@ -1,0 +1,7 @@
+# Competitor data and scores stay private (repo is public)
+*.json
+*.jsonl
+*.html
+*.pdf
+*.log
+method_note.html
