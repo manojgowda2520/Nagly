@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:in_app_review/in_app_review.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -201,7 +202,9 @@ class SettingsScreen extends StatelessWidget {
                     title: 'Manage subscription',
                     onTap: () => launchUrl(
                       Uri.parse(
-                        'https://play.google.com/store/account/subscriptions?package=com.manojbuilds.nagly',
+                        defaultTargetPlatform == TargetPlatform.iOS
+                            ? 'https://apps.apple.com/account/subscriptions'
+                            : 'https://play.google.com/store/account/subscriptions?package=com.manojbuilds.nagly',
                       ),
                       mode: LaunchMode.externalApplication,
                     ),
@@ -224,13 +227,20 @@ class SettingsScreen extends StatelessWidget {
                   emoji: '📣',
                   title: 'Tell a friend',
                   onTap: () => SharePlus.instance.share(
-                    ShareParams(text: Integrations.shareMessage),
+                    ShareParams(
+                      text: Integrations.shareMessage(
+                        ios: defaultTargetPlatform == TargetPlatform.iOS,
+                      ),
+                    ),
                   ),
                 ),
                 _Row(
                   emoji: '⭐',
                   title: 'Rate Nagly',
-                  onTap: () => InAppReview.instance.openStoreListing(),
+                  // iOS needs the App Store id, or the call silently does nothing.
+                  onTap: () => InAppReview.instance.openStoreListing(
+                    appStoreId: Integrations.appStoreId,
+                  ),
                 ),
                 _Row(
                   emoji: '✉️',

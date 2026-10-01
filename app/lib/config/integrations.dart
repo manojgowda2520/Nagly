@@ -75,6 +75,11 @@ abstract final class Integrations {
   static const String supportEmail = 'mgmanoj1481@gmail.com';
   static const String playStoreUrl =
       'https://play.google.com/store/apps/details?id=com.manojbuilds.nagly';
-  static const String shareMessage =
-      "My family nags me to drink water now. It's weirdly effective. Try Nagly: $playStoreUrl";
+  static const String appStoreId = '6814609746';
+  static const String appStoreUrl =
+      'https://apps.apple.com/app/nagly-moms-water-pill-nags/id$appStoreId';
+
+  /// Share text with the link for the store the sharer is on.
+  static String shareMessage({required bool ios}) =>
+      "My family nags me to drink water now. It's weirdly effective. Try Nagly: ${ios ? appStoreUrl : playStoreUrl}";
 }
