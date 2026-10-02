@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-import '../../config/integrations.dart';
 import '../../domain/models.dart';
 import '../../domain/mood_engine.dart';
 import '../../domain/persona_catalog.dart';
@@ -445,9 +444,7 @@ class MedicationCard extends StatelessWidget {
                 ),
                 Text(
                   paused
-                      ? Integrations.purchasesEnabled
-                            ? 'Paused — Pro keeps every reminder'
-                            : 'Paused — unlock with a short ad'
+                      ? 'Paused — Pro keeps every reminder'
                       : switch (status?.status) {
                           MedStatus.taken =>
                             'Taken at ${DateFormat.jm().format(DateTime.fromMillisecondsSinceEpoch(status!.atMs))}',

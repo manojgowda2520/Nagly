@@ -9,14 +9,15 @@ const trialMs = trialDays * 24 * 60 * 60 * 1000;
 /// Nobody should lose the reminder for their most important pill because they didn't pay.
 const freeMedicationLimit = 1;
 
-/// Unlock-table key for a 24h rewarded-ad unlock of unlimited medication reminders.
+/// Unlock-table key for a temporary (24h) unlock of unlimited medication reminders.
+/// No new ones are granted (the app has no ads); old ones simply expire.
 const medsUnlockKey = 'meds';
 
 /// Everything that decides what the user can use right now.
 ///
 /// Free forever: Mom personas, water, and one medication reminder.
 /// Full access: Pro purchase, or the 7-day app-managed welcome trial (no card).
-/// Rewarded ad: 24h unlock of one locked relationship (Dad, Grandparent, Bestie).
+/// Temporary unlocks from older versions keep working until they expire.
 class Access {
   const Access({
     required this.isPro,
@@ -80,12 +81,12 @@ class Access {
     return meds.where((m) => keep.contains(m.id)).toList();
   }
 
-  /// Expiry of a temporary ad unlock, when it's the only reason for access.
+  /// Expiry of a temporary unlock, when it's the only reason for access.
   int? adUnlockExpiry(String key) =>
       !fullAccess && _unlocked(key) ? unlocks[key] : null;
 }
 
-/// When a trial or ad unlock lapses, drop back to Mom. Returns null if nothing changes.
+/// When a trial or temporary unlock lapses, drop back to Mom. Returns null if nothing changes.
 ({Profile profile, String message})? resolvePersonaFallback(
   Profile profile,
   Access access,

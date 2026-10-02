@@ -63,11 +63,7 @@ class SettingsScreen extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          a.isPro
-                              ? 'Every voice, unlimited meds. Thank you!'
-                              : Integrations.purchasesEnabled
-                              ? 'Mom, water & 1 med or supplement free forever. Tap for Pro.'
-                              : 'Mom, water & 1 med or supplement free forever. Tap to unlock more with an ad.',
+                          a.isPro ? 'Every voice, unlimited meds. Thank you!' : 'Mom, water & 1 med or supplement free forever. Tap for Pro.',
                           style: const TextStyle(
                             fontWeight: FontWeight.w700,
                             color: NaglyColors.textSecondary,
@@ -176,42 +172,40 @@ class SettingsScreen extends StatelessWidget {
                   ),
               ],
             ),
-            if (Integrations.purchasesEnabled) ...[
-              const SectionLabel('Purchases'),
-              _Group(
-                children: [
-                  _Row(
-                    emoji: '♻️',
-                    title: 'Restore purchases',
-                    onTap: () async {
-                      final messenger = ScaffoldMessenger.of(context);
-                      final ok = await c.restore();
-                      messenger.showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            ok
-                                ? 'Pro restored 💛'
-                                : 'No previous purchase found.',
-                          ),
+            const SectionLabel('Purchases'),
+            _Group(
+              children: [
+                _Row(
+                  emoji: '♻️',
+                  title: 'Restore purchases',
+                  onTap: () async {
+                    final messenger = ScaffoldMessenger.of(context);
+                    final ok = await c.restore();
+                    messenger.showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          ok
+                              ? 'Pro restored 💛'
+                              : 'No previous purchase found.',
                         ),
-                      );
-                    },
-                  ),
-                  _Row(
-                    emoji: '🧾',
-                    title: 'Manage subscription',
-                    onTap: () => launchUrl(
-                      Uri.parse(
-                        defaultTargetPlatform == TargetPlatform.iOS
-                            ? 'https://apps.apple.com/account/subscriptions'
-                            : 'https://play.google.com/store/account/subscriptions?package=com.manojbuilds.nagly',
                       ),
-                      mode: LaunchMode.externalApplication,
+                    );
+                  },
+                ),
+                _Row(
+                  emoji: '🧾',
+                  title: 'Manage subscription',
+                  onTap: () => launchUrl(
+                    Uri.parse(
+                      defaultTargetPlatform == TargetPlatform.iOS
+                          ? 'https://apps.apple.com/account/subscriptions'
+                          : 'https://play.google.com/store/account/subscriptions?package=com.manojbuilds.nagly',
                     ),
+                    mode: LaunchMode.externalApplication,
                   ),
-                ],
-              ),
-            ],
+                ),
+              ],
+            ),
             const SectionLabel('About'),
             _Group(
               children: [

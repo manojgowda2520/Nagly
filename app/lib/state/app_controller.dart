@@ -7,7 +7,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-import '../config/integrations.dart';
 import '../data/database.dart';
 import '../domain/access.dart';
 import '../domain/history_chat.dart';
@@ -18,7 +17,6 @@ import '../domain/nudge_plan.dart';
 import '../domain/persona_catalog.dart';
 import '../domain/push_tags.dart';
 import '../domain/relationship_meter.dart';
-import '../services/ads.dart';
 import '../services/billing.dart';
 import '../services/notifications.dart';
 import '../services/push.dart';
@@ -62,14 +60,12 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
   AppController({
     required this.db,
     required this.billing,
-    required this.ads,
     required this.push,
     required this.notifications,
   });
 
   final NaglyDatabase db;
   final BillingService billing;
-  final AdService ads;
   final PushService push;
   final NotificationService notifications;
 
@@ -141,9 +137,6 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
             onAction: _onPushAction,
           )
           .catchError((Object e) => debugPrint('Push init failed: $e')),
-    );
-    unawaited(
-      ads.init().catchError((Object e) => debugPrint('Ads init failed: $e')),
     );
     permissionGranted = await notifications.permissionGranted();
     _scheduleSync();
@@ -467,7 +460,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         final departed = persona.displayName;
         profile = fallback.profile;
         await db.saveProfile(profile);
-        // When the trial ends, one sheet explains everything; otherwise (an ad unlock
+        // When the trial ends, one sheet explains everything; otherwise (a temporary unlock
         // lapsing) a small dialog does.
         if (!trialJustEnded) _emit(PersonaFallbackEvent(fallback.message));
         _departedPersona = departed;
@@ -484,7 +477,7 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
         _scheduleSync();
       }
       // An engaged free user gets one gentle offer a week.
-      if (Integrations.purchasesEnabled && !a.fullAccess && streak >= 3) {
+      if (!a.fullAccess && streak >= 3) {
         final last = await db.getInt(Keys.upsellShownAt) ?? 0;
         if (now.millisecondsSinceEpoch - last > 7 * 24 * 60 * 60 * 1000) {
           await db.setInt(Keys.upsellShownAt, now.millisecondsSinceEpoch);
@@ -637,14 +630,6 @@ class AppController extends ChangeNotifier with WidgetsBindingObserver {
     } else {
       await db.logMed(med.id, todayKey, status);
     }
-    await _changed();
-  }
-
-  Future<void> grantAdUnlock(String key) async {
-    await db.grantUnlock(
-      key,
-      DateTime.now().millisecondsSinceEpoch + tempUnlockMs,
-    );
     await _changed();
   }
 

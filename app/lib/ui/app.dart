@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../config/integrations.dart';
 import '../domain/models.dart';
 import '../services/push.dart';
 import '../state/app_controller.dart';
@@ -153,9 +152,7 @@ class _MainShellState extends State<MainShell> {
                   Navigator.pop(ctx);
                   openPaywall(ctx, placement: 'persona_expired');
                 },
-                child: Text(
-                  Integrations.purchasesEnabled ? 'Keep them' : 'Watch an ad',
-                ),
+                child: const Text('Keep them'),
               ),
             ],
           ),
@@ -271,20 +268,12 @@ class _MainShellState extends State<MainShell> {
   }
 }
 
-/// Opens the paywall — or, in Plan B (no purchases), the rewarded-ad unlock sheet.
+/// Opens the paywall for [placement].
 void openPaywall(
   BuildContext context, {
   required String placement,
   String? relationshipId,
 }) {
-  if (!Integrations.purchasesEnabled) {
-    showAdUnlockHub(
-      context,
-      focusRelationshipId: relationshipId,
-      medsFirst: placement == 'medication_limit',
-    );
-    return;
-  }
   Navigator.of(context).push(
     MaterialPageRoute<void>(
       fullscreenDialog: true,

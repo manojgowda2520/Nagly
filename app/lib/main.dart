@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 
 import 'config/integrations.dart';
 import 'data/database.dart';
-import 'services/ads.dart';
 import 'services/billing.dart';
 import 'services/notifications.dart';
 import 'services/push.dart';
@@ -31,9 +30,6 @@ Future<void> main() async {
     billing: Integrations.useRevenueCat
         ? RevenueCatBillingService()
         : FakeBillingService(db),
-    ads: Integrations.useAdMob
-        ? AdMobAdService(trackWithRevenueCat: Integrations.useRevenueCat)
-        : FakeAdService(),
     push: Integrations.useOneSignal
         ? OneSignalPushService()
         : FakePushService(),

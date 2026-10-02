@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../config/integrations.dart';
 
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -15,7 +14,7 @@ import '../widgets/common.dart';
 import '../widgets/persona_widgets.dart';
 import 'sheets.dart';
 
-/// Two-step picker: relationship → voice. Locked voices open the rewarded-ad unlock.
+/// Two-step picker: relationship → voice. Locked voices open the paywall.
 class PersonasScreen extends StatefulWidget {
   const PersonasScreen({super.key});
 
@@ -50,13 +49,7 @@ class _PersonasScreenState extends State<PersonasScreen> {
                   ? 'Pro — every voice is yours 💛'
                   : access.inTrial
                   ? 'Everyone is free for ${access.trialDaysLeft} more day${access.trialDaysLeft == 1 ? '' : 's'}'
-                  : switch (Integrations.monetizationMode) {
-                      MonetizationMode.payments =>
-                        'Mom is free forever. Go Pro for everyone else.',
-                      MonetizationMode.ads =>
-                        'Mom is free forever. Others: watch an ad for 24h.',
-                      MonetizationMode.both => 'Mom is free forever. Others: watch an ad for 24h, or go Pro.',
-                    },
+                  : 'Mom is free forever. Go Pro for everyone else.',
               style: const TextStyle(
                 fontWeight: FontWeight.w800,
                 color: NaglyColors.textSecondary,
@@ -135,7 +128,7 @@ class _PersonasScreenState extends State<PersonasScreen> {
               Padding(
                 padding: const EdgeInsets.only(bottom: 10),
                 child: Tag(
-                  '⏳ Unlocked by ad · ${countdownLabel(adExpiry, c.now.millisecondsSinceEpoch)}',
+                  '⏳ Unlocked · ${countdownLabel(adExpiry, c.now.millisecondsSinceEpoch)}',
                   color: NaglyColors.primaryDeep,
                 ),
               ),

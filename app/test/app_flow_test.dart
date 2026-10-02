@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:nagly/config/integrations.dart';
 import 'package:nagly/data/database.dart';
 import 'package:nagly/ui/screens/settings_screen.dart';
 import 'package:nagly/domain/models.dart';
-import 'package:nagly/services/ads.dart';
 import 'package:nagly/services/billing.dart';
 import 'package:nagly/services/notifications.dart';
 import 'package:nagly/services/push.dart';
@@ -43,7 +41,6 @@ Future<(AppController, NaglyDatabase, FakeNotifications)> _boot(
   final c = AppController(
     db: db,
     billing: FakeBillingService(db),
-    ads: FakeAdService(),
     push: FakePushService(),
     notifications: notifications,
   );
@@ -297,81 +294,28 @@ void main() {
     await _teardown(tester, c);
   });
 
-  testWidgets('locked persona → rewarded ad unlocks the relationship for 24h', (
-    tester,
-  ) async {
-    Integrations.monetizationMode = MonetizationMode.both;
-    addTearDown(
-      () => Integrations.monetizationMode = MonetizationMode.payments,
-    );
-    final (c, db, _) = await _boot(tester);
-    await c.finishOnboarding(const Profile());
-    await c.sandboxExpireTrial();
-    await tester.pump(const Duration(seconds: 1));
-    await tester.pump(const Duration(seconds: 1));
-    await _pumpUntil(tester, find.text('Keep free (water + 1 reminder)'));
-    await _tap(tester, find.text('Keep free (water + 1 reminder)'));
-    await _tap(tester, find.text('Personas'));
-    await _tap(tester, find.text('Bestie'));
-    await _tap(tester, find.text('The Bestie'));
-    expect(find.text('Watch ad · unlock 24h'), findsOneWidget);
-    await _tap(tester, find.text('Watch ad · unlock 24h'));
-    expect(find.text('Sandbox ad'), findsOneWidget);
-    await tester.pump(const Duration(seconds: 6));
-    await tester.pump(const Duration(seconds: 1));
-    expect(c.profile.personaId, 'the_bestie');
-    expect(c.access.relationshipAccessible('bestie'), isTrue);
-    expect(c.access.relationshipAccessible('dad'), isFalse);
-
-    await _teardown(tester, c);
-  });
-
   testWidgets(
-    'Plan B (no purchases): paywall becomes ad-unlock hub; ad unlocks extra meds',
+    'locked persona after the trial opens the paywall (no ads anywhere)',
     (tester) async {
-      Integrations.purchasesEnabled = false;
-      addTearDown(() => Integrations.purchasesEnabled = true);
       final (c, _, _) = await _boot(tester);
-      await c.addMedication('A', 8, 0);
-      await c.addMedication('B', 20, 0);
-      await c.finishOnboarding(const Profile(careMode: CareMode.medication));
+      await c.finishOnboarding(const Profile());
       await c.sandboxExpireTrial();
       await tester.pump(const Duration(seconds: 1));
       await tester.pump(const Duration(seconds: 1));
-      await _pumpUntil(tester, find.text('Unlock with a short ad'));
+      await _pumpUntil(tester, find.text('See plans'));
       expect(
-        find.text('Unlock with a short ad'),
-        findsOneWidget,
-        reason: 'trial-ended sheet offers ads, not plans',
+        find.textContaining(RegExp(r'\b[Aa]ds?\b')),
+        findsNothing,
+        reason: 'trial-ended sheet offers plans, never an ad',
       );
-      await _tap(tester, find.text('Unlock with a short ad'));
-      await _pumpUntil(tester, find.text('🎁 Unlock with a short ad'));
-      expect(find.text('🎁 Unlock with a short ad'), findsOneWidget);
-      expect(find.text('Go Pro'), findsNothing);
-      expect(c.activeMeds.length, 1);
-      await _tap(tester, find.text('Unlimited meds & supplements'));
-      expect(find.text('Sandbox ad'), findsOneWidget);
-      await tester.pump(const Duration(seconds: 6));
-      await tester.pump(const Duration(seconds: 1));
-      expect(c.activeMeds.length, 2);
-      expect(c.access.canAddMedication(2), isTrue);
+      await _tap(tester, find.text('Keep free (water + 1 reminder)'));
+      await _tap(tester, find.text('Personas'));
+      await _tap(tester, find.text('Bestie'));
+      await _tap(tester, find.text('The Bestie'));
+      await _pumpUntil(tester, find.text('Keep Bestie around'));
+      expect(find.text('Keep Bestie around'), findsOneWidget);
+      expect(c.access.relationshipAccessible('bestie'), isFalse);
       await _teardown(tester, c);
     },
   );
-
-  test('remote monetization_mode switch', () {
-    addTearDown(
-      () => Integrations.monetizationMode = MonetizationMode.payments,
-    );
-    expect(Integrations.purchasesEnabled, isTrue);
-    expect(Integrations.adsEnabled, isFalse);
-    Integrations.applyRemoteMode('ads');
-    expect(Integrations.purchasesEnabled, isFalse);
-    expect(Integrations.adsEnabled, isTrue);
-    Integrations.applyRemoteMode('both');
-    expect(Integrations.purchasesEnabled, isTrue);
-    expect(Integrations.adsEnabled, isTrue);
-    Integrations.applyRemoteMode('nonsense');
-    expect(Integrations.monetizationMode, MonetizationMode.both);
-  });
 }
