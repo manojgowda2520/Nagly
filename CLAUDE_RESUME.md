@@ -103,3 +103,10 @@ Still need: user's App Review contact info; availability (China?); version page 
 - Devpost story: added "Who it helps", "How OneSignal brings people back", "Where to look (design)", 3 GIFs (app/store/devpost/gifs). Numbers: 46 active customers, win-back 28 users ~14% CTR, in-app 75–80%.
 - OneSignal: A/B push sent 15:45 IST (ab_tests/efe74594-e6c3-499d-91f6-8ae2d204fa45, 10+10 delivered); in-app "Hi from Nagly (everyone, once)" live; templates "Hydration check A/B".
 - Android still In review. PENDING at ~22:00 when user says "refresh": D1 proof screenshots (Journey, A/B, RevenueCat), D2 upload to gallery, D3 update numbers + A/B result in story; user edits judge answers by hand (auto-edit blocked).
+
+## Oct 2 (after Shipaton deadline)
+- iOS 1.0.4 (9) LIVE (Settings fixes). iOS 1.0.5 (10) uploaded, ON HOLD (no user-visible change).
+- Ads removed from the app entirely (commit 2409e5b): iPhone and Android now build from the same payments-only code.
+- Android: 1.0.5 (10) submitted for review on Production + Closed testing (Alpha); Ads declaration -> No.
+  Internal testing has 1.0.5 as a draft. AFTER APPROVAL: set App content -> Advertising ID -> No and submit.
+- Final competition report: ~/Desktop/Shipaton-2026-Nagly-Awards-FINAL-After-Deadline.pdf (private; scores other teams).
