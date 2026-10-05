@@ -128,3 +128,10 @@ Still need: user's App Review contact info; availability (China?); version page 
   3. Shipaton Sale form: advised skipping.
 - Rules still apply: Claude never handles passwords/secret keys, asks before submit/publish/push, no incentivized reviews,
   competitor scores stay private (app/store/research/shipaton_gallery/final/ is untracked on purpose).
+
+## Oct 5 (new Claude account)
+- Android 1.0.5 (10) APPROVED and LIVE: Production full rollout (178 countries) + Closed testing Alpha, published Oct 5 11:47.
+  Internal-testing 1.0.5 draft left unpublished (not needed).
+- Play App content -> Advertising ID set to "No" (1.0.5 merged manifest has no AD_ID permission). Play lists it under
+  "What you've told us"; "Send for review" stays disabled because a declaration alone needs no review — it is applied with the next release.
+- Next: App Store ASO text with iOS 1.0.5 (10), needs user OK + ASC login in Chrome.
