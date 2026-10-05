@@ -2,7 +2,7 @@
 
 Say to Claude Code: **"Read CLAUDE_RESUME.md and docs/claude-memory/, then continue."**
 
-## LATEST — 2026-09-30 evening IST (Shipaton deadline: Oct 1, 12:15 PM IST)
+## 2026-09-30 evening IST (older — see "Oct 4–5" at the bottom for latest)
 - **iOS 1.0.3 (8)** submitted to App Review, auto-release. Fix: lock-screen buttons open the app so taps save
   (commit 1cae2b4, local only, not pushed). Needs a real-device check of "Took it" from the lock screen (TestFlight).
 - **YouTube LIVE (Oct 1): https://youtu.be/cYa6-qM5r9I** (channel mj manoj) = Nagly_demo_v2.mp4 with music lowered (MUSIC_VOL 0.14). Thumbnail: app/store/youtube/Nagly_thumbnail.png. **Devpost SUBMITTED (Oct 1 ~01:00 IST)**: https://devpost.com/software/nagly-reminders-that-sound-like-mom (video embedded, wording fixed).
@@ -110,3 +110,21 @@ Still need: user's App Review contact info; availability (China?); version page 
 - Android: 1.0.5 (10) submitted for review on Production + Closed testing (Alpha); Ads declaration -> No.
   Internal testing has 1.0.5 as a draft. AFTER APPROVAL: set App content -> Advertising ID -> No and submit.
 - Final competition report: ~/Desktop/Shipaton-2026-Nagly-Awards-FINAL-After-Deadline.pdf (private; scores other teams).
+
+## Oct 4–5 (switching Claude account again — START HERE)
+- Status: Shipaton judging Oct 1–13, winners Oct 21. Internal hackathon done (no win).
+- OneSignal health check (Oct 4): WORKING. Win-back 1 sent Oct 4 8:02 AM (28 sent, 25 delivered, 8% CTR; Android 13 / iOS 12);
+  Win-back 2 8:04 AM (21 delivered, 9.5%); Trial-ending Oct 2 (11 delivered). In-app "Hi from Nagly" 20 impressions 75% CTR,
+  "Welcome back" 7 at 85.7%. A/B: gentle 1/10 clicks vs guilt 0/10. Only failure = simulator test device (BadEnvironmentKeyInToken).
+  Streak 3/7 Journeys: 0 sends (no user at a streak yet) — normal.
+- Best award chance (my judge-style estimate): OneSignal (2nd–3rd), then Peace/HAMM. Catvertising out (ads removed).
+- PENDING:
+  1. Android 1.0.5 review — when approved: Play Console App content -> Advertising ID -> "No", submit; check store page shows
+     no "Contains ads"; optionally publish internal-testing 1.0.5 draft.
+  2. App Store ASO (needs user OK + ASC login): subtitle "Hydration & Medicine Reminder"; keywords
+     "drink,tracker,medication,vitamin,supplement,creatine,protein,dose,tablet,parents,family,habit,bp"; promo text
+     "One tap on the reminder logs your water or pill. No ads, ever. Mom's voice, water tracking and your most important pill reminder stay free forever.";
+     description "LOG WITHOUT OPENING THE APP" -> "ONE TAP ON THE REMINDER". Ship with iOS 1.0.5 (10), currently ON HOLD.
+  3. Shipaton Sale form: advised skipping.
+- Rules still apply: Claude never handles passwords/secret keys, asks before submit/publish/push, no incentivized reviews,
+  competitor scores stay private (app/store/research/shipaton_gallery/final/ is untracked on purpose).

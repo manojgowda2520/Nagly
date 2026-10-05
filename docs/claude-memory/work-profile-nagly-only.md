@@ -12,3 +12,5 @@ In the Work Chrome profile, work only inside the Nagly app (Play Console app 497
 
 **Why:** that profile is the user's work account with other company apps and mail in it.
 **How to apply:** stay on Nagly app URLs only. Reading the developer account type is fine if needed for Nagly, but never change account-level settings. Ask before accepting terms/declarations. See [[nagly-user-workflow]].
+
+**Update 2026-09-21:** after the Claude account switch, the user also signed in to Play Console (org account) in their **personal** Chrome profile. Use personal Chrome for Play Console now. The same Nagly-only rule applies there.

@@ -2,3 +2,6 @@
 - [Nagly builder workflow](nagly-user-workflow.md) — hands-off user, voice-to-text, git identity
 - [Work profile: Nagly only](work-profile-nagly-only.md) — in Work Chrome/Play Console touch only the Nagly app
 - [Nagly Play Console](nagly-play-console.md) — org account, IDs, setup tasks done, not yet sent for review
+- [Nagly iOS no ads](nagly-ios-no-ads.md) — no ads on any platform since 1.0.5 (Oct 2); payments only
+- [Nagly video rules](nagly-video-rules.md) — realism rules for the demo video (no fake features, open glass, notification first)
+- [Nagly Shipaton submitted](nagly-shipaton-submitted.md) — submitted Oct 1, video/Devpost links, internal hackathon done (no win); Android 1.0.5 in review
