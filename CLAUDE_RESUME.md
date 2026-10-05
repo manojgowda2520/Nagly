@@ -135,3 +135,8 @@ Still need: user's App Review contact info; availability (China?); version page 
 - Play App content -> Advertising ID set to "No" (1.0.5 merged manifest has no AD_ID permission). Play lists it under
   "What you've told us"; "Send for review" stays disabled because a declaration alone needs no review — it is applied with the next release.
 - Next: App Store ASO text with iOS 1.0.5 (10), needs user OK + ASC login in Chrome.
+- Oct 5: Play store page checked: no "Contains ads". Play DESCRIPTION is stale (says "watch a short ad", "12 voices, 4 families");
+  corrected draft in app/store/listing/play_description_1.0.5.txt, waiting for user OK to save + send for review.
+- Oct 5: App Store promotional text set on live 1.0.4 (no review). iOS 1.0.5 version created and SAVED, not submitted:
+  build 10, subtitle "Hydration & Medicine Reminder", new keywords, description "ONE TAP ON THE REMINDER" + "NO ADS",
+  What's New "Small improvements and fixes. Nagly stays ad-free…", auto-release. Needs user OK -> Add for Review -> Submit.
