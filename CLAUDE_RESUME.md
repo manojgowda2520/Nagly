@@ -140,3 +140,6 @@ Still need: user's App Review contact info; availability (China?); version page 
 - Oct 5: App Store promotional text set on live 1.0.4 (no review). iOS 1.0.5 version created and SAVED, not submitted:
   build 10, subtitle "Hydration & Medicine Reminder", new keywords, description "ONE TAP ON THE REMINDER" + "NO ADS",
   What's New "Small improvements and fixes. Nagly stays ad-free…", auto-release. Needs user OK -> Add for Review -> Submit.
+- Oct 5 evening: SUBMITTED iOS 1.0.5 (10) -> Waiting for Review (auto-release). Play: internal testing now 1.0.5
+  (old 1.0.0 build 1 with ad SDK replaced; that build blocked sends with "Incomplete advertising ID declaration"),
+  and the corrected Play full description is "Changes in review". Play Console for Mobil80 is Google account /u/1/ in Chrome.
