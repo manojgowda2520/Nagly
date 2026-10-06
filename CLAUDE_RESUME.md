@@ -143,3 +143,5 @@ Still need: user's App Review contact info; availability (China?); version page 
 - Oct 5 evening: SUBMITTED iOS 1.0.5 (10) -> Waiting for Review (auto-release). Play: internal testing now 1.0.5
   (old 1.0.0 build 1 with ad SDK replaced; that build blocked sends with "Incomplete advertising ID declaration"),
   and the corrected Play full description is "Changes in review". Play Console for Mobil80 is Google account /u/1/ in Chrome.
+- Oct 6: iOS 1.0.5 (10) APPROVED and LIVE (subtitle "Hydration & Medicine Reminder", "ONE TAP ON THE REMINDER", promo text).
+  Play description + Advertising ID still "in review".
